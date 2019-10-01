@@ -31,10 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.CompassSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -53,12 +51,11 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class Freik_Test_Compass extends LinearOpMode {
+public class Freik_Test_Motor extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    //private DcMotor leftDrive = null;
-    private CompassSensor compassSensor = null;
+    private DcMotor motor = null;
 
     @Override
     public void runOpMode() {
@@ -68,36 +65,35 @@ public class Freik_Test_Compass extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        /*
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-        */
-        compassSensor = hardwareMap.get(CompassSensor.class, "TestCompass");
+
+        motor = hardwareMap.get(DcMotor.class, "motor");
+
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        /*
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        */
 
+        motor.setDirection(DcMotor.Direction.FORWARD);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
+        double power = -.25, inc = .05;
+        double last = runtime.milliseconds();
         // run until the end of the match (driver presses STOP)
-        do {
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double direction;
-
-            direction = compassSensor.getDirection();
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
+        while(opModeIsActive()) {
+            // Every 250 ms, update the power rating
+            if (runtime.milliseconds() - last > 250) {
+                last = runtime.milliseconds();
+                motor.setPower(power);
+                power +=  inc;
+                if (power < -.799) {
+                    inc = .05;
+                } else if (power > .799) {
+                    inc = -.05;
+                }
+            }
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Direction", "Compass:%.2f", direction);
-//            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Power", "%.2f", power);
             telemetry.update();
-        } while (opModeIsActive());
+        }
     }
 }
