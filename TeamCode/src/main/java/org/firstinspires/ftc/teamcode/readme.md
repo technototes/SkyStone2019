@@ -1,3 +1,13 @@
+# A Quick Look Around
+
+Hi, folks. You'll see the interface for the Robot in `Robot.java` file. The controller is
+in, surprisingly enough the `Controller.java` file. The `SkeletonCode.java` file contains
+the work we've done thus far.
+
+Most all the rest of the files are "Enumerations". Enum's are useful to make your code more
+readable, and also make sure you don't screw things up by using the wrong numbers. Numbers
+in code are generally a bad idea if they're actually trying to convey "intent".
+
 ## TeamCode Module
 
 Welcome!
