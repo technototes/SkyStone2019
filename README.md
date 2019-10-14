@@ -1,3 +1,9 @@
+## SKYSTONE 2019
+
+This repository is a fork of [new SKYSTONE repository](https://github.com/FIRST-Tech-Challenge/SKYSTONE). This repository contains FTC team 16750's code for the 2019-2020 season. 
+
+The original README information is below:
+
 ## NOTICE
 
 This repository contains the public FTC SDK for the SKYSTONE (2019-2020) competition season.  
