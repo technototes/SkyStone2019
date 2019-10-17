@@ -1,6 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 public class Controller {
+  private Controller pad = null;
+
+  public Controller() {
+    //pad = TODO();//
+  }
+
   Direction dpad() {
     return Direction.None;
   }
