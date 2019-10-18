@@ -6,17 +6,21 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Basic: Robot op mode", group="Linear Opmode")
+@TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class Robot extends LinearOpMode {
 
   private DcMotor linearSlideMotor = null;
+  private DcMotor flMotor = null;
+  private DcMotor frMotor = null;
+  private DcMotor rlMotor = null;
+  private DcMotor rrMotor = null;
   private Servo grab = null;
   private Servo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
   private ElapsedTime runtime = new ElapsedTime();
-
 
   public Robot() {
     linearSlideMotor = hardwareMap.get(DcMotor.class, "lslide");
@@ -24,6 +28,11 @@ public class Robot extends LinearOpMode {
     claw = hardwareMap.get(Servo.class, "claw");
     extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
+
+    flMotor = hardwareMap.get(DcMotor.class, "flMotor");
+    frMotor = hardwareMap.get(DcMotor.class, "frMotor");
+    rlMotor = hardwareMap.get(DcMotor.class, "rlMotor");
+    rrMotor = hardwareMap.get(DcMotor.class, "rrMotor");
   }
 
   @Override
@@ -35,9 +44,11 @@ public class Robot extends LinearOpMode {
   public boolean isLinearSlideFullyExtended() {
     return extended.isPressed();
   }
+
   public boolean isLinearSlideFullyRetracted() {
     return retracted.isPressed();
   }
+
   public void lslide(LinearSlideOperation dir) {
     // Set the linear slide motor to the position
     if (dir == LinearSlideOperation.Extend) {
@@ -55,14 +66,40 @@ public class Robot extends LinearOpMode {
       //claw.
     }
   }
+
   public GrabberPosition getGrabberPosition() {
     return GrabberPosition.Horizontal;
   }
+
   public void setGrabberPosition(GrabberPosition position) {
   }
 
   // Lift stuff:
-  public void fourBarMotor(FourBarDirection dir) {}
-  public boolean isFourBarUpperLimit() { return false; }
-  public boolean isFourBarLowerLimit() { return false; }
+  public void fourBarMotor(FourBarDirection dir) {
+  }
+
+  public boolean isFourBarUpperLimit() {
+    return false;
+  }
+
+  public boolean isFourBarLowerLimit() {
+    return false;
+  }
+
+  // Drive train:
+  public void motorFrontLeft(double power) {
+    flMotor.setPower(Range.clip(power, -1, 1));
+  }
+
+  public void motorFrontRight(double power) {
+    frMotor.setPower(power);
+  }
+
+  public void motorRearLeft(double power) {
+    rlMotor.setPower(power);
+  }
+
+  public void motorRearRight(double power) {
+    rrMotor.setPower(power);
+  }
 }
