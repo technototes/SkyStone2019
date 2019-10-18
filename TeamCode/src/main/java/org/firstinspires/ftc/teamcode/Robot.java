@@ -102,4 +102,8 @@ public class Robot extends LinearOpMode {
   public void motorRearRight(double power) {
     rrMotor.setPower(power);
   }
+  public double gyro(){
+    return 0.0;
+    //TODO
+  }
 }
