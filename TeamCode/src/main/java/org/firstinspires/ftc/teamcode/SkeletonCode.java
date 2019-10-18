@@ -26,7 +26,7 @@ public class SkeletonCode {
   void linearSlide() {
     while (true) { // the robot over the baseplate :)
       Direction dpadDirection = control.dpad();
-      if (dpadDirection == Direction.Right) {
+      if (dpadDirection.isRight()) {
         if (robot.isLinearSlideFullyExtended() == true) {
           robot.lslide(LinearSlideOperation.Off);
         } else if (robot.isLinearSlideFullyRetracted() == true) {
@@ -34,7 +34,7 @@ public class SkeletonCode {
         } else {
           robot.lslide(LinearSlideOperation.Extend);
         }
-      } else if (dpadDirection == Direction.Left) {
+      } else if (dpadDirection.isLeft()) {
         if (robot.isLinearSlideFullyExtended() == true) {
           robot.lslide(LinearSlideOperation.Off);
         } else if (robot.isLinearSlideFullyRetracted() == true) {
@@ -49,7 +49,7 @@ public class SkeletonCode {
   void lift() {
     while (true) {
       Direction dir = control.lstick();
-      if (dir == Direction.Up) {
+      if (dir.isUp()){
         // Pushed up:
         if (robot.isFourBarUpperLimit() == true) {
           // HIT THEM LIMIT!
@@ -58,7 +58,7 @@ public class SkeletonCode {
           robot.fourBarMotor(FourBarDirection.Up);
         }
       }
-      if (dir == Direction.Down) {
+      if (dir.isDown()) {
         // Pushed down
         if (robot.isFourBarLowerLimit() == true) {
           robot.fourBarMotor(FourBarDirection.Off);
