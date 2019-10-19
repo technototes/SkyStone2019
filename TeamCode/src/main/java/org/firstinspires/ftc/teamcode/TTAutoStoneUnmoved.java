@@ -17,7 +17,6 @@ public class TTAutoStoneUnmoved extends Robot {
         INITIALIZE,
 
         LINE_UP_STONE,
-        MOVE_TO_STONE,
         PICK_UP_STONE,
 
         GO_TO_BASE_PLATE,
@@ -84,6 +83,7 @@ public class TTAutoStoneUnmoved extends Robot {
                     case LINE_UP_STONE:
                         telemetry.addData("state", currentState.toString());
                         runtime.reset();
+                        //deciding which position to go to depending on where the stone is
                         if (SkyStonePos.equals(SkyStonePos.OneAndFour)) {
                             timeDrive(x, y, z);
                             gyroHold(x, y, z);
@@ -100,10 +100,45 @@ public class TTAutoStoneUnmoved extends Robot {
                             case PICK_UP_STONE:
                                 telemetry.addData("state", currentState.toString());
                                 runtime.reset();
-                                robot.linearSlideMotor.setPower(x);
-                                robot..setPower(x);
-
+                                //positioning the attachments to collect the stone
+                                robot.slide.setPower(x);
+                                robot.liftMotor.setPower(x);
+                                robot.claw.setPosition(x);
+                                robot.liftMotor.setPower(x);
                         }
+                        switch (currentState) {
+                            case GO_TO_BASE_PLATE:
+                                telemetry.addData("state", currentState.toString());
+                                runtime.reset();
+                                //driving to the baseplate
+                                timeDrive(x, y, z);
+                                distDriveRear(x, y, z);
+                                timeDrive(x, y, z);
+                        }
+                        switch (currentState) {
+                            case PLACE_STONE:
+                                telemetry.addData("state", currentState.toString());
+                                runtime.reset();
+                                robot.liftMotor.setPower(x);
+                                robot.claw.setPosition(x);
+                                robot.liftMotor.setPower(x);
+                                timeDrive(x, y, z);
+                                robot.liftMotor.setPower(x);
+                                robot.claw.setPosition(x);
+                                timeDrive(x, y, z);
+                                robot.claw.setPosition(x);
+                                robot.liftMotor.setPower(x);
+                        }
+                        switch (currentState) {
+                            case MOVE_BASE_PLATE:
+                                telemetry.addData("state", currentState.toString());
+                                runtime.reset();
+                                robot.BPGrabber.setPostition(x);
+                                timeDrive(x, y, z);
+                                robot.BPGrabber.setPostition(x);
+
+                                }
+
                 }
             }
         }
