@@ -6,13 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.*;
 
 public class XDrive {
-    public static final double SCALEFACTOR = 0.2;//turn speed factor
-    public double joystickAngle;//input from joystick
-    public double dangle;//travel angle DO NOT SET
-    public double sangle;//gyro-sensor angle
-    public double power ;
-    public Robot robot;
-    public Controller controller;
+    public static final double SCALEFACTOR = 0.5;//turn speed factor
+    private Robot robot;
+    private Controller controller;
     /*
      fl  +-------+  fr
         /         \
@@ -29,41 +25,39 @@ public class XDrive {
     public static double frPower;
     public static double rrPower;
     public static double rlPower;
-    public static double turn;
-    public void drive() {
-        while(true) {
-            readController();
-            setDriveMotorPower();
-            //something like this
-            robot.motorFrontLeft(flPower);
-            robot.motorFrontRight(frPower);
-            robot.motorRearLeft(rlPower);
-            robot.motorRearRight(rrPower);
-        }
-
+    public static double tturn;
+    //leave gyroAngle at zero to set relative angle
+    public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
+        tturn = turn*SCALEFACTOR;
+        double angle = joystickAngle+robot.gyro();
+        flPower = power*Math.cos((angle-45)/(180/Math.PI))+tturn;
+        frPower = -power*Math.cos((angle+45)/(180/Math.PI))+tturn;
+        rrPower = -power*Math.cos((angle-45)/(180/Math.PI))+tturn;
+        rlPower = power*Math.cos((angle+45)/(180/Math.PI))+tturn;
+        robot.motorFrontLeft(flPower);
+        robot.motorFrontRight(frPower);
+        robot.motorRearLeft(rlPower);
+        robot.motorRearRight(rrPower);
     }
-    public void setDriveMotorPower() {
-        dangle = joystickAngle+robot.gyro();
-        flPower = power*Math.cos((dangle-45)/(180/Math.PI))+turn;
-        frPower = -power*Math.cos((dangle+45)/(180/Math.PI))+turn;
-        rrPower = -power*Math.cos((dangle-45)/(180/Math.PI))+turn;
-        rlPower = power*Math.cos((dangle+45)/(180/Math.PI))+turn;
-    }
-    public void readController() {
-        Button left = controller.lbump();
-        Button right = controller.rbump();
-        if(left != right) {
-            if(left == Button.Pressed) {
-                turn = -1;
-            }else {
-                turn = 1;
+    //set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and input angle to snap to.
+    public double snapToAngle(boolean nearestSnap, double gyroAngle, double snapTo){
+        double test = 0;
+        if(nearestSnap){
+            if(gyroAngle>50&&gyroAngle<130){
+                return 90;
             }
+            if(gyroAngle>140&&gyroAngle<220){
+                return 180;
+            }
+            if(gyroAngle>230&&gyroAngle<310){
+                return 270;
+            }
+            if((gyroAngle>=0&&gyroAngle<40)|| (gyroAngle>320&&gyroAngle<=360)){
+                return 0;
+            }
+        }else{
+
         }
-        turn *= SCALEFACTOR;
-        Direction j = controller.rstick();
-        double hypotenuse = Functions.pyt(j.X, j.X);
-        power = Range.clip(hypotenuse, -1.0, 1.0);
-        joystickAngle = Math.acos(j.X/hypotenuse);
     }
 }
 

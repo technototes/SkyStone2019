@@ -11,11 +11,12 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class Robot extends LinearOpMode {
 
-  private DcMotor linearSlideMotor = null;
+  private Servo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
   private DcMotor rlMotor = null;
   private DcMotor rrMotor = null;
+  private DcMotor liftMotor = null;
   private Servo grab = null;
   private Servo claw = null;
   private TouchSensor extended = null;
@@ -23,7 +24,7 @@ public class Robot extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
 
   public Robot() {
-    linearSlideMotor = hardwareMap.get(DcMotor.class, "lslide");
+    slide = hardwareMap.get(Servo.class, "lslide");
     grab = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
     extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
@@ -33,6 +34,7 @@ public class Robot extends LinearOpMode {
     frMotor = hardwareMap.get(DcMotor.class, "frMotor");
     rlMotor = hardwareMap.get(DcMotor.class, "rlMotor");
     rrMotor = hardwareMap.get(DcMotor.class, "rrMotor");
+    liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
   }
 
   @Override
@@ -49,16 +51,16 @@ public class Robot extends LinearOpMode {
     return retracted.isPressed();
   }
 
-  public void lslide(LinearSlideOperation dir) {
+  /*public void lslide(LinearSlideOperation dir) {
     // Set the linear slide motor to the position
     if (dir == LinearSlideOperation.Extend) {
       // TODO: This is probably wrong & silly
-      linearSlideMotor.setPower(1.0);
+      slide.setPower(1.0);
     } else if (dir == LinearSlideOperation.Retract) {
       // TODO: This is probably wrong & silly
-      linearSlideMotor.setPower(-1.0);
+      slide.setPower(-1.0);
     }
-  }
+  }*/
 
   // Grabber stuff:
   public void grabberClutch(GrabberMotorOperation operation) {
@@ -87,20 +89,23 @@ public class Robot extends LinearOpMode {
   }
 
   // Drive train:
+
   public void motorFrontLeft(double power) {
     flMotor.setPower(Range.clip(power, -1, 1));
   }
 
   public void motorFrontRight(double power) {
-    frMotor.setPower(power);
+    frMotor.setPower(Range.clip(power, -1, 1));
   }
 
   public void motorRearLeft(double power) {
-    rlMotor.setPower(power);
+    rlMotor.setPower(Range.clip(power, -1, 1));
   }
 
-  public void motorRearRight(double power) {
-    rrMotor.setPower(power);
+  public void motorRearRight(double power) { rrMotor.setPower(Range.clip(power, -1, 1)); }
+
+  public void motorLift(double power) {
+    liftMotor.setPower(power);
   }
   public double gyro(){
     return 0.0;
