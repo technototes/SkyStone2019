@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.*;
 
 import org.firstinspires.ftc.robotcore.external.Func;
 
-public class XDrive {
+public class XDrive extends Robot{
     public static final double SCALEFACTOR = 0.5;//turn speed factor
     private Robot robot;
     private Controller controller;
@@ -69,6 +69,54 @@ public class XDrive {
             test = gyroAngle;
         }
         return test;
+    }
+    public void timeDrive ( double speed, double time, double angle) {
+        ElapsedTime driveTime = new ElapsedTime();
+        double robotHeadingRad = 0.0;
+        double angleRad = Math.toRadians(angle);
+        double powerCompY = 0.0;
+        double powerCompX = 0.0;
+
+        double  frontLeftSpeed;
+        double  frontRightSpeed;
+        double  rearLeftSpeed;
+        double  rearRightSpeed;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+            driveTime.reset();
+
+            speed = Range.clip(speed, 0.0, 1.0);
+//            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+            robotHeadingRad = Math.toRadians(robot.gyro());
+            powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+            powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+
+            frontLeftSpeed = powerCompY + powerCompX;
+            frontRightSpeed = -powerCompY + powerCompX;
+            rearLeftSpeed = powerCompY - powerCompX;
+            rearRightSpeed = -powerCompY - powerCompX;
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() && driveTime.seconds() < time) {
+                robot.motorFrontLeft(frontLeftSpeed);
+                robot.motorFrontRight(frontRightSpeed);
+                robot.motorRearLeft(rearLeftSpeed);
+                robot.motorRearRight(rearRightSpeed);
+
+                // Display drive status for the driver.
+                //telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+                //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
+                //telemetry.addData("Gyro", "Heading: " + getRobotHeading());
+                //telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.motorFrontLeft(0);
+            robot.motorFrontRight(0);
+            robot.motorRearLeft(0);
+            robot.motorRearRight(0);
+        }
     }
 }
 
