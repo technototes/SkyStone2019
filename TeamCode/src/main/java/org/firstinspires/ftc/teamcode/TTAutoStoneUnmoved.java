@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import java.util.List;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -79,67 +77,59 @@ public class TTAutoStoneUnmoved extends Robot {
 
                     currentState = AutoState.LINE_UP_STONE;
                     break;
-                switch (currentState) {
-                    case LINE_UP_STONE:
-                        telemetry.addData("state", currentState.toString());
-                        runtime.reset();
-                        //deciding which position to go to depending on where the stone is
-                        if (SkyStonePos.equals(SkyStonePos.OneAndFour)) {
-                            timeDrive(x, y, z);
-                            gyroHold(x, y, z);
-                        }
-                        if (SkyStonePos.equals(SkyStonePos.TwoAndFive)) {
-                            timeDrive(x, y, z);
-                            gyroHold(x, y, z);
-                        }
-                        if (SkyStonePos.equals(SkyStonePos.ThreeAndSix)) {
-                            timeDrive(x, y, z);
-                            gyroHold(x, y, z);
-                        }
-                        switch (currentState) {
-                            case PICK_UP_STONE:
-                                telemetry.addData("state", currentState.toString());
-                                runtime.reset();
-                                //positioning the attachments to collect the stone
-                                robot.slide.setPower(x);
-                                robot.liftMotor.setPower(x);
-                                robot.claw.setPosition(x);
-                                robot.liftMotor.setPower(x);
-                        }
-                        switch (currentState) {
-                            case GO_TO_BASE_PLATE:
-                                telemetry.addData("state", currentState.toString());
-                                runtime.reset();
-                                //driving to the baseplate
-                                timeDrive(x, y, z);
-                                distDriveRear(x, y, z);
-                                timeDrive(x, y, z);
-                        }
-                        switch (currentState) {
-                            case PLACE_STONE:
-                                telemetry.addData("state", currentState.toString());
-                                runtime.reset();
-                                robot.liftMotor.setPower(x);
-                                robot.claw.setPosition(x);
-                                robot.liftMotor.setPower(x);
-                                timeDrive(x, y, z);
-                                robot.liftMotor.setPower(x);
-                                robot.claw.setPosition(x);
-                                timeDrive(x, y, z);
-                                robot.claw.setPosition(x);
-                                robot.liftMotor.setPower(x);
-                        }
-                        switch (currentState) {
-                            case MOVE_BASE_PLATE:
-                                telemetry.addData("state", currentState.toString());
-                                runtime.reset();
-                                robot.BPGrabber.setPostition(x);
-                                timeDrive(x, y, z);
-                                robot.BPGrabber.setPostition(x);
-
-                                }
-
-                }
+                case LINE_UP_STONE:
+                    telemetry.addData("state", currentState.toString());
+                    runtime.reset();
+                    //deciding which position to go to depending on where the stone is
+                    if (SkyStonePos.equals(SkyStonePos.OneAndFour)) {
+                        timeDrive(x, y, z);
+                        gyroHold(x, y, z);
+                    }
+                    if (SkyStonePos.equals(SkyStonePos.TwoAndFive)) {
+                        timeDrive(x, y, z);
+                        gyroHold(x, y, z);
+                    }
+                    if (SkyStonePos.equals(SkyStonePos.ThreeAndSix)) {
+                        timeDrive(x, y, z);
+                        gyroHold(x, y, z);
+                    }
+                    break;
+                case PICK_UP_STONE:
+                    telemetry.addData("state", currentState.toString());
+                    runtime.reset();
+                    //positioning the attachments to collect the stone
+                    robot.slide.setPower(x);
+                    robot.liftMotor.setPower(x);
+                    robot.claw.setPosition(x);
+                    robot.liftMotor.setPower(x);
+                    break;
+                case GO_TO_BASE_PLATE:
+                    telemetry.addData("state", currentState.toString());
+                    runtime.reset();
+                    //driving to the baseplate
+                    timeDrive(x, y, z);
+                    distDriveRear(x, y, z);
+                    timeDrive(x, y, z);
+                    break;
+                case PLACE_STONE:
+                    telemetry.addData("state", currentState.toString());
+                    runtime.reset();
+                    robot.liftMotor.setPower(x);
+                    robot.claw.setPosition(x);
+                    robot.liftMotor.setPower(x);
+                    timeDrive(x, y, z);
+                    robot.liftMotor.setPower(x);
+                    robot.claw.setPosition(x);
+                    timeDrive(x, y, z);
+                    robot.claw.setPosition(x);
+                    robot.liftMotor.setPower(x);
+                    break;
+                case MOVE_BASE_PLATE:
+                    telemetry.addData("state", currentState.toString());
+                    runtime.reset();
+                    robot.BPGrabber.setPostition(x);
+                    timeDrive(x, y, z);
+                    robot.BPGrabber.setPostition(x);
             }
         }
     }
