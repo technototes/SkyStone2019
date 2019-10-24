@@ -71,7 +71,7 @@ public class TTAutoStoneUnmoved extends Robot {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
 
-                    if (SkyStonePos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
+                    if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
                         tfod.activate();
                     }
 
@@ -81,15 +81,15 @@ public class TTAutoStoneUnmoved extends Robot {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //deciding which position to go to depending on where the stone is
-                    if (SkyStonePos.equals(SkyStonePos.OneAndFour)) {
+                    if (skystonepos.equals(SkyStonePos.OneAndFour)) {
                         timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
-                    if (SkyStonePos.equals(SkyStonePos.TwoAndFive)) {
+                    if (skystonepos.equals(SkyStonePos.TwoAndFive)) {
                         timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
-                    if (SkyStonePos.equals(SkyStonePos.ThreeAndSix)) {
+                    if (skystonepos.equals(SkyStonePos.ThreeAndSix)) {
                         timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
