@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 @Autonomous(name = "TTAutoStone", group = "TT")
-public class TTAutoStoneUnmoved extends LinearOpMode {
+public class TTAutoStoneMoved extends LinearOpMode {
 
     // States
     private enum AutoState {
