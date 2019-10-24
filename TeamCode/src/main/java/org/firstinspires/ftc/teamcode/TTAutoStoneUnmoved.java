@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -8,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 @Autonomous(name = "TTAutoStone", group = "TT")
-public class TTAutoStoneUnmoved extends Robot {
+public class TTAutoStoneUnmoved extends LinearOpMode {
 
     // States
     private enum AutoState {
@@ -23,6 +24,13 @@ public class TTAutoStoneUnmoved extends Robot {
         GO_TO_LINE,
 
         STOP
+    }
+
+    private enum SkyStonePos {
+        UNKNOWN,
+        OneAndFour,
+        TwoAndFive,
+        ThreeAndSix
     }
 
     private AutoState currentState = AutoState.INITIALIZE;
@@ -51,7 +59,7 @@ public class TTAutoStoneUnmoved extends Robot {
             sleep(50);
             idle();
         }
-        telemetry.addData(">", "Robot Heading = %d", robot.gyro.getIntegratedZValue());
+        telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
         telemetry.update();
 
         //Put vuforia Here
