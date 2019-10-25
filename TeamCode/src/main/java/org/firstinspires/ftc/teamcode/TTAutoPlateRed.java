@@ -96,7 +96,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
           gyroHold(x, y z);
           timeDrive(x, y, z);
           break;
-          
+
         case MOVE_BASE_PLATE:
           telemetry.addData("state", currentState.toString());
           runtime.reset();
