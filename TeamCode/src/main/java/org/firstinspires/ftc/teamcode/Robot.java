@@ -25,7 +25,8 @@ public class Robot /*extends LinearOpMode*/ {
     private Servo basePlateGrabber = null;
     public GyroSensor gyro = null;
 
-    public Robot() { }
+    public Robot() {
+    }
 
     public void init(HardwareMap hardwareMap) {
         slide = hardwareMap.get(Servo.class, "lslide");
@@ -122,6 +123,7 @@ public class Robot /*extends LinearOpMode*/ {
     public double gyroHeading() {
         return gyro.getHeading();
     }
+
     public final double SCALEFACTOR = 0.5;//turn speed factor
     private Robot robot;
     private Controller controller;
@@ -164,28 +166,29 @@ public class Robot /*extends LinearOpMode*/ {
 
     //set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and input angle to snap to.
     public double snapToAngle(double gyroAngle) {
-        double test = 0;
-        bb:
-        if (true) {
-            if (gyroAngle > 50 && gyroAngle < 130) {
-                test = 90 - gyroAngle;
-                break bb;
-            }
-            if (gyroAngle > 140 && gyroAngle < 220) {
-                test = 180 - gyroAngle;
-                break bb;
-            }
-            if (gyroAngle > 230 && gyroAngle < 310) {
-                test = 270 - gyroAngle;
-                break bb;
-            }
-            if ((gyroAngle >= 0 && gyroAngle < 40) || (gyroAngle > 320 && gyroAngle <= 360)) {
-                test = 0 - gyroAngle;
-                break bb;
-            }
-            test = gyroAngle;
+        if (gyroAngle > 50 && gyroAngle < 130) {
+            test = 90 - gyroAngle;
+
+        } else if (gyroAngle > 140 && gyroAngle < 220) {
+            test = 180 - gyroAngle;
+
+        } else if (gyroAngle > 230 && gyroAngle < 310) {
+            test = 270 - gyroAngle;
+
+        } else if ((gyroAngle >= 0 && gyroAngle < 40) || (gyroAngle > 320 && gyroAngle <= 360)) {
+            test = 0 - gyroAngle;
+
         }
         return test;
+
+
+    }
+
+    public void snap() {
+        double curr = gyroHeading();
+        double newangle = snapToAngle(curr);
+        drive(0.0, 0.0,0.0, newangle);
+
     }
 
     public void timeDrive(double speed, double time, double angle) {
