@@ -18,9 +18,21 @@ public class ReadFromController extends LinearOpMode {
 
     // Wait for the game to start (driver presses PLAY)
     waitForStart();
-    if (gamepad2.dpad_up) {
-      telemetry.addData("Pressing DPad Up");
+    if (gamepad1.dpad_up) {
+      telemetry.addLine("Pressing DPad Up");
       telemetry.update();
     }
+    if (gamepad1.dpad_down) {
+      telemetry.addLine("Pressing DPad Down");
+      telemetry.update();
+    }
+    if (gamepad1.dpad_left) {
+      telemetry.addLine("Pressing DPad Left");
+      telemetry.update();
+    }
+    if (gamepad1.dpad_right) {
+      telemetry.addLine("Pressing DPad Right")
+    }
+
   }
 }
