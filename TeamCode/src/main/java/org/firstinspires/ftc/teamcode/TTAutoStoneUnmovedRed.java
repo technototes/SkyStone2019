@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
-@Autonomous(name = "TTAutoStone", group = "TT")
-public class TTAutoStoneMoved extends LinearOpMode {
+@Autonomous(name = "TTAutoStoneUnmovedRed", group = "TT")
+public class TTAutoStoneUnmovedRed extends LinearOpMode {
 
     // States
     private enum AutoState {
@@ -101,7 +101,6 @@ public class TTAutoStoneMoved extends LinearOpMode {
                         timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
-                    currentState = AutoState.PICK_UP_STONE;
                     break;
                 case PICK_UP_STONE:
                     telemetry.addData("state", currentState.toString());
@@ -139,22 +138,6 @@ public class TTAutoStoneMoved extends LinearOpMode {
                     robot.BPGrabber.setPostition(x);
                     timeDrive(x, y, z);
                     robot.BPGrabber.setPostition(x);
-                    break;
-                case GO_TO_LINE:
-                    telemetry.addData("state", currentState.toString());
-                    runtime.reset();
-                    distToLine(x, y, z);
-                case STOP:
-                    telemetry.addData("state", currentState.toString());
-
-                    stop();
-                    break;
-
-                default:
-                    telemetry.addData("state", currentState.toString());
-
-                    stop();
-                    break;
             }
         }
     }

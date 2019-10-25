@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
-@Autonomous(name = "TTAutoStone", group = "TT")
-public class TTAutoStoneUnmoved extends LinearOpMode {
+@Autonomous(name = "TTAutoStoneMovedWallRed", group = "TT")
+public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
     // States
     private enum AutoState {
@@ -20,7 +20,6 @@ public class TTAutoStoneUnmoved extends LinearOpMode {
 
         GO_TO_BASE_PLATE,
         PLACE_STONE,
-        MOVE_BASE_PLATE,
         GO_TO_LINE,
 
         STOP
@@ -101,6 +100,7 @@ public class TTAutoStoneUnmoved extends LinearOpMode {
                         timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
+                    currentState = AutoState.PICK_UP_STONE;
                     break;
                 case PICK_UP_STONE:
                     telemetry.addData("state", currentState.toString());
@@ -117,6 +117,7 @@ public class TTAutoStoneUnmoved extends LinearOpMode {
                     //driving to the baseplate
                     timeDrive(x, y, z);
                     distDriveRear(x, y, z);
+                    gyroHold(x, y z);
                     timeDrive(x, y, z);
                     break;
                 case PLACE_STONE:
@@ -124,20 +125,31 @@ public class TTAutoStoneUnmoved extends LinearOpMode {
                     runtime.reset();
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
-                    robot.liftMotor.setPower(x);
                     timeDrive(x, y, z);
-                    robot.liftMotor.setPower(x);
+                    robot.motorLift(x);
                     robot.claw.setPosition(x);
+                    robot.motorLift(x);
                     timeDrive(x, y, z);
                     robot.claw.setPosition(x);
-                    robot.liftMotor.setPower(x);
+                    robot.motorLift(x);
                     break;
-                case MOVE_BASE_PLATE:
+
+                case GO_TO_LINE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
-                    robot.BPGrabber.setPostition(x);
-                    timeDrive(x, y, z);
-                    robot.BPGrabber.setPostition(x);
+                    distToLine(x, y, z);
+                    break;
+                case STOP:
+                    telemetry.addData("state", currentState.toString());
+
+                    stop();
+                    break;
+
+                default:
+                    telemetry.addData("state", currentState.toString());
+
+                    stop();
+                    break;
             }
         }
     }
