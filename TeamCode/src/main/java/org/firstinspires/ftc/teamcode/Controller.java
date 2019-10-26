@@ -21,8 +21,6 @@ public class Controller {
         }
         if (pad.dpad_right) {
             return new Direction(1, 0);
-
-            ;
         }
         return Direction.None;
     }

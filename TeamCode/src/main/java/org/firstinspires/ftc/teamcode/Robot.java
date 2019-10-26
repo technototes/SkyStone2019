@@ -166,6 +166,7 @@ public class Robot /*extends LinearOpMode*/ {
 
     //set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and input angle to snap to.
     public double snapToAngle(double gyroAngle) {
+        double test = 0.0;
         if (gyroAngle > 50 && gyroAngle < 130) {
             test = 90 - gyroAngle;
 

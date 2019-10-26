@@ -19,7 +19,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
     MOVE_BASE_PLATE,
     GO_TO_STONE,
     PICK_UP_STONE,
-    GO_TO_BASE_PLATE,
+    GO_TO_BASE_PLATE2,
     PLACE_STONE,
     GO_TO_LINE,
 
@@ -66,10 +66,11 @@ public class TTAutoStonePlateRed extends LinearOpMode {
 
     waitForStart();
 
-    if (tfod != null) {
+    // Removed: Rahul thinks it's vuphoria stuff
+/*    if (tfod != null) {
       tfod.deactivate();
     }
-
+*/
     // run until the end of the match (driver presses STOP)
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -93,7 +94,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
           //driving to the baseplate
           timeDrive(x, y, z);
           distDriveRear(x, y, z);
-          gyroHold(x, y z);
+          gyroHold(x, y, z);
           timeDrive(x, y, z);
           break;
 

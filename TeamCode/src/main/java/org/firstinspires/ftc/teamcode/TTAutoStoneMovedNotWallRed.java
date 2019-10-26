@@ -117,7 +117,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
           //driving to the baseplate
           timeDrive(x, y, z);
           distDriveRear(x, y, z);
-          gyroHold(x, y z);
+          gyroHold(x, y, z);
           timeDrive(x, y, z);
           break;
         case PLACE_STONE:
