@@ -3,65 +3,115 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class Controller {
-  private Controller pad = null;
+    private Gamepad pad = null;
 
-  public Controller() {
-    //pad = TODO();//
-  }
+    public Controller(Gamepad p) {
+        pad = p;
+    }
 
-  Direction dpad() {
-    return Direction.None;
-  }
+    Direction dpad() {
+        if (pad.dpad_down) {
+            return new Direction(0, 1);
+        }
+        if (pad.dpad_up) {
+            return new Direction(0, -1);
+        }
+        if (pad.dpad_left) {
+            return new Direction(-1, 0);
+        }
+        if (pad.dpad_right) {
+            return new Direction(1, 0);
 
-  Button buttonA() {
-    return Button.Released;
-  }
+            ;
+        }
+        return Direction.None;
+    }
 
-  Button buttonB() {
-    return Button.Released;
-  }
+    Button buttonA() {
+        if (pad.a) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  Button buttonX() {
-    return Button.Released;
-  }
+    Button buttonB() {
+        if (pad.b) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  Button buttonY() {
-    return Button.Released;
-  }
+    Button buttonX() {
+        if (pad.x) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  public Direction lstick() {
-    return Direction.None;
-  }
+    Button buttonY() {
+        if (pad.y) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  public Direction rstick() {
-    return Direction.None;
-  }
+    public Direction lstick() {
+        return new Direction(pad.left_stick_x, pad.left_stick_y);
+    }
 
-  Button lbump() {
-    return Button.Released;
-  }
+    public Direction rstick() {
+        return new Direction(pad.right_stick_x, pad.right_stick_y);
+    }
 
-  Button rbump() {
-    return Button.Released;
-  }
+    Button lbump() {
+        if (pad.left_bumper) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  double ltrigger() {
-    return 0.0;
-  }
+    Button rbump() {
+        if (pad.right_bumper) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  double rtrigger() {
-    return 0.0;
-  }
+    double ltrigger() {
+        return (double) pad.left_trigger;
+    }
 
-  Button back() {
-    return Button.Released;
-  }
+    double rtrigger() {
+        return (double) pad.right_trigger;
+    }
 
-  Button mode() {
-    return Button.Released;
-  }
+    Button back() {
+        if (pad.back) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 
-  Button start() {
-    return Button.Released;
-  }
+    Button mode() {
+        if (pad.guide) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
+
+    Button start() {
+        if (pad.start) {
+            return Button.Pressed;
+        } else {
+            return Button.Released;
+        }
+    }
 }
