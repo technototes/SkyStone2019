@@ -41,7 +41,7 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
+        double x = 0.0, y = 0.0, z = 0.0;
         /*
          * Initialize the standard drive system variables.
          * The init() method of the hardware class does most of the work here
@@ -90,15 +90,15 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
                     runtime.reset();
                     //deciding which position to go to depending on where the stone is
                     if (skystonepos.equals(SkyStonePos.OneAndFour)) {
-                        timeDrive(x, y, z);
+                        robot.timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
                     if (skystonepos.equals(SkyStonePos.TwoAndFive)) {
-                        timeDrive(x, y, z);
+                        robot.timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
                     if (skystonepos.equals(SkyStonePos.ThreeAndSix)) {
-                        timeDrive(x, y, z);
+                        robot.timeDrive(x, y, z);
                         gyroHold(x, y, z);
                     }
                     break;
@@ -115,9 +115,9 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //driving to the baseplate
-                    timeDrive(x, y, z);
+                    robot.timeDrive(x, y, z);
                     distDriveRear(x, y, z);
-                    timeDrive(x, y, z);
+                    robot.timeDrive(x, y, z);
                     break;
                 case PLACE_STONE:
                     telemetry.addData("state", currentState.toString());
@@ -125,10 +125,10 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
                     robot.liftMotor.setPower(x);
-                    timeDrive(x, y, z);
+                    robot.timeDrive(x, y, z);
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
-                    timeDrive(x, y, z);
+                    robot.timeDrive(x, y, z);
                     robot.claw.setPosition(x);
                     robot.liftMotor.setPower(x);
                     break;
@@ -136,7 +136,7 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     robot.BPGrabber.setPostition(x);
-                    timeDrive(x, y, z);
+                    robot.timeDrive(x, y, z);
                     robot.BPGrabber.setPostition(x);
             }
         }

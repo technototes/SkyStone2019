@@ -1,36 +1,48 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 //@TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class Robot /*extends LinearOpMode*/ {
 
-    private Servo slide = null;
+    private CRServo slide = null;
     private DcMotor flMotor = null;
     private DcMotor frMotor = null;
     private DcMotor rlMotor = null;
     private DcMotor rrMotor = null;
-    private DcMotor liftMotor = null;
-    private Servo Turn = null;
+    private DcMotor lLiftMotor = null;
+    private DcMotor rLiftMotor = null;
+    private Servo turn = null;
     private Servo claw = null;
     private TouchSensor extended = null;
     private TouchSensor retracted = null;
     private ElapsedTime runtime = new ElapsedTime();
     private Servo basePlateGrabber = null;
     public GyroSensor gyro = null;
+    private TouchSensor touch = null;
+
+    private final void sleep(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
     public Robot() {
     }
 
     public void init(HardwareMap hardwareMap) {
-        slide = hardwareMap.get(Servo.class, "lslide");
-        Turn = hardwareMap.get(Servo.class, "grabTurn");
+        slide = hardwareMap.get(CRServo.class, "servo");
+        turn = hardwareMap.get(Servo.class, "grabTurn");
         claw = hardwareMap.get(Servo.class, "claw");
         basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
         extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
@@ -40,9 +52,22 @@ public class Robot /*extends LinearOpMode*/ {
         frMotor = hardwareMap.get(DcMotor.class, "frMotor");
         rlMotor = hardwareMap.get(DcMotor.class, "rlMotor");
         rrMotor = hardwareMap.get(DcMotor.class, "rrMotor");
-        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        lLiftMotor = hardwareMap.get(DcMotor.class, "lLiftMotor");
+        rLiftMotor = hardwareMap.get(DcMotor.class, "rLiftMotor");
 
         gyro = hardwareMap.get(GyroSensor.class, "gyro");
+        touch = hardwareMap.get(TouchSensor.class, "touch");
+
+    }
+
+    public void calibrate() {
+        lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        gyro.calibrate();
+        while (gyro.isCalibrating()) {
+            sleep(50);
+            Thread.yield();
+        }
     }
 
     // Linear slide stuff:
@@ -56,36 +81,78 @@ public class Robot /*extends LinearOpMode*/ {
 
     public void lslide(LinearSlideOperation dir) {
         // Set the linear slide motor to the position
-        if (dir == LinearSlideOperation.Extend) {
-            // TODO: This is probably wrong
-            slide.setPosition(1.0);
-        } else if (dir == LinearSlideOperation.Retract) {
-            // TODO: This is probably wrong & silly
-            slide.setPosition(-1.0);
+        DcMotorSimple.Direction d = DcMotorSimple.Direction.FORWARD;
+        switch (dir) {
+            case Off:
+                slide.setPower(0.0);
+                return;
+            case Extend:
+                d = DcMotorSimple.Direction.FORWARD;
+                break;
+            case Retract:
+                d = DcMotorSimple.Direction.REVERSE;
+                break;
         }
+        slide.setDirection(d);
+
+        // TODO: This is probably wrong
+        slide.setPower(0.8);
+        sleep(500);
+        slide.setPower(0);
     }
 
     // Grabber stuff:
     public void grabberClutch(GrabberMotorOperation operation) {
-        // TODO: Fill this in
-        if (operation == GrabberMotorOperation.Close) {
-            //claw.
+        // TODO: Check this...
+        switch (operation) {
+            case Close:
+                claw.setPosition(0.0);
+                break;
+            case Open:
+                claw.setPosition(0.5);
+                break;
+            case Off:
+                claw.setPosition(0.2);
+                break;
         }
     }
 
     public GrabberPosition getGrabberPosition() {
-        // TODO: Fill this in (read the switch?)
-        return GrabberPosition.Horizontal;
+        // TODO: Check this...
+        double pos = turn.getPosition();
+        if (pos < 0.25) {
+            return GrabberPosition.Horizontal;
+        } else {
+            return GrabberPosition.Vertical;
+        }
     }
 
     public void setGrabberPosition(GrabberPosition position) {
-        // TODO: Fill this in: Set the servo!
+        switch (position) {
+            case Horizontal:
+                turn.setPosition(0.0);
+                break;
+            case Vertical:
+                turn.setPosition(0.25);
+                break;
+        }
     }
 
     // Lift stuff:
     public void fourBarMotor(FourBarDirection dir) {
-        // TODO: Fill this in
-        // Set the motor power
+        double power = 0.0;
+        switch (dir) {
+            case Off:
+                return;
+            case Up:
+                power = 0.8;
+                break;
+            case Down:
+                power = -0.8;
+                break;
+        }
+        lLiftMotor.setPower(power);
+        rLiftMotor.setPower(power);
     }
 
     public boolean isFourBarUpperLimit() {
@@ -116,11 +183,8 @@ public class Robot /*extends LinearOpMode*/ {
         rrMotor.setPower(Range.clip(power, -1, 1));
     }
 
-    public void motorLift(double power) {
-        liftMotor.setPower(power);
-    }
-
     public double gyroHeading() {
+        // TODO: Fix this. This is clearly busted :/
         return gyro.getHeading();
     }
 
@@ -181,15 +245,12 @@ public class Robot /*extends LinearOpMode*/ {
 
         }
         return test;
-
-
     }
 
     public void snap() {
         double curr = gyroHeading();
         double newangle = snapToAngle(curr);
-        drive(0.0, 0.0,0.0, newangle);
-
+        drive(0.0, 0.0, 0.0, newangle);
     }
 
     public void timeDrive(double speed, double time, double angle) {
