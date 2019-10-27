@@ -50,8 +50,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 //@Disabled
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class Freik_Test_Motor extends LinearOpMode {
+@TeleOp(name="Basic: Freik Test", group="Test")
+public class Freik_Test extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
