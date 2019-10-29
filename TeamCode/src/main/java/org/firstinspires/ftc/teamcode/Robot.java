@@ -247,10 +247,16 @@ public class Robot /*extends LinearOpMode*/ {
         return test;
     }
 
+    // Snap the robot to the closest 90 degree angle
     public void snap() {
         double curr = gyroHeading();
         double newangle = snapToAngle(curr);
-        drive(0.0, 0.0, 0.0, newangle);
+        snap(newangle);
+    }
+
+    // Turn the robot to a specific angle
+    public void snap(double angle) {
+        drive(0.0, 0.0, 0.0, angle);
     }
 
     public void timeDrive(double speed, double time, double angle) {
