@@ -220,8 +220,6 @@ public class Robot /*extends LinearOpMode*/ {
   }
 
   public final double SCALEFACTOR = 0.5; // turn speed factor
-  private Robot robot;
-  private Controller controller;
   /*
   fl  +-------+  fr
      /         \
@@ -248,15 +246,15 @@ public class Robot /*extends LinearOpMode*/ {
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
     tturn = turn * SCALEFACTOR;
-    double angle = joystickAngle + robot.gyroHeading();
+    double angle = joystickAngle + this.gyroHeading();
     flPower = power * Math.cos((angle - 45) / (180 / Math.PI)) + tturn;
     frPower = -power * Math.cos((angle + 45) / (180 / Math.PI)) + tturn;
     rrPower = -power * Math.cos((angle - 45) / (180 / Math.PI)) + tturn;
     rlPower = power * Math.cos((angle + 45) / (180 / Math.PI)) + tturn;
-    robot.motorFrontLeft(flPower);
-    robot.motorFrontRight(frPower);
-    robot.motorRearLeft(rlPower);
-    robot.motorRearRight(rrPower);
+    this.motorFrontLeft(flPower);
+    this.motorFrontRight(frPower);
+    this.motorRearLeft(rlPower);
+    this.motorRearRight(rrPower);
   }
 
   // set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and
@@ -308,7 +306,7 @@ public class Robot /*extends LinearOpMode*/ {
 
       speed = Range.clip(speed, 0.0, 1.0);
       //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
-      robotHeadingRad = Math.toRadians(robot.gyroHeading());
+      robotHeadingRad = Math.toRadians(this.gyroHeading());
       powerCompY =
           (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
               + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
@@ -323,10 +321,10 @@ public class Robot /*extends LinearOpMode*/ {
 
       // keep looping while we are still active, and BOTH motors are running.
       while (true && driveTime.seconds() < time) {
-        robot.motorFrontLeft(frontLeftSpeed);
-        robot.motorFrontRight(frontRightSpeed);
-        robot.motorRearLeft(rearLeftSpeed);
-        robot.motorRearRight(rearRightSpeed);
+        this.motorFrontLeft(frontLeftSpeed);
+        this.motorFrontRight(frontRightSpeed);
+        this.motorRearLeft(rearLeftSpeed);
+        this.motorRearRight(rearRightSpeed);
 
         // Display drive status for the driver.
         // telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
@@ -338,20 +336,13 @@ public class Robot /*extends LinearOpMode*/ {
       }
 
       // Stop all motion;
-      robot.motorFrontLeft(0);
-      robot.motorFrontRight(0);
-      robot.motorRearLeft(0);
-      robot.motorRearRight(0);
+      this.motorFrontLeft(0);
+      this.motorFrontRight(0);
+      this.motorRearLeft(0);
+      this.motorRearRight(0);
     }
     // TODO: Alex, this stuff clearly isn't finished
     // Please finish it :)
-
-    // turn hasn't been defined: What is it?
-    //   turn *= SCALEFACTOR;
-    Direction j = controller.rstick();
-    double hypotenuse = Functions.pyt(j.X, j.X);
-    double power = Range.clip(hypotenuse, -1.0, 1.0);
-    double joystickAngle = Math.acos(j.X / hypotenuse);
-    // Now we're using hypotenuse, power, joystickAngle, and maybe turn?
   }
+
 }
