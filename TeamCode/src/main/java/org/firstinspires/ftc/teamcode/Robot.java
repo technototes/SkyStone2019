@@ -89,8 +89,15 @@ public class Robot /*extends LinearOpMode*/ {
   }
 
   public void calibrate() {
+    //make lift motors work together
     lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+    //account for extra gear on drive motors
+    flMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    frMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    rlMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     while (imu.getCalibrationStatus().calibrationStatus != 0
         || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);
@@ -168,20 +175,9 @@ public class Robot /*extends LinearOpMode*/ {
   }
 
   // Lift stuff:
-  public void setLift(LiftDirection dir) {
-    double power = 0.0;
-    switch (dir) {
-      case Off:
-        return;
-      case Up:
-        power = 0.8;
-        break;
-      case Down:
-        power = -0.8;
-        break;
-    }
-    lLiftMotor.setPower(power);
-    rLiftMotor.setPower(power);
+  public void setLift(double speed) {
+    lLiftMotor.setPower(speed);
+    rLiftMotor.setPower(speed);
   }
 
   public boolean isLiftAtUpperLimit() {
