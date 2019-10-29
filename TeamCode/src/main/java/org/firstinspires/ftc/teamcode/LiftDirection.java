@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-public enum FourBarDirection {
+public enum LiftDirection {
   Up, Down, Off
 }

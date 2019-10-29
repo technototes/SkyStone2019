@@ -53,17 +53,17 @@ public class SkeletonCode {
 //Pushedup:
                         if (robot.isFourBarUpperLimit() == true) {
 //HITTHEMLIMIT!
-                            robot.fourBarMotor(FourBarDirection.Off);
+                            robot.fourBarMotor(LiftDirection.Off);
                         } else {
-                            robot.fourBarMotor(FourBarDirection.Up);
+                            robot.fourBarMotor(LiftDirection.Up);
                         }
                     }
                     if (dir.isDown()) {
 //Pusheddown
                         if (robot.isFourBarLowerLimit() == true) {
-                            robot.fourBarMotor(FourBarDirection.Off);
+                            robot.fourBarMotor(LiftDirection.Off);
                         } else {
-                            robot.fourBarMotor(FourBarDirection.Down);
+                            robot.fourBarMotor(LiftDirection.Down);
                         }
                     }
                 }
