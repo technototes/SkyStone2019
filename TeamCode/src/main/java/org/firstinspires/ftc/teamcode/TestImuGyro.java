@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -19,7 +20,7 @@ import java.util.Locale;
 // IMU = Internal Motion Unit
 // It's a gyro with lots of interesting data. This sample has all the stuff
 // necessary to generate a heading. Need to wrap it up inside the Robot class
-
+@Disabled
 @TeleOp(name = "Sensor: BNO055 imu sample", group = "Sensor")
 public class TestImuGyro extends LinearOpMode
 {

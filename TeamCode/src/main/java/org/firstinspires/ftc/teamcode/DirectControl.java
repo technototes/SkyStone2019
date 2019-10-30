@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.robot.Robot;
 @TeleOp(name = "Skeleton code")
-public class SkeletonCode extends LinearOpMode {
+public class DirectControl extends LinearOpMode {
     private TTRobot robot;
     private Controller control;
     private Controller driver;
