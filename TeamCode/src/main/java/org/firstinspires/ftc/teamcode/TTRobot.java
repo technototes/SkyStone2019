@@ -274,12 +274,61 @@ public class TTRobot {
   public double rrPower;
   public double rlPower;
   public double tturn;
+  private ElapsedTime runtime2 = new ElapsedTime();
+  private ElapsedTime timer = new ElapsedTime();
+
+  // State used for updating telemetry
+  private Orientation angles1;
+  private Orientation angles2;
+
+  private double leftStickY = 0;
+  private double leftStickX = 0;
+  private double rightStickX = 0;
+
+  private double robotHeadingRad = 0.0;
+  private double powerCompY = 0.0;
+  private double powerCompX = 0.0;
+
+  private double powerFrontLeft = 0.0;
+  private double powerFrontRight = 0.0;
+  private double powerRearLeft = 0.0;
+  private double powerRearRight = 0.0;
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
-    double hypotenuse = Math.sqrt((j1.X*j1.X)+(j1.Y*j1.Y));
-    double dangle = Math.acos(j1.X/hypotenuse);
-    drive(dangle, gyroAngle, Range.clip(hypotenuse, -1.0, 1.0), j2.X);
+    if (j1.Y != 0) {
+      leftStickY = stepInput(j1.Y);
+    } else {
+      leftStickY = 0.0;
+    }
+    if (j1.X != 0) {
+      leftStickX = stepInput(j1.X);
+    } else {
+      leftStickX = 0.0;
+    }
+    rightStickX = stepInputRotate(j2.X);
+
+    if (leftStickY != 0 || leftStickX != 0 || rightStickX != 0) {
+//                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
+      robotHeadingRad = Math.toRadians(gyroAngle);
+      powerCompY = (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
+      powerCompX = -(Math.sin(robotHeadingRad) * leftStickY) + (Math.cos(robotHeadingRad) * leftStickX);
+
+      powerFrontLeft = powerCompY + powerCompX + rightStickX;
+      powerFrontRight = -powerCompY + powerCompX + rightStickX;
+      powerRearLeft = powerCompY - powerCompX + rightStickX;
+      powerRearRight = -powerCompY - powerCompX + rightStickX;
+    } else {
+      powerFrontLeft = 0.0;
+      powerFrontRight = 0.0;
+      powerRearLeft = 0.0;
+      powerRearRight = 0.0;
+    }
+
+    motorFrontLeft(Range.clip(powerFrontLeft, -1.0, 1.0));
+    motorFrontRight(Range.clip(powerFrontRight, -1.0, 1.0));
+    motorRearLeft(Range.clip(powerRearLeft, -1.0, 1.0));
+    motorRearRight(Range.clip(powerRearRight, -1.0, 1.0));
   }
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
