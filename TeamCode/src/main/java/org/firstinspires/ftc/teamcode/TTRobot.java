@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -29,9 +30,13 @@ public class TTRobot {
   private final double HORIZONTALGRABBERPOSITION = 0.0;
   // the grab rotation 'vertical' position
   private final double VERTICALGRABBERPOSITION = 0.5;
+  //the power of the linear slide
+  private final double LINEARSLIDEPOWER = 0.5;
 
   private boolean isGrabberOpened = true;
+  private LinearSlidePosition position = LinearSlidePosition.In;
 
+  private DigitalChannel lslideSwitch = null;
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
@@ -106,11 +111,7 @@ public class TTRobot {
     lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-    // account for extra gear on drive motors
-    flMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    frMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    rlMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
@@ -130,13 +131,46 @@ public class TTRobot {
     return retracted.isPressed();
   }
 
-  public void lslide(double speed) {
-    if (Math.abs(speed) > 0.05) {
-      // TODO: Check isLinearSlideFullyRetracted/Extended to prevent the driver from
-      // destroying the robot
-      slide.setPower(speed);
-    } else {
-      slide.setPower(0);
+  public void lslide(LinearSlideOperation inOrOut) {
+    if(position == LinearSlidePosition.In){
+        if(inOrOut == LinearSlideOperation.Extend){
+          while(lslideSwitch.getState()){
+            slide.setPower(LINEARSLIDEPOWER);
+          }
+          slide.setPower(LINEARSLIDEPOWER);
+          while(!lslideSwitch.getState()){
+            slide.setPower(LINEARSLIDEPOWER);
+          }
+          position = LinearSlidePosition.Middle;
+        }
+    }else if(position == LinearSlidePosition.Middle){
+      if(inOrOut == LinearSlideOperation.Extend){
+        while(lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.Middle;
+      }else{
+        while(lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.Middle;
+      }
+    }else{
+      if(inOrOut == LinearSlideOperation.Retract){
+        while(lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.Middle;
+      }
     }
   }
 
@@ -243,17 +277,18 @@ public class TTRobot {
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
-    double hypotenuse = Functions.pyt(j1.X, j1.Y);
-    drive(Math.acos(j1.X / hypotenuse), gyroAngle, Range.clip(hypotenuse, -1.0, 1.0), j2.X);
+    double hypotenuse = Math.sqrt((j1.X*j1.X)+(j1.Y*j1.Y));
+    double dangle = Math.acos(j1.X/hypotenuse);
+    drive(dangle, gyroAngle, Range.clip(hypotenuse, -1.0, 1.0), j2.X);
   }
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
     tturn = turn * TURNSPEEDFACTOR;
-    double angle = joystickAngle + this.gyroHeading();
-    flPower = power * Math.cos((angle - 45) / (180 / Math.PI)) + tturn;
-    frPower = -power * Math.cos((angle + 45) / (180 / Math.PI)) + tturn;
-    rrPower = -power * Math.cos((angle - 45) / (180 / Math.PI)) + tturn;
-    rlPower = power * Math.cos((angle + 45) / (180 / Math.PI)) + tturn;
+    double angle = joystickAngle + gyroAngle;
+    flPower = power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
+    frPower = -power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
+    rrPower = -power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
+    rlPower = power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
     this.motorFrontLeft(flPower);
     this.motorFrontRight(frPower);
     this.motorRearLeft(rlPower);

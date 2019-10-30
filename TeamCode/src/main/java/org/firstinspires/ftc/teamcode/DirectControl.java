@@ -29,9 +29,13 @@ public class DirectControl extends LinearOpMode {
             if (control.buttonX() == Button.Pressed) {
                 robot.grabberClutch();
             }
-            // I think Alex wants this to be read from the right stick
-            Direction rstickDir = control.rstick();
-            robot.lslide(rstickDir.X);
+            //redid this to work with magnetic limit switch
+            Direction dpad = control.dpad();
+            if(dpad.X == 1){
+                robot.lslide(LinearSlideOperation.Extend);
+            }else if(dpad.X == -1){
+                robot.lslide(LinearSlideOperation.Retract);
+            }
 
             Direction dir = control.lstick();
             robot.setLift(dir.Y);
@@ -42,6 +46,9 @@ public class DirectControl extends LinearOpMode {
                 L.Y > 0.01 || L.Y < -0.01 ||
                 R.X > 0.01 || R.X < -0.01) {
                 robot.joystickDrive(L, R, robot.gyroHeading());
+            }
+            if(Math.abs(control.rstick().X) > 0.05){
+                robot.drive(0,0, 0,  control.rstick().X);
             }
             telemetry.update();
         }
