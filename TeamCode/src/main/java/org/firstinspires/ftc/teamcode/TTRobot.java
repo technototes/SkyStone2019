@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 // @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class TTRobot /*extends LinearOpMode*/ {
   private final double TURNSPEEDFACTOR = 0.5; // turn speed factor
-  private final double  LINEARSLIDEPOWER = 0.8;
+  private final double LINEARSLIDEPOWER = 0.8;
   private final int LINEARSLIDESLEEP = 500;
   private final double LINEARSLIDEOFFPOWER = 0.0;
   private final double CLOSECLAWPOSITION = 0.0;
@@ -66,7 +66,7 @@ public class TTRobot /*extends LinearOpMode*/ {
     }
   }
 
-  public Robot() {}
+  public TTRobot() {}
 
   public void init(HardwareMap hardwareMap) {
     // Get handles to all the hardware
@@ -103,11 +103,11 @@ public class TTRobot /*extends LinearOpMode*/ {
   }
 
   public void calibrate() {
-    //make lift motors work together
+    // make lift motors work together
     lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-    //account for extra gear on drive motors
+    // account for extra gear on drive motors
     flMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     frMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rlMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -115,7 +115,7 @@ public class TTRobot /*extends LinearOpMode*/ {
 
     while (imu.getCalibrationStatus().calibrationStatus != 0
         || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
-     sleep(10);
+      sleep(10);
     }
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
@@ -131,19 +131,21 @@ public class TTRobot /*extends LinearOpMode*/ {
   }
 
   public void lslide(double speed) {
-    if(Math.abs(speed) > 0.05) {
+    if (Math.abs(speed) > 0.05) {
+      // TODO: Check isLinearSlideFullyRetracted/Extended to prevent the driver from
+      // destroying the robot
       slide.setPower(speed);
-    }else{
+    } else {
       slide.setPower(0);
     }
   }
 
   // Grabber stuff:
   public void grabberClutch() {
-    if(isGrabberOpened){
+    if (isGrabberOpened) {
       claw.setPower(-1);
       isGrabberOpened = false;
-    }else{
+    } else {
       claw.setPower(1);
     }
   }
@@ -157,6 +159,7 @@ public class TTRobot /*extends LinearOpMode*/ {
       return GrabberPosition.Vertical;
     }
   }
+
   public void snapGrabberPosition(GrabberPosition position) {
     switch (position) {
       case Horizontal:
@@ -167,13 +170,14 @@ public class TTRobot /*extends LinearOpMode*/ {
         break;
     }
   }
+
   public void turnGrabber(GrabberPosition position) {
     switch (position) {
       case Horizontal:
-        turn.setPosition(turn.getPosition()-0.1);
+        turn.setPosition(turn.getPosition() - 0.1);
         break;
       case Vertical:
-        turn.setPosition(turn.getPosition()+0.1);
+        turn.setPosition(turn.getPosition() + 0.1);
         break;
     }
   }
@@ -339,7 +343,5 @@ public class TTRobot /*extends LinearOpMode*/ {
       this.motorRearLeft(0);
       this.motorRearRight(0);
     }
-
   }
-
 }

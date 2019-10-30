@@ -36,7 +36,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
     private SkyStonePos skystonepos = SkyStonePos.UNKNOWN;
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime timer = new ElapsedTime();
-    private Robot robot;
+    private TTRobot robot;
 
     @Override
     public void runOpMode() {
