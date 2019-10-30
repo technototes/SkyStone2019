@@ -1,20 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-
-public class SkeletonCode {
-    private Robot robot;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.robot.Robot;
+@TeleOp(name = "Skeleton code")
+public class SkeletonCode extends OpMode {
+    private TTRobot robot;
     private Controller control;
     private Controller driver;
 
-    public SkeletonCode(Gamepad ctrl, Gamepad drv, Robot r) {
-        control = new Controller(ctrl);
-        driver = new Controller(drv);
-        robot = r;
-    }
-
-
-    public void directcontrol() {
+    @Override
+    public void runOpMode() {
+        robot = new TTRobot();
+        driver = new Controller(gamepad1);
+        control = new Controller(gamepad2);
+        robot.init(harwareMap);
         while (true) {
             //ASSERT(we'realreadyatthebrick)
             if (control.buttonA() == Button.Pressed) {
@@ -52,6 +53,7 @@ public class SkeletonCode {
                     /*
                     if (dir.isUp()) {
 //Pushedup:
+                        /*
                         if (robot.isFourBarUpperLimit() == true) {
 //HITTHEMLIMIT!
                             robot.fourBarMotor(LiftDirection.Off);

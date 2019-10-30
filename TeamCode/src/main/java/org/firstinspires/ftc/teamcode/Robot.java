@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 // @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
-public class Robot /*extends LinearOpMode*/ {
+public class TTRobot /*extends LinearOpMode*/ {
   private final double TURNSPEEDFACTOR = 0.5; // turn speed factor
   private final double  LINEARSLIDEPOWER = 0.8;
   private final int LINEARSLIDESLEEP = 500;
@@ -34,6 +34,7 @@ public class Robot /*extends LinearOpMode*/ {
   private final double ORIGINALLIFTPOWER = 0.0;
   private final double LIFTGOINGDOWN = 0.8;
   private final double LIFTGOINGUP = -0.8;
+
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
