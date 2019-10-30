@@ -49,6 +49,7 @@ public class SkeletonCode {
                     robot.lslide(LinearSlideOperation.Retract);
 //while(true){
                     Direction dir = control.lstick();
+                    /*
                     if (dir.isUp()) {
 //Pushedup:
                         if (robot.isFourBarUpperLimit() == true) {
@@ -66,7 +67,9 @@ public class SkeletonCode {
                             robot.fourBarMotor(LiftDirection.Down);
                         }
                     }
+                     */
                 }
+
                 Direction L = driver.lstick();
                 Direction R = driver.rstick();
                 if (L.X > 0.01 || L.X < -0.01 ||

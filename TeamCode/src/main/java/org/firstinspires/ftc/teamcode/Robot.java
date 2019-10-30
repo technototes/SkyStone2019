@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 // @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class Robot /*extends LinearOpMode*/ {
   private final double TURNSPEEDFACTOR = 0.5; // turn speed factor
-  private final double  LINEARSLIDEPOSITION = 0.8;
+  private final double  LINEARSLIDEPOWER = 0.8;
   private final int LINEARSLIDESLEEP = 500;
   private final double LINEARSLIDEOFFPOWER = 0.0;
   private final double CLOSECLAWPOSITION = 0.0;
