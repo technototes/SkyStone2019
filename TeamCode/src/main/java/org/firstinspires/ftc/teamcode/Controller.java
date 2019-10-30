@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class Controller {
     private Gamepad pad = null;
+    private Telemetry telemetry = null;
 
-    public Controller(Gamepad p) {
+    public Controller(Gamepad p, Telemetry tel) {
         pad = p;
     }
 

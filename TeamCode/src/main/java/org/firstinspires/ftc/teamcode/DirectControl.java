@@ -13,11 +13,12 @@ public class DirectControl extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new TTRobot();
-        driver = new Controller(gamepad1);
-        control = new Controller(gamepad2);
-        robot.init(hardwareMap);
-        while (true) {
-            //ASSERT(we'realreadyatthebrick)
+        driver = new Controller(gamepad1, telemetry);
+        control = new Controller(gamepad2, telemetry);
+        robot.init(hardwareMap, telemetry);
+        waitForStart();
+        while (opModeIsActive()) {
+
             if (control.buttonA() == Button.Pressed) {
                 if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
                     robot.snapGrabberPosition(GrabberPosition.Horizontal);
@@ -41,7 +42,8 @@ public class DirectControl extends LinearOpMode {
                 L.Y > 0.01 || L.Y < -0.01 ||
                 R.X > 0.01 || R.X < -0.01) {
                 robot.joystickDrive(L, R, robot.gyroHeading());
-           }
+            }
+            telemetry.update();
         }
     }
 }

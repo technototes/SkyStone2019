@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -19,23 +20,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-// @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
-public class TTRobot /*extends LinearOpMode*/ {
-  private final double TURNSPEEDFACTOR = 0.5; // turn speed factor
-  private final double LINEARSLIDEPOWER = 0.8;
-  private final int LINEARSLIDESLEEP = 500;
-  private final double LINEARSLIDEOFFPOWER = 0.0;
-  private final double CLOSECLAWPOSITION = 0.0;
-  private final double OPENCLAWPOSITION = 0.5;
-  private final double OFFCLAWPOSITION = 0.2;
+public class TTRobot {
+  // The power applied to the wheels for robot rotation
+  private final double TURNSPEEDFACTOR = 0.5;
+  // the grab rotation position for snapping to horizontal or vertical
   private final double GRABBERPOSITIONCUTOFF = 0.25;
+  // the grab rotation 'horizontal' position
   private final double HORIZONTALGRABBERPOSITION = 0.0;
+  // the grab rotation 'vertical' position
   private final double VERTICALGRABBERPOSITION = 0.5;
-  private final double ORIGINALLIFTPOWER = 0.0;
-  private final double LIFTGOINGDOWN = 0.8;
-  private final double LIFTGOINGUP = -0.8;
 
   private boolean isGrabberOpened = true;
+
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
@@ -50,6 +46,8 @@ public class TTRobot /*extends LinearOpMode*/ {
   private ElapsedTime runtime = new ElapsedTime();
   private Servo basePlateGrabber = null;
   private TouchSensor touch = null;
+
+  private Telemetry telemetry = null;
 
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
@@ -68,7 +66,8 @@ public class TTRobot /*extends LinearOpMode*/ {
 
   public TTRobot() {}
 
-  public void init(HardwareMap hardwareMap) {
+  public void init(HardwareMap hardwareMap, Telemetry tel) {
+    telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
@@ -113,6 +112,7 @@ public class TTRobot /*extends LinearOpMode*/ {
     rlMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+    // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
         || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);

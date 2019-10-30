@@ -46,19 +46,15 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
          * Initialize the standard drive system variables.
          * The init() method of the hardware class does most of the work here
          */
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
 
         sleep(2000);
         // start calibrating the gyro.
         telemetry.addData(">", "Gyro Calibrating. Do Not move!");
         telemetry.update();
-        robot.gyro.calibrate();
         // make sure the gyro is calibrated.
-        while (robot.gyro.isCalibrating()) {
-            sleep(50);
-            idle();
-        }
+        robot.calibrate();
         telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
         telemetry.update();
 
@@ -66,10 +62,11 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
 
         waitForStart();
 
+        /*
         if (tfod != null) {
             tfod.deactivate();
         }
-
+        */
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -79,10 +76,11 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
 
+                    /*
                     if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
                         tfod.activate();
                     }
-
+                    */
                     currentState = AutoState.LINE_UP_STONE;
                     break;
                 case LINE_UP_STONE:
@@ -91,15 +89,15 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
                     //deciding which position to go to depending on where the stone is
                     if (skystonepos.equals(SkyStonePos.OneAndFour)) {
                         robot.timeDrive(x, y, z);
-                        gyroHold(x, y, z);
+                        //gyroHold(x, y, z);
                     }
                     if (skystonepos.equals(SkyStonePos.TwoAndFive)) {
                         robot.timeDrive(x, y, z);
-                        gyroHold(x, y, z);
+                        //gyroHold(x, y, z);
                     }
                     if (skystonepos.equals(SkyStonePos.ThreeAndSix)) {
                         robot.timeDrive(x, y, z);
-                        gyroHold(x, y, z);
+                        //gyroHold(x, y, z);
                     }
                     currentState = AutoState.PICK_UP_STONE;
                     break;
@@ -107,23 +105,26 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //positioning the attachments to collect the stone
+                    /*
                     robot.slide.setPower(x);
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
                     robot.liftMotor.setPower(x);
+                    */
                     break;
                 case GO_TO_BASE_PLATE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //driving to the baseplate
                     robot.timeDrive(x, y, z);
-                    distDriveRear(x, y, z);
-                    gyroHold(x, y, z);
+                    //distDriveRear(x, y, z);
+                    //gyroHold(x, y, z);
                     robot.timeDrive(x, y, z);
                     break;
                 case PLACE_STONE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
+                    /*
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
                     robot.timeDrive(x, y, z);
@@ -133,12 +134,13 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
                     robot.timeDrive(x, y, z);
                     robot.claw.setPosition(x);
                     robot.motorLift(x);
+                    */
                     break;
 
                 case GO_TO_LINE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
-                    distToLine(x, y, z);
+                    //distToLine(x, y, z);
                 case STOP:
                     telemetry.addData("state", currentState.toString());
 
@@ -151,6 +153,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
                     stop();
                     break;
             }
+            telemetry.update();
         }
     }
 }

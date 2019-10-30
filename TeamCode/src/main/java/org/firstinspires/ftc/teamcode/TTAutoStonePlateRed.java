@@ -48,7 +48,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
          * Initialize the standard drive system variables.
          * The init() method of the hardware class does most of the work here
          */
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
 
         sleep(2000);
@@ -82,7 +82,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //positioning the attachments to collect the stone
-                    timeDriveWithButt(x, y, z);
+                    //timeDriveWithButt(x, y, z);
                     break;
 
                 case GO_TO_BASE_PLATE2:
@@ -90,8 +90,10 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                     runtime.reset();
                     //driving to the baseplate
                     robot.timeDrive(x, y, z);
+                    /*
                     distDriveRear(x, y, z);
                     gyroHold(x, y, z);
+                    */
                     robot.timeDrive(x, y, z);
                     break;
 
@@ -105,7 +107,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                 case GO_TO_STONE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
-                    distToLine(x, y, z);
+                    //distToLine(x, y, z);
                     robot.timeDrive(x, y, z);
                     break;
 
@@ -113,10 +115,12 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
                     //positioning the attachments to collect the stone
+                    /*
                     robot.slide.setPower(x);
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
                     robot.liftMotor.setPower(x);
+                    */
                     break;
 
                 case GO_TO_BASE_PLATE3:
@@ -129,6 +133,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                 case PLACE_STONE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
+                    /*
                     robot.liftMotor.setPower(x);
                     robot.claw.setPosition(x);
                     robot.timeDrive(x, y, z);
@@ -138,12 +143,13 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                     robot.timeDrive(x, y, z);
                     robot.claw.setPosition(x);
                     robot.motorLift(x);
+                    */
                     break;
 
                 case GO_TO_LINE:
                     telemetry.addData("state", currentState.toString());
                     runtime.reset();
-                    distToLine(x, y, z);
+                    //distToLine(x, y, z);
                 case STOP:
                     telemetry.addData("state", currentState.toString());
 
@@ -156,6 +162,7 @@ public class TTAutoStonePlateRed extends LinearOpMode {
                     stop();
                     break;
             }
+            telemetry.update();
         }
     }
 }
