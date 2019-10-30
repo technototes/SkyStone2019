@@ -35,6 +35,7 @@ public class TTRobot /*extends LinearOpMode*/ {
   private final double LIFTGOINGDOWN = 0.8;
   private final double LIFTGOINGUP = -0.8;
 
+  private boolean isGrabberOpened = true;
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
@@ -43,7 +44,7 @@ public class TTRobot /*extends LinearOpMode*/ {
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
   private Servo turn = null;
-  private Servo claw = null;
+  private CRServo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
   private ElapsedTime runtime = new ElapsedTime();
@@ -71,7 +72,7 @@ public class TTRobot /*extends LinearOpMode*/ {
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
-    claw = hardwareMap.get(Servo.class, "claw");
+    claw = hardwareMap.get(CRServo.class, "claw");
     basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
     extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
@@ -111,6 +112,7 @@ public class TTRobot /*extends LinearOpMode*/ {
     frMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rlMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
     while (imu.getCalibrationStatus().calibrationStatus != 0
         || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
      sleep(10);
@@ -128,41 +130,21 @@ public class TTRobot /*extends LinearOpMode*/ {
     return retracted.isPressed();
   }
 
-  public void lslide(LinearSlideOperation dir) {
-    // Set the linear slide motor to the position
-    DcMotorSimple.Direction d = DcMotorSimple.Direction.FORWARD;
-    switch (dir) {
-      case Off:
-        slide.setPower(LINEARSLIDEOFFPOWER);
-        return;
-      case Extend:
-        d = DcMotorSimple.Direction.FORWARD;
-        break;
-      case Retract:
-        d = DcMotorSimple.Direction.REVERSE;
-        break;
+  public void lslide(double speed) {
+    if(Math.abs(speed) > 0.05) {
+      slide.setPower(speed);
+    }else{
+      slide.setPower(0);
     }
-    slide.setDirection(d);
-
-    // TODO: This is probably wrong
-    slide.setPower(LINEARSLIDEPOWER);
-    sleep(LINEARSLIDESLEEP);
-    slide.setPower(LINEARSLIDEOFFPOWER);
-}
+  }
 
   // Grabber stuff:
-  public void grabberClutch(GrabberMotorOperation operation) {
-    // TODO: Check this...
-    switch (operation) {
-      case Close:
-        claw.setPosition(CLOSECLAWPOSITION);
-        break;
-      case Open:
-        claw.setPosition(OPENCLAWPOSITION);
-        break;
-      case Off:
-        claw.setPosition(OFFCLAWPOSITION);
-        break;
+  public void grabberClutch() {
+    if(isGrabberOpened){
+      claw.setPower(-1);
+      isGrabberOpened = false;
+    }else{
+      claw.setPower(1);
     }
   }
 
@@ -175,14 +157,23 @@ public class TTRobot /*extends LinearOpMode*/ {
       return GrabberPosition.Vertical;
     }
   }
-
-  public void setGrabberPosition(GrabberPosition position) {
+  public void snapGrabberPosition(GrabberPosition position) {
     switch (position) {
       case Horizontal:
         turn.setPosition(HORIZONTALGRABBERPOSITION);
         break;
       case Vertical:
         turn.setPosition(VERTICALGRABBERPOSITION);
+        break;
+    }
+  }
+  public void turnGrabber(GrabberPosition position) {
+    switch (position) {
+      case Horizontal:
+        turn.setPosition(turn.getPosition()-0.1);
+        break;
+      case Vertical:
+        turn.setPosition(turn.getPosition()+0.1);
         break;
     }
   }
@@ -348,8 +339,7 @@ public class TTRobot /*extends LinearOpMode*/ {
       this.motorRearLeft(0);
       this.motorRearRight(0);
     }
-    // TODO: Alex, this stuff clearly isn't finished
-    // Please finish it :)
+
   }
 
 }
