@@ -21,7 +21,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 // @TeleOp(name = "Basic: Robot op mode", group = "Linear Opmode")
 public class Robot /*extends LinearOpMode*/ {
-
+  private final double TURNSPEEDFACTOR = 0.5; // turn speed factor
+  private final double  LINEARSLIDEPOSITION = 0.8;
+  private final int LINEARSLIDESLEEP = 500;
+  private final double LINEARSLIDEOFFPOWER = 0.0;
+  private final double CLOSECLAWPOSITION = 0.0;
+  private final double OPENCLAWPOSITION = 0.5;
+  private final double OFFCLAWPOSITION = 0.2;
+  private final double GRABBERPOSITIONCUTOFF = 0.25;
+  private final double HORIZONTALGRABBERPOSITION = 0.0;
+  private final double VERTICALGRABBERPOSITION = 0.5;
+  private final double ORIGINALLIFTPOWER = 0.0;
+  private final double LIFTGOINGDOWN = 0.8;
+  private final double LIFTGOINGUP = -0.8;
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
@@ -93,7 +105,7 @@ public class Robot /*extends LinearOpMode*/ {
     rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     while (imu.getCalibrationStatus().calibrationStatus != 0
         || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
-      sleep(10);
+     sleep(10);
     }
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
@@ -113,7 +125,7 @@ public class Robot /*extends LinearOpMode*/ {
     DcMotorSimple.Direction d = DcMotorSimple.Direction.FORWARD;
     switch (dir) {
       case Off:
-        slide.setPower(0.0);
+        slide.setPower(LINEARSLIDEOFFPOWER);
         return;
       case Extend:
         d = DcMotorSimple.Direction.FORWARD;
@@ -125,23 +137,23 @@ public class Robot /*extends LinearOpMode*/ {
     slide.setDirection(d);
 
     // TODO: This is probably wrong
-    slide.setPower(0.8);
-    sleep(500);
-    slide.setPower(0);
-  }
+    slide.setPower(LINEARSLIDEPOWER);
+    sleep(LINEARSLIDESLEEP);
+    slide.setPower(LINEARSLIDEOFFPOWER);
+}
 
   // Grabber stuff:
   public void grabberClutch(GrabberMotorOperation operation) {
     // TODO: Check this...
     switch (operation) {
       case Close:
-        claw.setPosition(0.0);
+        claw.setPosition(CLOSECLAWPOSITION);
         break;
       case Open:
-        claw.setPosition(0.5);
+        claw.setPosition(OPENCLAWPOSITION);
         break;
       case Off:
-        claw.setPosition(0.2);
+        claw.setPosition(OFFCLAWPOSITION);
         break;
     }
   }
@@ -149,7 +161,7 @@ public class Robot /*extends LinearOpMode*/ {
   public GrabberPosition getGrabberPosition() {
     // TODO: Check this...
     double pos = turn.getPosition();
-    if (pos < 0.25) {
+    if (pos < GRABBERPOSITIONCUTOFF) {
       return GrabberPosition.Horizontal;
     } else {
       return GrabberPosition.Vertical;
@@ -159,25 +171,25 @@ public class Robot /*extends LinearOpMode*/ {
   public void setGrabberPosition(GrabberPosition position) {
     switch (position) {
       case Horizontal:
-        turn.setPosition(0.0);
+        turn.setPosition(HORIZONTALGRABBERPOSITION);
         break;
       case Vertical:
-        turn.setPosition(0.5);
+        turn.setPosition(VERTICALGRABBERPOSITION);
         break;
     }
   }
 
   // Lift stuff:
   public void setLift(LiftDirection dir) {
-    double power = 0.0;
+    double power = ORIGINALLIFTPOWER;
     switch (dir) {
       case Off:
         return;
       case Up:
-        power = 0.8;
+        power = LIFTGOINGDOWN;
         break;
       case Down:
-        power = -0.8;
+        power = LIFTGOINGUP;
         break;
     }
     lLiftMotor.setPower(power);
@@ -219,7 +231,7 @@ public class Robot /*extends LinearOpMode*/ {
     return angles.firstAngle;
   }
 
-  public final double SCALEFACTOR = 0.5; // turn speed factor
+
   private Robot robot;
   private Controller controller;
   /*
@@ -247,7 +259,7 @@ public class Robot /*extends LinearOpMode*/ {
   }
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
-    tturn = turn * SCALEFACTOR;
+    tturn = turn * TURNSPEEDFACTOR;
     double angle = joystickAngle + robot.gyroHeading();
     flPower = power * Math.cos((angle - 45) / (180 / Math.PI)) + tturn;
     frPower = -power * Math.cos((angle + 45) / (180 / Math.PI)) + tturn;
@@ -258,7 +270,6 @@ public class Robot /*extends LinearOpMode*/ {
     robot.motorRearLeft(rlPower);
     robot.motorRearRight(rrPower);
   }
-
   // set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and
   // input angle to snap to.
   public double snapToAngle(double gyroAngle) {
