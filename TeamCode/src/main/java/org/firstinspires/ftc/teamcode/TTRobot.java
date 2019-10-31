@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-public class TTRobot {
+public class TTRobot{
   // The power applied to the wheels for robot rotation
   private final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
@@ -32,31 +32,31 @@ public class TTRobot {
   private final double VERTICALGRABBERPOSITION = 0.5;
   //the power of the linear slide
   private final double LINEARSLIDEPOWER = 0.5;
-
+  private final double STICKDEADZONE = 0.25;
   private boolean isGrabberOpened = true;
   private LinearSlidePosition position = LinearSlidePosition.In;
 
-  private DigitalChannel lslideSwitch = null;
-  private CRServo slide = null;
+  //private DigitalChannel lslideSwitch = null;
+  //private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
   private DcMotor rlMotor = null;
   private DcMotor rrMotor = null;
-  private DcMotor lLiftMotor = null;
-  private DcMotor rLiftMotor = null;
-  private Servo turn = null;
-  private CRServo claw = null;
-  private TouchSensor extended = null;
-  private TouchSensor retracted = null;
-  private ElapsedTime runtime = new ElapsedTime();
-  private Servo basePlateGrabber = null;
-  private TouchSensor touch = null;
+  // private DcMotor lLiftMotor = null;
+  //private DcMotor rLiftMotor = null;
+  //private Servo turn = null;
+  //private CRServo claw = null;
+  //private TouchSensor extended = null;
+  //private TouchSensor retracted = null;
+  //private ElapsedTime runtime = new ElapsedTime();
+  //private Servo basePlateGrabber = null;
+  //private TouchSensor touch = null;
 
   private Telemetry telemetry = null;
 
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
-  private BNO055IMU imu;
+  private BNO055IMU imu1;
   // State used for updating telemetry
   private Orientation angles;
   private Acceleration gravity;
@@ -74,23 +74,24 @@ public class TTRobot {
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "servo");
+    /*slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(CRServo.class, "claw");
     basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
     extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
-
-    flMotor = hardwareMap.get(DcMotor.class, "flMotor");
-    frMotor = hardwareMap.get(DcMotor.class, "frMotor");
-    rlMotor = hardwareMap.get(DcMotor.class, "rlMotor");
-    rrMotor = hardwareMap.get(DcMotor.class, "rrMotor");
+*/
+    flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
+    frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
+    rlMotor = hardwareMap.get(DcMotor.class, "motorRearLeft");
+    rrMotor = hardwareMap.get(DcMotor.class, "motorRearRight");
+    /*
     lLiftMotor = hardwareMap.get(DcMotor.class, "lLiftMotor");
     rLiftMotor = hardwareMap.get(DcMotor.class, "rLiftMotor");
 
-    imu = hardwareMap.get(BNO055IMU.class, "imu");
-    touch = hardwareMap.get(TouchSensor.class, "touch");
-
+*/
+    imu1 = hardwareMap.get(BNO055IMU.class, "imu1");
+//    touch = hardwareMap.get(TouchSensor.class, "touch");
     // Setup the IMU
     // Set up the parameters with which we will use our IMU. Note that integration
     // algorithm here just reports accelerations to the logcat log; it doesn't actually
@@ -99,139 +100,139 @@ public class TTRobot {
     parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
     parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
     parameters.calibrationDataFile =
-        "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+            "AdafruitIMUCalibration.json"; // see the calibration sample opmode
     parameters.loggingEnabled = true;
     parameters.loggingTag = "IMU";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-    imu.initialize(parameters);
+    imu1.initialize(parameters);
   }
 
   public void calibrate() {
     // make lift motors work together
-    lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+    // lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    //rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
 
     // Shamelessly copied from example code...
-    while (imu.getCalibrationStatus().calibrationStatus != 0
-        || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
+    while (imu1.getCalibrationStatus().calibrationStatus != 0
+            || imu1.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);
     }
     // Start the logging of measured acceleration
-    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+    imu1.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
+  /*
+    // Linear slide stuff:
+    public boolean isLinearSlideFullyExtended() {
+      return extended.isPressed();
+    }
 
-  // Linear slide stuff:
-  public boolean isLinearSlideFullyExtended() {
-    return extended.isPressed();
-  }
+    public boolean isLinearSlideFullyRetracted() {
+      return retracted.isPressed();
+    }
 
-  public boolean isLinearSlideFullyRetracted() {
-    return retracted.isPressed();
-  }
-
-  public void lslide(LinearSlideOperation inOrOut) {
-    if(position == LinearSlidePosition.In){
+    public void lslide(LinearSlideOperation inOrOut) {
+      if(position == LinearSlidePosition.In){
+          if(inOrOut == LinearSlideOperation.Extend){
+            while(lslideSwitch.getState()){
+              slide.setPower(LINEARSLIDEPOWER);
+            }
+            slide.setPower(LINEARSLIDEPOWER);
+            while(!lslideSwitch.getState()){
+              slide.setPower(LINEARSLIDEPOWER);
+            }
+            position = LinearSlidePosition.Middle;
+          }
+      }else if(position == LinearSlidePosition.Middle){
         if(inOrOut == LinearSlideOperation.Extend){
           while(lslideSwitch.getState()){
             slide.setPower(LINEARSLIDEPOWER);
           }
-          slide.setPower(LINEARSLIDEPOWER);
           while(!lslideSwitch.getState()){
             slide.setPower(LINEARSLIDEPOWER);
           }
           position = LinearSlidePosition.Middle;
+        }else{
+          while(lslideSwitch.getState()){
+            slide.setPower(-LINEARSLIDEPOWER);
+          }
+          while(!lslideSwitch.getState()){
+            slide.setPower(-LINEARSLIDEPOWER);
+          }
+          position = LinearSlidePosition.Middle;
         }
-    }else if(position == LinearSlidePosition.Middle){
-      if(inOrOut == LinearSlideOperation.Extend){
-        while(lslideSwitch.getState()){
-          slide.setPower(LINEARSLIDEPOWER);
-        }
-        while(!lslideSwitch.getState()){
-          slide.setPower(LINEARSLIDEPOWER);
-        }
-        position = LinearSlidePosition.Middle;
       }else{
-        while(lslideSwitch.getState()){
-          slide.setPower(-LINEARSLIDEPOWER);
+        if(inOrOut == LinearSlideOperation.Retract){
+          while(lslideSwitch.getState()){
+            slide.setPower(-LINEARSLIDEPOWER);
+          }
+          while(!lslideSwitch.getState()){
+            slide.setPower(-LINEARSLIDEPOWER);
+          }
+          position = LinearSlidePosition.Middle;
         }
-        while(!lslideSwitch.getState()){
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        position = LinearSlidePosition.Middle;
-      }
-    }else{
-      if(inOrOut == LinearSlideOperation.Retract){
-        while(lslideSwitch.getState()){
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        while(!lslideSwitch.getState()){
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        position = LinearSlidePosition.Middle;
       }
     }
-  }
 
-  // Grabber stuff:
-  public void grabberClutch() {
-    if (isGrabberOpened) {
-      claw.setPower(-1);
-      isGrabberOpened = false;
-    } else {
-      claw.setPower(1);
+    // Grabber stuff:
+    public void grabberClutch() {
+      if (isGrabberOpened) {
+        claw.setPower(-1);
+        isGrabberOpened = false;
+      } else {
+        claw.setPower(1);
+      }
     }
-  }
 
-  public GrabberPosition getGrabberPosition() {
-    // TODO: Check this...
-    double pos = turn.getPosition();
-    if (pos < GRABBERPOSITIONCUTOFF) {
-      return GrabberPosition.Horizontal;
-    } else {
-      return GrabberPosition.Vertical;
+    public GrabberPosition getGrabberPosition() {
+      // TODO: Check this...
+      double pos = turn.getPosition();
+      if (pos < GRABBERPOSITIONCUTOFF) {
+        return GrabberPosition.Horizontal;
+      } else {
+        return GrabberPosition.Vertical;
+      }
     }
-  }
 
-  public void snapGrabberPosition(GrabberPosition position) {
-    switch (position) {
-      case Horizontal:
-        turn.setPosition(HORIZONTALGRABBERPOSITION);
-        break;
-      case Vertical:
-        turn.setPosition(VERTICALGRABBERPOSITION);
-        break;
+    public void snapGrabberPosition(GrabberPosition position) {
+      switch (position) {
+        case Horizontal:
+          turn.setPosition(HORIZONTALGRABBERPOSITION);
+          break;
+        case Vertical:
+          turn.setPosition(VERTICALGRABBERPOSITION);
+          break;
+      }
     }
-  }
 
-  public void turnGrabber(GrabberPosition position) {
-    switch (position) {
-      case Horizontal:
-        turn.setPosition(turn.getPosition() - 0.1);
-        break;
-      case Vertical:
-        turn.setPosition(turn.getPosition() + 0.1);
-        break;
+    public void turnGrabber(GrabberPosition position) {
+      switch (position) {
+        case Horizontal:
+          turn.setPosition(turn.getPosition() - 0.1);
+          break;
+        case Vertical:
+          turn.setPosition(turn.getPosition() + 0.1);
+          break;
+      }
     }
-  }
 
-  // Lift stuff:
-  public void setLift(double speed) {
-    lLiftMotor.setPower(speed);
-    rLiftMotor.setPower(speed);
-  }
+    // Lift stuff:
+    public void setLift(double speed) {
+      lLiftMotor.setPower(speed);
+      rLiftMotor.setPower(speed);
+    }
 
-  public boolean isLiftAtUpperLimit() {
-    // TODO: Read the upper limit switch
-    return false;
-  }
+    public boolean isLiftAtUpperLimit() {
+      // TODO: Read the upper limit switch
+      return false;
+    }
 
-  public boolean isLiftAtLowerLimit() {
-    // TODO: Read the lower limit switch
-    return false;
-  }
-
+    public boolean isLiftAtLowerLimit() {
+      // TODO: Read the lower limit switch
+      return false;
+    }
+  */
   // Drive train:
   // These should just be used by the drive train
   public void motorFrontLeft(double power) {
@@ -252,8 +253,8 @@ public class TTRobot {
 
   public double gyroHeading() {
     // UNTESTED!
-    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    gravity = imu.getGravity();
+    angles = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    gravity = imu1.getGravity();
     return angles.firstAngle;
   }
 
@@ -297,7 +298,7 @@ public class TTRobot {
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
     if (j1.Y != 0) {
-      leftStickY = stepInput(j1.Y);
+      leftStickY = -stepInput(j1.Y);
     } else {
       leftStickY = 0.0;
     }
@@ -306,9 +307,9 @@ public class TTRobot {
     } else {
       leftStickX = 0.0;
     }
-    rightStickX = stepInputRotate(j2.X);
+    rightStickX = -stepInputRotate(j2.X);
 
-    if (leftStickY != 0 || leftStickX != 0 || rightStickX != 0) {
+    if (Math.abs(leftStickY) > STICKDEADZONE || Math.abs(leftStickX) > STICKDEADZONE || Math.abs(rightStickX) > STICKDEADZONE) {
 //                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
       robotHeadingRad = Math.toRadians(gyroAngle);
       powerCompY = (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
@@ -394,11 +395,11 @@ public class TTRobot {
       //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
       robotHeadingRad = Math.toRadians(this.gyroHeading());
       powerCompY =
-          (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
-              + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+              (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+                      + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
       powerCompX =
-          -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
-              + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+              -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+                      + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
       frontLeftSpeed = powerCompY + powerCompX;
       frontRightSpeed = -powerCompY + powerCompX;
@@ -427,5 +428,51 @@ public class TTRobot {
       this.motorRearLeft(0);
       this.motorRearRight(0);
     }
+  }
+  double stepInputRotate(double dVal)  {
+    double stepVal = 0.0;
+    double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
+
+    // get the corresponding index for the scaleInput array.
+    int index = Math.abs((int) (dVal * 10.0));
+
+    // index cannot exceed size of array minus 1.
+    if (index > 10) {
+      index = 10;
+    }
+
+    // get value from the array.
+    if (dVal < 0) {
+      stepVal = -stepArray[index];
+    } else {
+      stepVal = stepArray[index];
+    }
+
+
+    // return scaled value.
+    return stepVal;
+  }
+  double stepInput(double dVal)  {
+    double stepVal = 0.0;
+    double[] stepArray = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
+
+    // get the corresponding index for the scaleInput array.
+    int index = Math.abs((int) (dVal * 10.0));
+
+    // index cannot exceed size of array minus 1.
+    if (index > 10) {
+      index = 10;
+    }
+
+    // get value from the array.
+    if (dVal < 0) {
+      stepVal = -stepArray[index];
+    } else {
+      stepVal = stepArray[index];
+    }
+
+
+    // return scaled value.
+    return stepVal;
   }
 }

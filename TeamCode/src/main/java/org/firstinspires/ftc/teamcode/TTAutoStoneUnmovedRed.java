@@ -130,12 +130,12 @@ public class TTAutoStoneUnmovedRed extends LinearOpMode {
                     robot.timeDrive(x, y, z);
                     robot.claw.setPosition(x);
                     robot.liftMotor.setPower(x);
-                    */
+
                     robot.lLiftMotor(Up);
                     robot.rLiftMotor(Up);
                     robot.grabberClutch(Close);
                     robot.lLiftMotor(Down);
-                    robot.rLiftMotor(Down);
+                    robot.rLiftMotor(Down);*/
                     break;
                 case MOVE_BASE_PLATE:
                     telemetry.addData("state", currentState.toString());
