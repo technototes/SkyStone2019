@@ -13,12 +13,16 @@ public class DirectControl extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot = new TTRobot();
-        driver = new Controller(gamepad1, telemetry);
-        control = new Controller(gamepad2, telemetry);
+        // If you want telemetry, include a name as a string
+        // If you don't want telemetry, pass a null:
+        driver = new Controller(gamepad1, telemetry, "driver");
+        control = new Controller(gamepad2, telemetry, null);
         robot.init(hardwareMap, telemetry);
+        robot.calibrate(); // OOPS!
         waitForStart();
         while (opModeIsActive()) {
 
+            // Handle Grabber rotation
             if (control.buttonA() == Button.Pressed) {
                 if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
                     robot.snapGrabberPosition(GrabberPosition.Horizontal);
@@ -26,6 +30,7 @@ public class DirectControl extends LinearOpMode {
                     robot.snapGrabberPosition(GrabberPosition.Vertical);
                 }
             }
+            // Handle Grabber clutch
             if (control.buttonX() == Button.Pressed) {
                 robot.grabberClutch();
             }
@@ -37,19 +42,23 @@ public class DirectControl extends LinearOpMode {
                 robot.lslide(LinearSlideOperation.Retract);
             }*/
 
+            // Lift control:
             Direction dir = control.lstick();
-            if(Math.abs(control.lstick().Y) > robot.LIFTDEADZONE)
+            if(Math.abs(dir.Y) > robot.STICKDEADZONE)
                 robot.setLift(dir.Y);
 
+            // Driver control:
             Direction L = driver.lstick();
             Direction R = driver.rstick();
-            if (L.X > 0.01 || L.X < -0.01 ||
-                    L.Y > 0.01 || L.Y < -0.01 ||
-                    R.X > 0.01 || R.X < -0.01) {
+            if (Math.abs(L.X) > robot.STICKDEADZONE ||
+                Math.abs(L.Y) > robot.STICKDEADZONE ||
+                Math.abs(R.X) > robot.STICKDEADZONE) {
                 robot.joystickDrive(L, R, robot.gyroHeading());
             }
-            if(Math.abs(control.rstick().X) > 0.05){
-                robot.drive(0,0, 0,  control.rstick().X);
+            // The attachments controller can also rotate the robot
+            R = control.rstick();
+            if(Math.abs(R.X) > robot.STICKDEADZONE){
+                robot.drive(0,0, 0,  R.X);
             }
             telemetry.update();
         }

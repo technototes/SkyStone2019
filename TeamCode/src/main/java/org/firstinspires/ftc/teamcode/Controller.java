@@ -7,23 +7,25 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Controller {
     private Gamepad pad = null;
     private Telemetry telemetry = null;
+    private String name = null;
 
-    public Controller(Gamepad p, Telemetry tel) {
+    public Controller(Gamepad p, Telemetry tel, String nm) {
         pad = p;
+        name = nm;
     }
 
     Direction dpad() {
         if (pad.dpad_down) {
-            return new Direction(0, 1);
+            return getStick("d", 0, 1);
         }
         if (pad.dpad_up) {
-            return new Direction(0, -1);
+            return getStick("d", 0, -1);
         }
         if (pad.dpad_left) {
-            return new Direction(-1, 0);
+            return getStick("d", -1, 0);
         }
         if (pad.dpad_right) {
-            return new Direction(1, 0);
+            return getStick("d", 1, 0);
         }
         return Direction.None;
     }
@@ -61,11 +63,11 @@ public class Controller {
     }
 
     public Direction lstick() {
-        return new Direction(pad.left_stick_x, pad.left_stick_y);
+        return getStick("l", pad.left_stick_x, pad.left_stick_y);
     }
 
     public Direction rstick() {
-        return new Direction(pad.right_stick_x, pad.right_stick_y);
+        return getStick("r", pad.right_stick_x, pad.right_stick_y);
     }
 
     Button lbump() {
@@ -74,6 +76,13 @@ public class Controller {
         } else {
             return Button.Released;
         }
+    }
+
+    private Direction getStick(String which, float X, float Y) {
+        if (name != null) {
+            telemetry.addData(name + "-" + which + "> ", "X:%3.2f, Y:%3.2f", X, Y);
+        }
+        return new Direction(X, Y);
     }
 
     Button rbump() {

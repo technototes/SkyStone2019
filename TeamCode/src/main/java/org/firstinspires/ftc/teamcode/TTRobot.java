@@ -23,17 +23,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class TTRobot{
   // The power applied to the wheels for robot rotation
-  private final double TURNSPEEDFACTOR = 0.5;
+  private static final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
-  private final double GRABBERPOSITIONCUTOFF = 0.25;
+  private static final double GRABBERPOSITIONCUTOFF = 0.25;
   // the grab rotation 'horizontal' position
-  private final double HORIZONTALGRABBERPOSITION = 0.0;
+  private static final double HORIZONTALGRABBERPOSITION = 0.0;
   // the grab rotation 'vertical' position
-  private final double VERTICALGRABBERPOSITION = 0.5;
+  private static final double VERTICALGRABBERPOSITION = 0.5;
   //the power of the linear slide
-  private final double LINEARSLIDEPOWER = 0.5;
-  private final double STICKDEADZONE = 0.25;
-  public final double LIFTDEADZONE = 0.25;
+  private static final double LINEARSLIDEPOWER = 0.5;
+
+  // This is the middle 'dead zone' of the analog sticks
+  public static final double STICKDEADZONE = 0.25;
 
   private boolean isGrabberOpened = true;
   private LinearSlidePosition position = LinearSlidePosition.In;
@@ -50,7 +51,6 @@ public class TTRobot{
   private CRServo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
-  private ElapsedTime runtime = new ElapsedTime();
   private Servo basePlateGrabber = null;
   private TouchSensor touch = null;
 
@@ -58,7 +58,7 @@ public class TTRobot{
 
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
-  private BNO055IMU imu1;
+  private BNO055IMU imu;
   // State used for updating telemetry
   private Orientation angles;
   private Acceleration gravity;
@@ -92,8 +92,9 @@ public class TTRobot{
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
 
 
-    imu1 = hardwareMap.get(BNO055IMU.class, "imu1");
+    imu = hardwareMap.get(BNO055IMU.class, "imu1");
 //    touch = hardwareMap.get(TouchSensor.class, "touch");
+
     // Setup the IMU
     // Set up the parameters with which we will use our IMU. Note that integration
     // algorithm here just reports accelerations to the logcat log; it doesn't actually
@@ -106,7 +107,7 @@ public class TTRobot{
     parameters.loggingEnabled = true;
     parameters.loggingTag = "IMU";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-    imu1.initialize(parameters);
+    imu.initialize(parameters);
   }
 
   public void calibrate() {
@@ -117,12 +118,12 @@ public class TTRobot{
 
 
     // Shamelessly copied from example code...
-    while (imu1.getCalibrationStatus().calibrationStatus != 0
-            || imu1.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
+    while (imu.getCalibrationStatus().calibrationStatus != 0
+            || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);
     }
     // Start the logging of measured acceleration
-    imu1.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
 
     // Linear slide stuff:
@@ -255,8 +256,8 @@ public class TTRobot{
 
   public double gyroHeading() {
     // UNTESTED!
-    angles = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    gravity = imu1.getGravity();
+    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    gravity = imu.getGravity();
     return angles.firstAngle;
   }
 
@@ -272,33 +273,22 @@ public class TTRobot{
      \         /
   rl  +-------+  rr
   */
-  public double flPower;
-  public double frPower;
-  public double rrPower;
-  public double rlPower;
-  public double tturn;
-  private ElapsedTime runtime2 = new ElapsedTime();
-  private ElapsedTime timer = new ElapsedTime();
-
-  // State used for updating telemetry
-  private Orientation angles1;
-  private Orientation angles2;
-
-  private double leftStickY = 0;
-  private double leftStickX = 0;
-  private double rightStickX = 0;
-
-  private double robotHeadingRad = 0.0;
-  private double powerCompY = 0.0;
-  private double powerCompX = 0.0;
-
-  private double powerFrontLeft = 0.0;
-  private double powerFrontRight = 0.0;
-  private double powerRearLeft = 0.0;
-  private double powerRearRight = 0.0;
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
+    double leftStickY = 0;
+    double leftStickX = 0;
+    double rightStickX = 0;
+
+    double robotHeadingRad = 0.0;
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
+
+    double powerFrontLeft = 0.0;
+    double powerFrontRight = 0.0;
+    double powerRearLeft = 0.0;
+    double powerRearRight = 0.0;
+
     if (j1.Y != 0) {
       leftStickY = -stepInput(j1.Y);
     } else {
@@ -328,19 +318,20 @@ public class TTRobot{
       powerRearRight = 0.0;
     }
 
-    motorFrontLeft(Range.clip(powerFrontLeft, -1.0, 1.0));
-    motorFrontRight(Range.clip(powerFrontRight, -1.0, 1.0));
-    motorRearLeft(Range.clip(powerRearLeft, -1.0, 1.0));
-    motorRearRight(Range.clip(powerRearRight, -1.0, 1.0));
+    motorFrontLeft(powerFrontLeft);
+    motorFrontRight(powerFrontRight);
+    motorRearLeft(powerRearLeft);
+    motorRearRight(powerRearRight);
   }
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
-    tturn = turn * TURNSPEEDFACTOR;
+    double tturn = turn * TURNSPEEDFACTOR;
     double angle = joystickAngle + gyroAngle;
-    flPower = power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
-    frPower = -power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
-    rrPower = -power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
-    rlPower = power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
+    double flPower = power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
+    double frPower = -power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
+    double rrPower = -power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
+    double rlPower = power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
+    telemetry.addData("drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
     this.motorFrontLeft(flPower);
     this.motorFrontRight(frPower);
     this.motorRearLeft(rlPower);
@@ -389,8 +380,6 @@ public class TTRobot{
     double rearLeftSpeed;
     double rearRightSpeed;
 
-    // Ensure that the opmode is still active
-    if (true) {
       driveTime.reset();
 
       speed = Range.clip(speed, 0.0, 1.0);
@@ -409,19 +398,19 @@ public class TTRobot{
       rearRightSpeed = -powerCompY - powerCompX;
 
       // keep looping while we are still active, and BOTH motors are running.
-      while (true && driveTime.seconds() < time) {
+      while (driveTime.seconds() < time) {
         this.motorFrontLeft(frontLeftSpeed);
         this.motorFrontRight(frontRightSpeed);
         this.motorRearLeft(rearLeftSpeed);
         this.motorRearRight(rearRightSpeed);
 
         // Display drive status for the driver.
-        // telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
-        // frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-        // telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " +
-        // robot.gyro.getIntegratedZValue());
-        // telemetry.addData("Gyro", "Heading: " + getRobotHeading());
-        // telemetry.update();
+        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
+        frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+/*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
+        imu.getgetIntegratedZValue());*/
+        telemetry.addData("Gyro", "Heading: " + gyroHeading());
+        //telemetry.update();
       }
 
       // Stop all motion;
@@ -429,7 +418,6 @@ public class TTRobot{
       this.motorFrontRight(0);
       this.motorRearLeft(0);
       this.motorRearRight(0);
-    }
   }
   double stepInputRotate(double dVal)  {
     double stepVal = 0.0;
