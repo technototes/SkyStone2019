@@ -33,24 +33,26 @@ public class TTRobot{
   //the power of the linear slide
   private final double LINEARSLIDEPOWER = 0.5;
   private final double STICKDEADZONE = 0.25;
+  public final double LIFTDEADZONE = 0.25;
+
   private boolean isGrabberOpened = true;
   private LinearSlidePosition position = LinearSlidePosition.In;
 
-  //private DigitalChannel lslideSwitch = null;
-  //private CRServo slide = null;
+  private DigitalChannel lslideSwitch = null;
+  private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
   private DcMotor rlMotor = null;
   private DcMotor rrMotor = null;
-  // private DcMotor lLiftMotor = null;
-  //private DcMotor rLiftMotor = null;
-  //private Servo turn = null;
-  //private CRServo claw = null;
-  //private TouchSensor extended = null;
-  //private TouchSensor retracted = null;
-  //private ElapsedTime runtime = new ElapsedTime();
-  //private Servo basePlateGrabber = null;
-  //private TouchSensor touch = null;
+  private DcMotor lLiftMotor = null;
+  private DcMotor rLiftMotor = null;
+  private Servo turn = null;
+  private CRServo claw = null;
+  private TouchSensor extended = null;
+  private TouchSensor retracted = null;
+  private ElapsedTime runtime = new ElapsedTime();
+  private Servo basePlateGrabber = null;
+  private TouchSensor touch = null;
 
   private Telemetry telemetry = null;
 
@@ -73,23 +75,23 @@ public class TTRobot{
 
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
-    // Get handles to all the hardware
-    /*slide = hardwareMap.get(CRServo.class, "servo");
-    turn = hardwareMap.get(Servo.class, "grabTurn");
-    claw = hardwareMap.get(CRServo.class, "claw");
-    basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
-    extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
-    retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
-*/
+    //Get handles to all the hardware
+    //slide = hardwareMap.get(CRServo.class, "servo");
+    //turn = hardwareMap.get(Servo.class, "grabTurn");
+    //claw = hardwareMap.get(CRServo.class, "claw");
+    //basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
+    //extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
+    //retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
+
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
     rlMotor = hardwareMap.get(DcMotor.class, "motorRearLeft");
     rrMotor = hardwareMap.get(DcMotor.class, "motorRearRight");
-    /*
-    lLiftMotor = hardwareMap.get(DcMotor.class, "lLiftMotor");
-    rLiftMotor = hardwareMap.get(DcMotor.class, "rLiftMotor");
 
-*/
+    lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
+    rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+
+
     imu1 = hardwareMap.get(BNO055IMU.class, "imu1");
 //    touch = hardwareMap.get(TouchSensor.class, "touch");
     // Setup the IMU
@@ -109,8 +111,8 @@ public class TTRobot{
 
   public void calibrate() {
     // make lift motors work together
-    // lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    //rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+    lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
 
@@ -122,7 +124,7 @@ public class TTRobot{
     // Start the logging of measured acceleration
     imu1.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
-  /*
+
     // Linear slide stuff:
     public boolean isLinearSlideFullyExtended() {
       return extended.isPressed();
@@ -132,7 +134,7 @@ public class TTRobot{
       return retracted.isPressed();
     }
 
-    public void lslide(LinearSlideOperation inOrOut) {
+    /*public void lslide(LinearSlideOperation inOrOut) {
       if(position == LinearSlidePosition.In){
           if(inOrOut == LinearSlideOperation.Extend){
             while(lslideSwitch.getState()){
@@ -173,7 +175,7 @@ public class TTRobot{
           position = LinearSlidePosition.Middle;
         }
       }
-    }
+    }*/
 
     // Grabber stuff:
     public void grabberClutch() {
@@ -232,7 +234,7 @@ public class TTRobot{
       // TODO: Read the lower limit switch
       return false;
     }
-  */
+
   // Drive train:
   // These should just be used by the drive train
   public void motorFrontLeft(double power) {

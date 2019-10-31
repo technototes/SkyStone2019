@@ -30,21 +30,22 @@ public class DirectControl extends LinearOpMode {
                 robot.grabberClutch();
             }
             //redid this to work with magnetic limit switch
-            Direction dpad = control.dpad();
+            /*Direction dpad = control.dpad();
             if(dpad.X == 1){
                 robot.lslide(LinearSlideOperation.Extend);
             }else if(dpad.X == -1){
                 robot.lslide(LinearSlideOperation.Retract);
-            }
+            }*/
 
             Direction dir = control.lstick();
-            robot.setLift(dir.Y);
+            if(Math.abs(control.lstick().Y) > robot.LIFTDEADZONE)
+                robot.setLift(dir.Y);
 
             Direction L = driver.lstick();
             Direction R = driver.rstick();
             if (L.X > 0.01 || L.X < -0.01 ||
-                L.Y > 0.01 || L.Y < -0.01 ||
-                R.X > 0.01 || R.X < -0.01) {
+                    L.Y > 0.01 || L.Y < -0.01 ||
+                    R.X > 0.01 || R.X < -0.01) {
                 robot.joystickDrive(L, R, robot.gyroHeading());
             }
             if(Math.abs(control.rstick().X) > 0.05){
