@@ -45,6 +45,9 @@ public class DirectControl extends LinearOpMode {
             Direction dir = control.lstick();
             if(Math.abs(dir.Y) > robot.STICKDEADZONE)
                 robot.setLift(dir.Y);
+            else {
+                robot.setLift(0);
+            }
 
             // Driver control:
             Direction L = driver.lstick();

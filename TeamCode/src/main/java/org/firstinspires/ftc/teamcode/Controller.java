@@ -80,7 +80,7 @@ public class Controller {
 
     private Direction getStick(String which, float X, float Y) {
         if (name != null) {
-            telemetry.addData(name + "-" + which + "> ", "X:%3.2f, Y:%3.2f", X, Y);
+            //telemetry.addData(name + "-" + which + "> ", "X:%3.2f, Y:%3.2f", (double)X, (double)Y);
         }
         return new Direction(X, Y);
     }
