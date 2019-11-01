@@ -155,7 +155,7 @@ public class TTPOVDrive extends TTLinearOpMode {
             }
             // Gamepad 2 - y
                 if (gamepad2.y) {
-                    robot.setLift(dir.Y);
+                    robot.setLift(.5);// TODO: This is wrong gamepad2.y);
                 }
                 else {
                     robot.setLift(0);

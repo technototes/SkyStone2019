@@ -406,7 +406,7 @@ public abstract class TTLinearOpMode extends LinearOpMode {
     }
 
     public double getRobotHeading() {
-        angles1 = robot.gyroHeading();
+        return robot.gyroHeading();
     }
 
 }
