@@ -50,363 +50,373 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-
 public abstract class TTLinearOpMode extends LinearOpMode {
 
-    static final double HEADING_THRESHOLD = 0.5;    // As tight as we can make it with an integer gyro
-    static final double P_TURN_COEFF = 0.1;    // Larger is more responsive, but also less stable
+  static final double HEADING_THRESHOLD = 0.5; // As tight as we can make it with an integer gyro
+  static final double P_TURN_COEFF = 0.1; // Larger is more responsive, but also less stable
 
-    public static final boolean LIMIT_MAG_ON = false;
-    public static final boolean LIMIT_MAG_OFF = true;
-    public static final boolean LIMIT_MEC_ON = true;
-    public static final boolean LIMIT_MEC_OFF = false;
+  public static final boolean LIMIT_MAG_ON = false;
+  public static final boolean LIMIT_MAG_OFF = true;
+  public static final boolean LIMIT_MEC_ON = true;
+  public static final boolean LIMIT_MEC_OFF = false;
 
-    public static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    public static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+  public static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+  public static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+  public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
-    public enum GoldMineralPos {LEFT, MIDDLE, RIGHT, UNKNOWN}
+  public enum GoldMineralPos {
+    LEFT,
+    MIDDLE,
+    RIGHT,
+    UNKNOWN
+  }
 
-    // sometimes it helps to multiply the raw RGB values with a scale factor
-    // to amplify/attentuate the measured values.
-    static final double SCALE_FACTOR = 255;
+  // sometimes it helps to multiply the raw RGB values with a scale factor
+  // to amplify/attentuate the measured values.
+  static final double SCALE_FACTOR = 255;
 
-    public TTRobot robot = null;
-    private Orientation angles1;
+  public TTRobot robot = null;
+  private Orientation angles1;
 
-    // hsvValues is an array that will hold the hue, saturation, and value information.
-    float hsvValues[] = {0F, 0F, 0F};
+  // hsvValues is an array that will hold the hue, saturation, and value information.
+  float hsvValues[] = {0F, 0F, 0F};
 
-    private static final String VUFORIA_KEY = "Afr2UsD/////AAAAGVsbt/Ka6EOAj/MfHaZcCWKIcaxclUoOSaQnk/mNz2rzlo+lylAA/E62EFXpjco7vFmqzFyTw+tvPHZj9qMjMKdWHxsHbq/cbQZ7r6BCe5qBzRNVMg69lJEP7dJ+ss5q41SR0Cqs93RSa09U2idgrO5mIsk5VWR19iAbrcuO7cgqfgYQlpeHchR3Z+NdQo/lbWaRqV1fRNVFcwfI8DzLDwvFlEsKass4F5tglt3lDS1zyA/pzfOU9W5zc3OH33dNTN/M4w4dkVDDEOnzmkOP+0svMgM0J4vDaRx+2ZEiFrmVWvW5wz/VumSfniVgg2SlWjy3d0+GCVfTra7OhmBKlWH0qlTYemBc8YE+XtErUG/D";
-    private VuforiaLocalizer vuforia;
-    public TFObjectDetector tfod;
+  private static final String VUFORIA_KEY =
+      "Afr2UsD/////AAAAGVsbt/Ka6EOAj/MfHaZcCWKIcaxclUoOSaQnk/mNz2rzlo+lylAA/E62EFXpjco7vFmqzFyTw+tvPHZj9qMjMKdWHxsHbq/cbQZ7r6BCe5qBzRNVMg69lJEP7dJ+ss5q41SR0Cqs93RSa09U2idgrO5mIsk5VWR19iAbrcuO7cgqfgYQlpeHchR3Z+NdQo/lbWaRqV1fRNVFcwfI8DzLDwvFlEsKass4F5tglt3lDS1zyA/pzfOU9W5zc3OH33dNTN/M4w4dkVDDEOnzmkOP+0svMgM0J4vDaRx+2ZEiFrmVWvW5wz/VumSfniVgg2SlWjy3d0+GCVfTra7OhmBKlWH0qlTYemBc8YE+XtErUG/D";
+  private VuforiaLocalizer vuforia;
+  public TFObjectDetector tfod;
 
+  public void timeDrive(double speed, double time, double angle) {
 
-    public void timeDrive(double speed,
-                          double time,
-                          double angle) {
+    ElapsedTime driveTime = new ElapsedTime();
 
-        ElapsedTime driveTime = new ElapsedTime();
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
 
-        double robotHeadingRad = 0.0;
-        double angleRad = Math.toRadians(angle);
-        double powerCompY = 0.0;
-        double powerCompX = 0.0;
+    double frontLeftSpeed;
+    double frontRightSpeed;
+    double rearLeftSpeed;
+    double rearRightSpeed;
 
-        double frontLeftSpeed;
-        double frontRightSpeed;
-        double rearLeftSpeed;
-        double rearRightSpeed;
+    // Ensure that the opmode is still active
+    if (opModeIsActive()) {
+      driveTime.reset();
 
-        // Ensure that the opmode is still active
-        if (opModeIsActive()) {
-            driveTime.reset();
+      speed = Range.clip(speed, 0.0, 1.0);
+      //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+      robotHeadingRad = Math.toRadians(getRobotHeading());
+      powerCompY =
+          (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+              + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      powerCompX =
+          -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+              + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
-            speed = Range.clip(speed, 0.0, 1.0);
-//            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
-            robotHeadingRad = Math.toRadians(getRobotHeading());
-            powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
-            powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      frontLeftSpeed = powerCompY + powerCompX;
+      frontRightSpeed = -powerCompY + powerCompX;
+      rearLeftSpeed = powerCompY - powerCompX;
+      rearRightSpeed = -powerCompY - powerCompX;
 
-            frontLeftSpeed = powerCompY + powerCompX;
-            frontRightSpeed = -powerCompY + powerCompX;
-            rearLeftSpeed = powerCompY - powerCompX;
-            rearRightSpeed = -powerCompY - powerCompX;
+      // keep looping while we are still active, and BOTH motors are running.
+      while (opModeIsActive() && driveTime.seconds() < time) {
+        robot.motorFrontLeft(frontLeftSpeed);
+        robot.motorFrontRight(frontRightSpeed);
+        robot.motorRearLeft(rearLeftSpeed);
+        robot.motorRearRight(rearRightSpeed);
 
-            // keep looping while we are still active, and BOTH motors are running.
-            while (opModeIsActive() && driveTime.seconds() < time) {
-                robot.motorFrontLeft(frontLeftSpeed);
-                robot.motorFrontRight(frontRightSpeed);
-                robot.motorRearLeft(rearLeftSpeed);
-                robot.motorRearRight(rearRightSpeed);
+        // Display drive status for the driver.
+        telemetry.addData(
+            "Speed",
+            "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f",
+            frontLeftSpeed,
+            frontRightSpeed,
+            rearLeftSpeed,
+            rearRightSpeed);
+        // telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " +
+        // robot.gyro.getIntegratedZValue());
+        telemetry.addData("Gyro", "Heading: " + getRobotHeading());
+        telemetry.update();
+      }
 
-                // Display drive status for the driver.
-                telemetry.addData("Speed", "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-                //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
-                telemetry.addData("Gyro", "Heading: " + getRobotHeading());
-                telemetry.update();
-            }
+      // Stop all motion;
+      robot.motorFrontLeft(0);
+      robot.motorFrontRight(0);
+      robot.motorRearLeft(0);
+      robot.motorRearRight(0);
+    }
+  }
 
-            // Stop all motion;
-            robot.motorFrontLeft(0);
-            robot.motorFrontRight(0);
-            robot.motorRearLeft(0);
-            robot.motorRearRight(0);
+  /**
+   * Method to obtain & hold a heading for a finite amount of time Move will stop once the requested
+   * time has elapsed
+   *
+   * @param speed Desired speed of turn.
+   * @param angle Absolute Angle (in Degrees) relative to last gyro reset. 0 = fwd. +ve is CCW from
+   *     fwd. -ve is CW from forward. If a relative angle is required, add/subtract from current
+   *     heading.
+   * @param holdTime Length of time (in seconds) to hold the specified heading.
+   */
+  public void gyroHold(double speed, double angle, double holdTime) {
+
+    ElapsedTime holdTimer = new ElapsedTime();
+
+    // keep looping while we have time remaining.
+    holdTimer.reset();
+    while (opModeIsActive() && (holdTimer.time() < holdTime)) {
+      // Update telemetry & Allow time for other processes to run.
+      onHeading(speed, angle, P_TURN_COEFF);
+      telemetry.update();
+    }
+
+    // Stop all motion;
+    robot.motorFrontLeft(0.0);
+    robot.motorFrontRight(0.0);
+    robot.motorRearLeft(0.0);
+    robot.motorRearRight(0.0);
+  }
+
+  /**
+   * Perform one cycle of closed loop heading control.
+   *
+   * @param speed Desired speed of turn.
+   * @param angle Absolute Angle (in Degrees) relative to last gyro reset. 0 = fwd. +ve is CCW from
+   *     fwd. -ve is CW from forward. If a relative angle is required, add/subtract from current
+   *     heading.
+   * @param PCoeff Proportional Gain coefficient
+   * @return
+   */
+  boolean onHeading(double speed, double angle, double PCoeff) {
+    double error;
+    double steer;
+    boolean onTarget = false;
+    double turnSpeed;
+
+    // determine turn power based on +/- error
+    error = getError(angle);
+
+    if (Math.abs(error) <= HEADING_THRESHOLD) {
+      steer = 0.0;
+      turnSpeed = 0.0;
+      onTarget = true;
+    } else {
+      steer = getSteer(error, PCoeff);
+      turnSpeed = speed * steer;
+    }
+
+    // Send desired speeds to motors.
+    robot.motorFrontLeft(turnSpeed);
+    robot.motorFrontRight(turnSpeed);
+    robot.motorRearLeft(turnSpeed);
+    robot.motorRearRight(turnSpeed);
+
+    // Display it for the driver.
+    telemetry.addData("Target", "%5.2f", angle);
+    telemetry.addData("Err/St", "%5.2f/%5.2f", error, steer);
+    telemetry.addData("Speed.", "%5.2f", turnSpeed);
+
+    return onTarget;
+  }
+
+  /**
+   * getError determines the error between the target angle and the robot's current heading
+   *
+   * @param targetAngle Desired angle (relative to global reference established at last Gyro Reset).
+   * @return error angle: Degrees in the range +/- 180. Centered on the robot's frame of reference
+   *     +ve error means the robot should turn LEFT (CCW) to reduce error.
+   */
+  public double getError(double targetAngle) {
+    double robotError;
+
+    // calculate error in -179 to +180 range  (
+    //        robotError = targetAngle - (360 - robot.gyro.getHeading());
+    robotError = targetAngle - getRobotHeading();
+    while (robotError > 180) robotError -= 360;
+    while (robotError <= -180) robotError += 360;
+    return robotError;
+  }
+
+  /**
+   * returns desired steering force. +/- 1 range. +ve = steer left
+   *
+   * @param error Error angle in robot relative degrees
+   * @param PCoeff Proportional Gain Coefficient
+   * @return
+   */
+  public double getSteer(double error, double PCoeff) {
+    return Range.clip(error * PCoeff, -1, 1);
+  }
+
+  // Check if Red
+  public boolean isRed(ModernRoboticsI2cColorSensor cs) {
+    int redValue = cs.red();
+    int greenValue = cs.green();
+    int blueValue = cs.blue();
+    return redValue > blueValue && redValue > greenValue;
+  }
+
+  // Check if Blue
+  public boolean isBlue(ModernRoboticsI2cColorSensor cs) {
+    int redValue = cs.red();
+    int greenValue = cs.green();
+    int blueValue = cs.blue();
+    return blueValue > redValue && blueValue > greenValue;
+  }
+
+  // Check if Gold
+  public boolean isGold(ColorSensor cs) {
+    // convert the RGB values to HSV values.
+    // multiply by the SCALE_FACTOR.
+    // then cast it back to int (SCALE_FACTOR is a double)
+    Color.RGBToHSV(
+        (int) (cs.red() * SCALE_FACTOR),
+        (int) (cs.green() * SCALE_FACTOR),
+        (int) (cs.blue() * SCALE_FACTOR),
+        hsvValues);
+
+    return (hsvValues[0] < 100 && hsvValues[1] > 0.20);
+  }
+
+  public float getColorHue(ColorSensor cs) {
+    // convert the RGB values to HSV values.
+    // multiply by the SCALE_FACTOR.
+    // then cast it back to int (SCALE_FACTOR is a double)
+    Color.RGBToHSV(
+        (int) (cs.red() * SCALE_FACTOR),
+        (int) (cs.green() * SCALE_FACTOR),
+        (int) (cs.blue() * SCALE_FACTOR),
+        hsvValues);
+
+    return hsvValues[0];
+  }
+
+  // For lower power input, use step function to smooth driving
+  double stepInput(double dVal) {
+    double stepVal = 0.0;
+
+    if (gamepad1.right_trigger != 0) {
+      stepVal = dVal;
+    } else {
+      double[] stepArray = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
+
+      // get the corresponding index for the scaleInput array.
+      int index = Math.abs((int) (dVal * 10.0));
+
+      // index cannot exceed size of array minus 1.
+      if (index > 10) {
+        index = 10;
+      }
+
+      // get value from the array.
+      if (dVal < 0) {
+        stepVal = -stepArray[index];
+      } else {
+        stepVal = stepArray[index];
+      }
+    }
+
+    // return scaled value.
+    return stepVal;
+  }
+
+  // For lower power input, use step function to smooth driving
+  double stepInputRotate(double dVal) {
+    double stepVal = 0.0;
+
+    if (gamepad1.right_trigger != 0) {
+      stepVal = dVal;
+    } else {
+      double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
+
+      // get the corresponding index for the scaleInput array.
+      int index = Math.abs((int) (dVal * 10.0));
+
+      // index cannot exceed size of array minus 1.
+      if (index > 10) {
+        index = 10;
+      }
+
+      // get value from the array.
+      if (dVal < 0) {
+        stepVal = -stepArray[index];
+      } else {
+        stepVal = stepArray[index];
+      }
+    }
+
+    // return scaled value.
+    return stepVal;
+  }
+
+  /** Initialize the Vuforia localization engine. */
+  public void initVuforia() {
+    /*
+     * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+     */
+    VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+    parameters.vuforiaLicenseKey = VUFORIA_KEY;
+    parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+    //  Instantiate the Vuforia engine
+    vuforia = ClassFactory.getInstance().createVuforia(parameters);
+  }
+
+  /** Initialize the Tensor Flow Object Detection engine. */
+  public void initTfod() {
+    int tfodMonitorViewId =
+        hardwareMap
+            .appContext
+            .getResources()
+            .getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+    TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+    tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+    tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+  }
+
+  public GoldMineralPos getGoldPosition(List<Recognition> updatedRecognitions) {
+    GoldMineralPos goldMineralPosition = GoldMineralPos.UNKNOWN;
+
+    if (tfod != null && updatedRecognitions != null) {
+      boolean isGoldDetected = false;
+      int gMineralPos = -1;
+      int sMineralPos = -1;
+
+      telemetry.addData("# Object Detected", updatedRecognitions.size());
+      for (Recognition recognition : updatedRecognitions) {
+        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+          isGoldDetected = true;
         }
-    }
-
-
-    /**
-     * Method to obtain & hold a heading for a finite amount of time
-     * Move will stop once the requested time has elapsed
-     *
-     * @param speed    Desired speed of turn.
-     * @param angle    Absolute Angle (in Degrees) relative to last gyro reset.
-     *                 0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
-     *                 If a relative angle is required, add/subtract from current heading.
-     * @param holdTime Length of time (in seconds) to hold the specified heading.
-     */
-    public void gyroHold(double speed, double angle, double holdTime) {
-
-        ElapsedTime holdTimer = new ElapsedTime();
-
-        // keep looping while we have time remaining.
-        holdTimer.reset();
-        while (opModeIsActive() && (holdTimer.time() < holdTime)) {
-            // Update telemetry & Allow time for other processes to run.
-            onHeading(speed, angle, P_TURN_COEFF);
-            telemetry.update();
-        }
-
-        // Stop all motion;
-        robot.motorFrontLeft(0.0);
-        robot.motorFrontRight(0.0);
-        robot.motorRearLeft(0.0);
-        robot.motorRearRight(0.0);
-    }
-
-    /**
-     * Perform one cycle of closed loop heading control.
-     *
-     * @param speed  Desired speed of turn.
-     * @param angle  Absolute Angle (in Degrees) relative to last gyro reset.
-     *               0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
-     *               If a relative angle is required, add/subtract from current heading.
-     * @param PCoeff Proportional Gain coefficient
-     * @return
-     */
-    boolean onHeading(double speed, double angle, double PCoeff) {
-        double error;
-        double steer;
-        boolean onTarget = false;
-        double turnSpeed;
-
-        // determine turn power based on +/- error
-        error = getError(angle);
-
-        if (Math.abs(error) <= HEADING_THRESHOLD) {
-            steer = 0.0;
-            turnSpeed = 0.0;
-            onTarget = true;
-        } else {
-            steer = getSteer(error, PCoeff);
-            turnSpeed = speed * steer;
-        }
-
-        // Send desired speeds to motors.
-        robot.motorFrontLeft(turnSpeed);
-        robot.motorFrontRight(turnSpeed);
-        robot.motorRearLeft(turnSpeed);
-        robot.motorRearRight(turnSpeed);
-
-        // Display it for the driver.
-        telemetry.addData("Target", "%5.2f", angle);
-        telemetry.addData("Err/St", "%5.2f/%5.2f", error, steer);
-        telemetry.addData("Speed.", "%5.2f", turnSpeed);
-
-        return onTarget;
-    }
-
-    /**
-     * getError determines the error between the target angle and the robot's current heading
-     *
-     * @param targetAngle Desired angle (relative to global reference established at last Gyro Reset).
-     * @return error angle: Degrees in the range +/- 180. Centered on the robot's frame of reference
-     * +ve error means the robot should turn LEFT (CCW) to reduce error.
-     */
-    public double getError(double targetAngle) {
-        double robotError;
-
-        // calculate error in -179 to +180 range  (
-//        robotError = targetAngle - (360 - robot.gyro.getHeading());
-        robotError = targetAngle - getRobotHeading();
-        while (robotError > 180) robotError -= 360;
-        while (robotError <= -180) robotError += 360;
-        return robotError;
-    }
-
-    /**
-     * returns desired steering force.  +/- 1 range.  +ve = steer left
-     *
-     * @param error  Error angle in robot relative degrees
-     * @param PCoeff Proportional Gain Coefficient
-     * @return
-     */
-    public double getSteer(double error, double PCoeff) {
-        return Range.clip(error * PCoeff, -1, 1);
-    }
-
-    // Check if Red
-    public boolean isRed(ModernRoboticsI2cColorSensor cs) {
-        int redValue = cs.red();
-        int greenValue = cs.green();
-        int blueValue = cs.blue();
-        return redValue > blueValue && redValue > greenValue;
-    }
-
-    // Check if Blue
-    public boolean isBlue(ModernRoboticsI2cColorSensor cs) {
-        int redValue = cs.red();
-        int greenValue = cs.green();
-        int blueValue = cs.blue();
-        return blueValue > redValue && blueValue > greenValue;
-    }
-
-    // Check if Gold
-    public boolean isGold(ColorSensor cs) {
-        // convert the RGB values to HSV values.
-        // multiply by the SCALE_FACTOR.
-        // then cast it back to int (SCALE_FACTOR is a double)
-        Color.RGBToHSV((int) (cs.red() * SCALE_FACTOR),
-                (int) (cs.green() * SCALE_FACTOR),
-                (int) (cs.blue() * SCALE_FACTOR),
-                hsvValues);
-
-        return (hsvValues[0] < 100 && hsvValues[1] > 0.20);
-    }
-
-    public float getColorHue(ColorSensor cs) {
-        // convert the RGB values to HSV values.
-        // multiply by the SCALE_FACTOR.
-        // then cast it back to int (SCALE_FACTOR is a double)
-        Color.RGBToHSV((int) (cs.red() * SCALE_FACTOR),
-                (int) (cs.green() * SCALE_FACTOR),
-                (int) (cs.blue() * SCALE_FACTOR),
-                hsvValues);
-
-        return hsvValues[0];
-    }
-
-
-    // For lower power input, use step function to smooth driving
-    double stepInput(double dVal) {
-        double stepVal = 0.0;
-
-        if (gamepad1.right_trigger != 0) {
-            stepVal = dVal;
-        } else {
-            double[] stepArray = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
-
-            // get the corresponding index for the scaleInput array.
-            int index = Math.abs((int) (dVal * 10.0));
-
-            // index cannot exceed size of array minus 1.
-            if (index > 10) {
-                index = 10;
-            }
-
-            // get value from the array.
-            if (dVal < 0) {
-                stepVal = -stepArray[index];
+        int top = (int) recognition.getTop();
+        int left = (int) recognition.getLeft();
+        telemetry.addData(
+            "Pos", "Left: " + left + " | Top: " + top + " | Label: " + recognition.getLabel());
+      }
+      if (updatedRecognitions.size() == 2) {
+        if (isGoldDetected) {
+          for (Recognition recognition : updatedRecognitions) {
+            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+              gMineralPos = (int) recognition.getTop();
             } else {
-                stepVal = stepArray[index];
+              sMineralPos = (int) recognition.getTop();
             }
-        }
-
-        // return scaled value.
-        return stepVal;
-    }
-
-    // For lower power input, use step function to smooth driving
-    double stepInputRotate(double dVal) {
-        double stepVal = 0.0;
-
-        if (gamepad1.right_trigger != 0) {
-            stepVal = dVal;
+          }
+          if (gMineralPos < sMineralPos) {
+            goldMineralPosition = GoldMineralPos.LEFT;
+          } else {
+            goldMineralPosition = GoldMineralPos.MIDDLE;
+          }
         } else {
-            double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
-
-            // get the corresponding index for the scaleInput array.
-            int index = Math.abs((int) (dVal * 10.0));
-
-            // index cannot exceed size of array minus 1.
-            if (index > 10) {
-                index = 10;
-            }
-
-            // get value from the array.
-            if (dVal < 0) {
-                stepVal = -stepArray[index];
-            } else {
-                stepVal = stepArray[index];
-            }
+          goldMineralPosition = GoldMineralPos.RIGHT;
         }
-
-        // return scaled value.
-        return stepVal;
+      }
     }
 
+    return goldMineralPosition;
+  }
 
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-    public void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-    }
-
-    /**
-     * Initialize the Tensor Flow Object Detection engine.
-     */
-    public void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
-    }
-
-
-    public GoldMineralPos getGoldPosition(List<Recognition> updatedRecognitions) {
-        GoldMineralPos goldMineralPosition = GoldMineralPos.UNKNOWN;
-
-        if (tfod != null && updatedRecognitions != null) {
-            boolean isGoldDetected = false;
-            int gMineralPos = -1;
-            int sMineralPos = -1;
-
-            telemetry.addData("# Object Detected", updatedRecognitions.size());
-            for (Recognition recognition : updatedRecognitions) {
-                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                    isGoldDetected = true;
-                }
-                int top = (int) recognition.getTop();
-                int left = (int) recognition.getLeft();
-                telemetry.addData("Pos", "Left: " + left + " | Top: " + top + " | Label: " + recognition.getLabel());
-            }
-            if (updatedRecognitions.size() == 2) {
-                if (isGoldDetected) {
-                    for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                            gMineralPos = (int) recognition.getTop();
-                        } else {
-                            sMineralPos = (int) recognition.getTop();
-                        }
-                    }
-                    if (gMineralPos < sMineralPos) {
-                        goldMineralPosition = GoldMineralPos.LEFT;
-                    } else {
-                        goldMineralPosition = GoldMineralPos.MIDDLE;
-                    }
-                } else {
-                    goldMineralPosition = GoldMineralPos.RIGHT;
-                }
-            }
-        }
-
-        return goldMineralPosition;
-    }
-
-    public double getRobotHeading() {
-        return robot.gyroHeading();
-    }
-
+  public double getRobotHeading() {
+    return robot.gyroHeading();
+  }
 }

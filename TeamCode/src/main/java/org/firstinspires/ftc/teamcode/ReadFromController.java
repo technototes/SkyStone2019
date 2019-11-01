@@ -34,6 +34,5 @@ public class ReadFromController extends LinearOpMode {
     if (gamepad1.dpad_right) {
       telemetry.addLine("Pressing DPad Right");
     }
-
   }
 }

@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-public class TTRobot{
+public class TTRobot {
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
@@ -30,7 +30,7 @@ public class TTRobot{
   private static final double HORIZONTALGRABBERPOSITION = 0.0;
   // the grab rotation 'vertical' position
   private static final double VERTICALGRABBERPOSITION = 0.5;
-  //the power of the linear slide
+  // the power of the linear slide
   private static final double LINEARSLIDEPOWER = 0.5;
 
   // This is the middle 'dead zone' of the analog sticks
@@ -75,13 +75,13 @@ public class TTRobot{
 
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
-    //Get handles to all the hardware
-    //slide = hardwareMap.get(CRServo.class, "servo");
+    // Get handles to all the hardware
+    // slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(CRServo.class, "claw");
-    //basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
-    //extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
-    //retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
+    // basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
+    // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
+    // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -91,8 +91,7 @@ public class TTRobot{
     lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
 
-
-//    touch = hardwareMap.get(TouchSensor.class, "touch");
+    //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
     // Setup the IMU
     // Set up the parameters with which we will use our IMU. Note that integration
@@ -101,7 +100,7 @@ public class TTRobot{
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
     parameters.calibrationDataFile =
-            "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+        "AdafruitIMUCalibration.json"; // see the calibration sample opmode
     imu = hardwareMap.get(BNO055IMU.class, "imu1");
     imu.initialize(parameters);
   }
@@ -113,7 +112,7 @@ public class TTRobot{
 
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
-            || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
+        || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);
     }
     // Start the logging of measured acceleration
@@ -129,20 +128,18 @@ public class TTRobot{
     return retracted.isPressed();
   }
 
-    public void lslide(LinearSlideOperation inOrOut) {
-      if (position == LinearSlidePosition.In && inOrOut ==  LinearSlideOperation.Retract) {
-        //if driver is trying to go in don't let them
+  public void lslide(LinearSlideOperation inOrOut) {
+    if (position == LinearSlidePosition.In && inOrOut == LinearSlideOperation.Retract) {
+      // if driver is trying to go in don't let them
 
-        return;
+      return;
 
-      }
-      else if (position == LinearSlidePosition.Out && inOrOut == LinearSlideOperation.Extend) {
-        //if drive is trying to go in don't let them
+    } else if (position == LinearSlidePosition.Out && inOrOut == LinearSlideOperation.Extend) {
+      // if drive is trying to go in don't let them
 
-        return;
-      }
-
+      return;
     }
+  }
 
   // Grabber stuff:
   public void grabberClutch() {
@@ -221,7 +218,8 @@ public class TTRobot{
   }
 
   public double gyroHeading() {
-    Orientation angles1 = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    Orientation angles1 =
+        imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
@@ -265,11 +263,15 @@ public class TTRobot{
     }
     rightStickX = -stepInputRotate(j2.X);
 
-    if (Math.abs(leftStickY) > STICKDEADZONE || Math.abs(leftStickX) > STICKDEADZONE || Math.abs(rightStickX) > STICKDEADZONE) {
-//                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
+    if (Math.abs(leftStickY) > STICKDEADZONE
+        || Math.abs(leftStickX) > STICKDEADZONE
+        || Math.abs(rightStickX) > STICKDEADZONE) {
+      //                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
       robotHeadingRad = Math.toRadians(gyroAngle);
-      powerCompY = (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
-      powerCompX = -(Math.sin(robotHeadingRad) * leftStickY) + (Math.cos(robotHeadingRad) * leftStickX);
+      powerCompY =
+          (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
+      powerCompX =
+          -(Math.sin(robotHeadingRad) * leftStickY) + (Math.cos(robotHeadingRad) * leftStickX);
 
       powerFrontLeft = powerCompY + powerCompX + rightStickX;
       powerFrontRight = -powerCompY + powerCompX + rightStickX;
@@ -291,11 +293,12 @@ public class TTRobot{
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
     double tturn = turn * TURNSPEEDFACTOR;
     double angle = joystickAngle + gyroAngle;
-    double flPower = power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
-    double frPower = -power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
-    double rrPower = -power * Math.cos(-Math.PI*angle-Math.PI/4) + tturn;
-    double rlPower = power * Math.cos(-Math.PI*angle+Math.PI/4) + tturn;
-    telemetry.addData("drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
+    double flPower = power * Math.cos(-Math.PI * angle - Math.PI / 4) + tturn;
+    double frPower = -power * Math.cos(-Math.PI * angle + Math.PI / 4) + tturn;
+    double rrPower = -power * Math.cos(-Math.PI * angle - Math.PI / 4) + tturn;
+    double rlPower = power * Math.cos(-Math.PI * angle + Math.PI / 4) + tturn;
+    telemetry.addData(
+        "drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
     this.motorFrontLeft(flPower);
     this.motorFrontRight(frPower);
     this.motorRearLeft(rlPower);
@@ -350,11 +353,11 @@ public class TTRobot{
     //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
     robotHeadingRad = Math.toRadians(this.gyroHeading());
     powerCompY =
-            (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
-                    + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+        (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+            + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
     powerCompX =
-            -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
-                    + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+        -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+            + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
     frontLeftSpeed = powerCompY + powerCompX;
     frontRightSpeed = -powerCompY + powerCompX;
@@ -369,12 +372,17 @@ public class TTRobot{
       this.motorRearRight(rearRightSpeed);
 
       // Display drive status for the driver.
-      telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
-              frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-/*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
-        imu.getgetIntegratedZValue());*/
+      telemetry.addData(
+          "Speed",
+          "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f",
+          frontLeftSpeed,
+          frontRightSpeed,
+          rearLeftSpeed,
+          rearRightSpeed);
+      /*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
+      imu.getgetIntegratedZValue());*/
       telemetry.addData("Gyro", "Heading: " + gyroHeading());
-      //telemetry.update();
+      // telemetry.update();
     }
 
     // Stop all motion;
@@ -383,7 +391,8 @@ public class TTRobot{
     this.motorRearLeft(0);
     this.motorRearRight(0);
   }
-  double stepInputRotate(double dVal)  {
+
+  double stepInputRotate(double dVal) {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
 
@@ -402,11 +411,11 @@ public class TTRobot{
       stepVal = stepArray[index];
     }
 
-
     // return scaled value.
     return stepVal;
   }
-  double stepInput(double dVal)  {
+
+  double stepInput(double dVal) {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
 
@@ -424,7 +433,6 @@ public class TTRobot{
     } else {
       stepVal = stepArray[index];
     }
-
 
     // return scaled value.
     return stepVal;
