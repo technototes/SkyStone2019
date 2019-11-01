@@ -69,5 +69,5 @@ public class DirectControl extends LinearOpMode {
             robot.joystickDrive(L2, D, robot.gyroHeading());
             }
             telemetry.update();
-    } 
+    }
 }
