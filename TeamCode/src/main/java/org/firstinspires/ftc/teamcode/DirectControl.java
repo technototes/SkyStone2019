@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "Skeleton code")
+@TeleOp(name = "Direct Control")
 public class DirectControl extends LinearOpMode {
   private TTRobot robot;
   private Controller control;

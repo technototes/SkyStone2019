@@ -117,8 +117,7 @@ public class TTRobot {
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
     // Shamelessly copied from example code...
-    while (imu.getCalibrationStatus().calibrationStatus != 0
-        || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
+    while (!imu.isGyroCalibrated() || !imu.isSystemCalibrated()) {
       sleep(10);
     }
     // Start the logging of measured acceleration
