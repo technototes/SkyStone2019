@@ -120,115 +120,87 @@ public class TTRobot{
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
 
-    // Linear slide stuff:
-    public boolean isLinearSlideFullyExtended() {
-      return extended.isPressed();
-    }
+  // Linear slide stuff:
+  public boolean isLinearSlideFullyExtended() {
+    return extended.isPressed();
+  }
 
-    public boolean isLinearSlideFullyRetracted() {
-      return retracted.isPressed();
-    }
+  public boolean isLinearSlideFullyRetracted() {
+    return retracted.isPressed();
+  }
 
-    /*public void lslide(LinearSlideOperation inOrOut) {
-      if(position == LinearSlidePosition.In){
-          if(inOrOut == LinearSlideOperation.Extend){
-            while(lslideSwitch.getState()){
-              slide.setPower(LINEARSLIDEPOWER);
-            }
-            slide.setPower(LINEARSLIDEPOWER);
-            while(!lslideSwitch.getState()){
-              slide.setPower(LINEARSLIDEPOWER);
-            }
-            position = LinearSlidePosition.Middle;
-          }
-      }else if(position == LinearSlidePosition.Middle){
-        if(inOrOut == LinearSlideOperation.Extend){
-          while(lslideSwitch.getState()){
-            slide.setPower(LINEARSLIDEPOWER);
-          }
-          while(!lslideSwitch.getState()){
-            slide.setPower(LINEARSLIDEPOWER);
-          }
-          position = LinearSlidePosition.Middle;
-        }else{
-          while(lslideSwitch.getState()){
-            slide.setPower(-LINEARSLIDEPOWER);
-          }
-          while(!lslideSwitch.getState()){
-            slide.setPower(-LINEARSLIDEPOWER);
-          }
-          position = LinearSlidePosition.Middle;
-        }
-      }else{
-        if(inOrOut == LinearSlideOperation.Retract){
-          while(lslideSwitch.getState()){
-            slide.setPower(-LINEARSLIDEPOWER);
-          }
-          while(!lslideSwitch.getState()){
-            slide.setPower(-LINEARSLIDEPOWER);
-          }
-          position = LinearSlidePosition.Middle;
-        }
+    public void lslide(LinearSlideOperation inOrOut) {
+      if (position == LinearSlidePosition.In && inOrOut ==  LinearSlideOperation.Retract) {
+        //if driver is trying to go in don't let them
+
+        return;
+
       }
-    }*/
+      else if (position == LinearSlidePosition.Out && inOrOut == LinearSlideOperation.Extend) {
+        //if drive is trying to go in don't let them
 
-    // Grabber stuff:
-    public void grabberClutch() {
-      if (isGrabberOpened) {
-        claw.setPower(-1);
-        isGrabberOpened = false;
-      } else {
-        claw.setPower(1);
+        return;
       }
+
     }
 
-    public GrabberPosition getGrabberPosition() {
-      // TODO: Check this...
-      double pos = turn.getPosition();
-      if (pos < GRABBERPOSITIONCUTOFF) {
-        return GrabberPosition.Horizontal;
-      } else {
-        return GrabberPosition.Vertical;
-      }
+  // Grabber stuff:
+  public void grabberClutch() {
+    if (isGrabberOpened) {
+      claw.setPower(-1);
+      isGrabberOpened = false;
+    } else {
+      claw.setPower(1);
     }
+  }
 
-    public void snapGrabberPosition(GrabberPosition position) {
-      switch (position) {
-        case Horizontal:
-          turn.setPosition(HORIZONTALGRABBERPOSITION);
-          break;
-        case Vertical:
-          turn.setPosition(VERTICALGRABBERPOSITION);
-          break;
-      }
+  public GrabberPosition getGrabberPosition() {
+    // TODO: Check this...
+    double pos = turn.getPosition();
+    if (pos < GRABBERPOSITIONCUTOFF) {
+      return GrabberPosition.Horizontal;
+    } else {
+      return GrabberPosition.Vertical;
     }
+  }
 
-    public void turnGrabber(GrabberPosition position) {
-      switch (position) {
-        case Horizontal:
-          turn.setPosition(turn.getPosition() - 0.1);
-          break;
-        case Vertical:
-          turn.setPosition(turn.getPosition() + 0.1);
-          break;
-      }
+  public void snapGrabberPosition(GrabberPosition position) {
+    switch (position) {
+      case Horizontal:
+        turn.setPosition(HORIZONTALGRABBERPOSITION);
+        break;
+      case Vertical:
+        turn.setPosition(VERTICALGRABBERPOSITION);
+        break;
     }
+  }
 
-    // Lift stuff:
-    public void setLift(double speed) {
-      lLiftMotor.setPower(speed);
-      rLiftMotor.setPower(speed);
+  public void turnGrabber(GrabberPosition position) {
+    switch (position) {
+      case Horizontal:
+        turn.setPosition(turn.getPosition() - 0.1);
+        break;
+      case Vertical:
+        turn.setPosition(turn.getPosition() + 0.1);
+        break;
     }
+  }
 
-    public boolean isLiftAtUpperLimit() {
-      // TODO: Read the upper limit switch
-      return false;
-    }
+  // Lift stuff:
+  public void setLift(double speed) {
+    lLiftMotor.setPower(speed);
+    rLiftMotor.setPower(speed);
+  }
 
-    public boolean isLiftAtLowerLimit() {
-      // TODO: Read the lower limit switch
-      return false;
-    }
+  public boolean isLiftAtUpperLimit() {
+    // TODO: Read the upper limit switch
+    return false;
+  }
+
+  public boolean isLiftAtLowerLimit() {
+    // TODO: Read the lower limit switch
+    return false;
+  }
 
   // Drive train:
   // These should just be used by the drive train
@@ -372,44 +344,44 @@ public class TTRobot{
     double rearLeftSpeed;
     double rearRightSpeed;
 
-      driveTime.reset();
+    driveTime.reset();
 
-      speed = Range.clip(speed, 0.0, 1.0);
-      //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
-      robotHeadingRad = Math.toRadians(this.gyroHeading());
-      powerCompY =
-              (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
-                      + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
-      powerCompX =
-              -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
-                      + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    speed = Range.clip(speed, 0.0, 1.0);
+    //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+    robotHeadingRad = Math.toRadians(this.gyroHeading());
+    powerCompY =
+            (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+                    + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    powerCompX =
+            -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+                    + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
-      frontLeftSpeed = powerCompY + powerCompX;
-      frontRightSpeed = -powerCompY + powerCompX;
-      rearLeftSpeed = powerCompY - powerCompX;
-      rearRightSpeed = -powerCompY - powerCompX;
+    frontLeftSpeed = powerCompY + powerCompX;
+    frontRightSpeed = -powerCompY + powerCompX;
+    rearLeftSpeed = powerCompY - powerCompX;
+    rearRightSpeed = -powerCompY - powerCompX;
 
-      // keep looping while we are still active, and BOTH motors are running.
-      while (driveTime.seconds() < time) {
-        this.motorFrontLeft(frontLeftSpeed);
-        this.motorFrontRight(frontRightSpeed);
-        this.motorRearLeft(rearLeftSpeed);
-        this.motorRearRight(rearRightSpeed);
+    // keep looping while we are still active, and BOTH motors are running.
+    while (driveTime.seconds() < time) {
+      this.motorFrontLeft(frontLeftSpeed);
+      this.motorFrontRight(frontRightSpeed);
+      this.motorRearLeft(rearLeftSpeed);
+      this.motorRearRight(rearRightSpeed);
 
-        // Display drive status for the driver.
-        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
-        frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+      // Display drive status for the driver.
+      telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
+              frontRightSpeed, rearLeftSpeed, rearRightSpeed);
 /*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
         imu.getgetIntegratedZValue());*/
-        telemetry.addData("Gyro", "Heading: " + gyroHeading());
-        //telemetry.update();
-      }
+      telemetry.addData("Gyro", "Heading: " + gyroHeading());
+      //telemetry.update();
+    }
 
-      // Stop all motion;
-      this.motorFrontLeft(0);
-      this.motorFrontRight(0);
-      this.motorRearLeft(0);
-      this.motorRearRight(0);
+    // Stop all motion;
+    this.motorFrontLeft(0);
+    this.motorFrontRight(0);
+    this.motorRearLeft(0);
+    this.motorRearRight(0);
   }
   double stepInputRotate(double dVal)  {
     double stepVal = 0.0;

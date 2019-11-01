@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @TeleOp(name = "Skeleton code")
 public class DirectControl extends LinearOpMode {
     private TTRobot robot;
@@ -67,7 +69,16 @@ public class DirectControl extends LinearOpMode {
                 L2.Y = L.Y;
             }
             robot.joystickDrive(L2, D, robot.gyroHeading());
+            if (control.buttonY() == Button.Pressed) {
+                robot.lslide(LinearSlideOperation.Extend);
             }
-            telemetry.update();
+            else if (control.buttonA() == Button.Pressed) {
+                robot.lslide(LinearSlideOperation.Retract);
+            }
+            else {
+                return;
+            }
+        }
+        telemetry.update();
     }
 }
