@@ -76,7 +76,7 @@ public class DirectControl extends LinearOpMode {
                 robot.lslide(LinearSlideOperation.Retract);
             }
             else {
-                return;
+                // DO NOTHING, not "return;" :D
             }
         }
         telemetry.update();
