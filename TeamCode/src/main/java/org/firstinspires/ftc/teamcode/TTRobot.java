@@ -76,7 +76,7 @@ public class TTRobot{
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     //Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "slide");
+    //slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(CRServo.class, "claw");
     //basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
@@ -92,7 +92,6 @@ public class TTRobot{
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
 
 
-    imu = hardwareMap.get(BNO055IMU.class, "imu1");
 //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
     // Setup the IMU
@@ -101,21 +100,16 @@ public class TTRobot{
     // provide positional information.
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-    parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
     parameters.calibrationDataFile =
             "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-    parameters.loggingEnabled = true;
-    parameters.loggingTag = "IMU";
-    parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+    imu = hardwareMap.get(BNO055IMU.class, "imu1");
     imu.initialize(parameters);
   }
 
   public void calibrate() {
-    // make lift motors work together
-    lLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    rLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-
+    // make lift motors work together: they're facing opposite directions
+    lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+    rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
@@ -255,10 +249,8 @@ public class TTRobot{
   }
 
   public double gyroHeading() {
-    // UNTESTED!
-    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    gravity = imu.getGravity();
-    return angles.firstAngle;
+    Orientation angles1 = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
   /*
@@ -369,16 +361,16 @@ public class TTRobot{
   }
 
   public void timeDrive(double speed, double time, double angle) {
-      ElapsedTime driveTime = new ElapsedTime();
-      double robotHeadingRad = 0.0;
-      double angleRad = Math.toRadians(angle);
-      double powerCompY = 0.0;
-      double powerCompX = 0.0;
+    ElapsedTime driveTime = new ElapsedTime();
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
 
-      double frontLeftSpeed;
-      double frontRightSpeed;
-      double rearLeftSpeed;
-      double rearRightSpeed;
+    double frontLeftSpeed;
+    double frontRightSpeed;
+    double rearLeftSpeed;
+    double rearRightSpeed;
 
       driveTime.reset();
 
@@ -399,48 +391,49 @@ public class TTRobot{
 
       // keep looping while we are still active, and BOTH motors are running.
       while (driveTime.seconds() < time) {
-          this.motorFrontLeft(frontLeftSpeed);
-          this.motorFrontRight(frontRightSpeed);
-          this.motorRearLeft(rearLeftSpeed);
-          this.motorRearRight(rearRightSpeed);
+        this.motorFrontLeft(frontLeftSpeed);
+        this.motorFrontRight(frontRightSpeed);
+        this.motorRearLeft(rearLeftSpeed);
+        this.motorRearRight(rearRightSpeed);
 
-          // Display drive status for the driver.
-          telemetry.addData("Speed", "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
-                  frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+        // Display drive status for the driver.
+        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed,
+        frontRightSpeed, rearLeftSpeed, rearRightSpeed);
 /*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
         imu.getgetIntegratedZValue());*/
-          telemetry.addData("Gyro", "Heading: " + gyroHeading());
-          this.motorFrontLeft(0);
-          this.motorFrontRight(0);
-          this.motorRearLeft(0);
-          this.motorRearRight(0);
+        telemetry.addData("Gyro", "Heading: " + gyroHeading());
+        //telemetry.update();
       }
 
-
+      // Stop all motion;
+      this.motorFrontLeft(0);
+      this.motorFrontRight(0);
+      this.motorRearLeft(0);
+      this.motorRearRight(0);
   }
-    double stepInputRotate(double dVal)  {
-        double stepVal = 0.0;
-            double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
+  double stepInputRotate(double dVal)  {
+    double stepVal = 0.0;
+    double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
 
-            // get the corresponding index for the scaleInput array.
-            int index = Math.abs((int) (dVal * 10.0));
+    // get the corresponding index for the scaleInput array.
+    int index = Math.abs((int) (dVal * 10.0));
 
-            // index cannot exceed size of array minus 1.
-            if (index > 10) {
-                index = 10;
-            }
-
-            // get value from the array.
-            if (dVal < 0) {
-                stepVal = -stepArray[index];
-            } else {
-                stepVal = stepArray[index];
-            }
-
-
-        // return scaled value.
-        return stepVal;
+    // index cannot exceed size of array minus 1.
+    if (index > 10) {
+      index = 10;
     }
+
+    // get value from the array.
+    if (dVal < 0) {
+      stepVal = -stepArray[index];
+    } else {
+      stepVal = stepArray[index];
+    }
+
+
+    // return scaled value.
+    return stepVal;
+  }
   double stepInput(double dVal)  {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};

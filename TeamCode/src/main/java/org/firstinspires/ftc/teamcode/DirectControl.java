@@ -51,18 +51,23 @@ public class DirectControl extends LinearOpMode {
 
             // Driver control:
             Direction L = driver.lstick();
-            Direction R = driver.rstick();
-            if (Math.abs(L.X) > robot.STICKDEADZONE ||
-                Math.abs(L.Y) > robot.STICKDEADZONE ||
-                Math.abs(R.X) > robot.STICKDEADZONE) {
-                robot.joystickDrive(L, R, robot.gyroHeading());
+            Direction R1 = driver.rstick();
+            Direction R2 = control.rstick();
+            Direction D = new Direction(0,0);
+            Direction L2 = new Direction(0,0);
+            if(Math.abs(R2.X) > robot.STICKDEADZONE) {
+                D.X = R2.X;
+            }else if(Math.abs(R1.X) > robot.STICKDEADZONE){
+                D.X = R1.X;
             }
-            // The attachments controller can also rotate the robot
-            R = control.rstick();
-            if(Math.abs(R.X) > robot.STICKDEADZONE){
-                robot.drive(0,0, 0,  R.X);
+            if(Math.abs(L.X) > robot.STICKDEADZONE) {
+                L2.X = L.X;
+            }
+            if(Math.abs(L.Y) > robot.STICKDEADZONE) {
+                L2.Y = L.Y;
+            }
+            robot.joystickDrive(L2, D, robot.gyroHeading());
             }
             telemetry.update();
-        }
-    }
+    } 
 }
