@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 // about a 200 degree range :(
 
 @TeleOp(name = "CRServo Test", group = "Sensor")
+@Disabled
 public class TestServo extends LinearOpMode {
 
     static final double INCREMENT = 0.5;     // amount to slew servo each CYCLE_MS cycle
