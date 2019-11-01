@@ -76,9 +76,9 @@ public class TTPOVDrive extends TTLinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new TTHardware();
-        robot.init(hardwareMap);
-
+        robot = new TTRobot();
+        robot.init(hardwareMap, telemetry);
+        robot.calibrate();
 
 
         telemetry.addData("Status", "Initialized");
@@ -110,7 +110,7 @@ public class TTPOVDrive extends TTLinearOpMode {
             } else {
                 leftStickX = 0.0;
             }
-            rightStickX = stepInputRotate(gamepad1.right_stick_x);
+            rightStickX = stepInputRotate(-gamepad1.right_stick_x);
 
             if (leftStickY != 0 || leftStickX != 0 || rightStickX != 0) {
 //                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
@@ -129,11 +129,12 @@ public class TTPOVDrive extends TTLinearOpMode {
                 powerRearRight = 0.0;
             }
 
-            robot.motorFrontLeft.setPower(Range.clip(powerFrontLeft, -1.0, 1.0));
-            robot.motorFrontRight.setPower(Range.clip(powerFrontRight, -1.0, 1.0));
-            robot.motorRearLeft.setPower(Range.clip(powerRearLeft, -1.0, 1.0));
-            robot.motorRearRight.setPower(Range.clip(powerRearRight, -1.0, 1.0));
 
+
+            robot.motorFrontLeft(Range.clip(powerFrontLeft, -1.0, 1.0));
+            robot.motorFrontRight(Range.clip(powerFrontRight, -1.0, 1.0));
+            robot.motorRearLeft(Range.clip(powerRearLeft, -1.0, 1.0));
+            robot.motorRearRight(Range.clip(powerRearRight, -1.0, 1.0));
 
 
             // Gamepad 1 - Y
@@ -152,6 +153,14 @@ public class TTPOVDrive extends TTLinearOpMode {
             if (gamepad1.x) {
                 gyroHold(0.35, -45.0, 2.0);
             }
+            // Gamepad 2 - y
+                if (gamepad2.y) {
+                    robot.setLift(dir.Y);
+                }
+                else {
+                    robot.setLift(0);
+                }
+
 
 
         }
