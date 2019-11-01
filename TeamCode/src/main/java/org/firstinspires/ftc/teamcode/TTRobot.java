@@ -22,6 +22,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class TTRobot {
+  enum LinearSlidePosition {
+    In,
+    middleIn,
+    middleOut,
+    Out
+  }
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
