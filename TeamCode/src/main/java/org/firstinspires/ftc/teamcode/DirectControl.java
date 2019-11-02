@@ -49,6 +49,10 @@ public class DirectControl extends LinearOpMode {
         robot.turnn(0.6);
         telemetry.addLine("Close 0.6");
       }
+      if (control.rbump() == Button.Pressed) {
+        robot.turnn(1.0);
+      }
+
       // redid this to work with magnetic limit switch
       /*Direction dpad = control.dpad();
       if(dpad.X == 1){
@@ -56,30 +60,34 @@ public class DirectControl extends LinearOpMode {
       }else if(dpad.X == -1){
           robot.lslide(LinearSlideOperation.Retract);
       }*/
-      double slide = control.lstick().X;
-      /*if(Math.abs(slide)>robot.STICKDEADZONE){
-        robot.simpleSlide(slide);
-      }else{
+      Direction slide = control.dpad();
+      if (slide.isRight()) {
+        robot.simpleSlide(1);
+      }
+      else if (slide.isLeft()){
+        robot.simpleSlide(-1);
+      }
+      else {
         robot.simpleSlide(0);
       }
-       */
-      if(Math.abs(slide)>robot.STICKDEADZONE){
-        if(slide>0){
-          robot.lslide(LinearSlideOperation.Extend);
-        }else{
-          robot.lslide((LinearSlideOperation.Retract));
-        }
-      }
+
+
 
 
       // Lift control:
-      Direction dir = control.lstick();
-      if (Math.abs(dir.Y) > robot.STICKDEADZONE) robot.setLift(dir.Y);
+      Direction dir = control.dpad();
+      if (dir.isUp()) {
+        robot.setLift(1.0);
+      }
+      else if (dir.isDown()) {
+        robot.setLift(-1);
+      }
       else {
         robot.setLift(0);
       }
 
       // Driver control:
+      Direction Dpad = driver.dpad();
       Direction L = driver.lstick();
       Direction R1 = driver.rstick();
       Direction R2 = control.rstick();
@@ -96,11 +104,18 @@ public class DirectControl extends LinearOpMode {
       if (Math.abs(L.Y) > robot.STICKDEADZONE) {
         L2.Y = L.Y;
       }
-      if(driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed){
-        robot.joystickDrive(L2, D, 0);
-      }else {
-        robot.joystickDrive(L2, D, robot.gyroHeading());
+
+      //Turbo Mode (insert Tristan happy face)
+      if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0 )) {
+        L2.turbo(0.5);
+        D.turbo(0.5);
+      } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0 )) {
+        L2.turbo(2.0);
+        D.turbo(2.0);
       }
+
+
+      robot.joystickDrive(L2, D, robot.gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
       } else if (control.buttonA() == Button.Pressed) {
@@ -108,6 +123,26 @@ public class DirectControl extends LinearOpMode {
       } else {
         // DO NOTHING, not "return;" :D
       }*/
+
+
+      if(driver.dpad().isDown()){
+        robot.joystickDrive(new Direction(-0,-0.5), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isUp()){
+        robot.joystickDrive(new Direction(0,0.5), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isLeft()){
+        robot.joystickDrive(new Direction(-0.5,0), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isRight()){
+        robot.joystickDrive(new Direction(0.5,0), new Direction(0,0), robot.gyroHeading());
+      }
+      if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
+        robot.joystickDrive(L2, D, 0);
+      }
+      else {
+        robot.joystickDrive(L2, D, robot.gyroHeading());
+      }
     }
     telemetry.update();
   }
