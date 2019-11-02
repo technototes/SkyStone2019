@@ -2,57 +2,60 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "test")
 public class a extends LinearOpMode {
-  private DigitalChannel lslideSwitch;
-  private DigitalChannel l11;
-  private DigitalChannel l12;
-  private DigitalChannel l13;
-  private DigitalChannel l20;
+  /*private DigitalChannel l20;
   private DigitalChannel l21;
   private DigitalChannel l22;
   private DigitalChannel l23;
+  private DigitalChannel slideLimit;
+  private DigitalChannel l11;
+  private DigitalChannel liftLimit;
+  private DigitalChannel l13;*/
 
   private Controller control;
   private Controller driver;
-  private String val(DigitalChannel chan) {
-    return chan.getState() == true ? "true" : "false";
-  }
+  private Servo claw;
+
   @Override
   public void runOpMode() {
-    lslideSwitch = hardwareMap.get(DigitalChannel.class, "mLimitSwitch");
-     l11 = hardwareMap.get(DigitalChannel.class, "limit11");
-     l12 = hardwareMap.get(DigitalChannel.class, "limit12");
-     l13 = hardwareMap.get(DigitalChannel.class, "limit13");
-     l20 = hardwareMap.get(DigitalChannel.class, "limit20");
-     l21 = hardwareMap.get(DigitalChannel.class, "limit21");
-     l22 = hardwareMap.get(DigitalChannel.class, "limit22");
-     l23 = hardwareMap.get(DigitalChannel.class, "limit23");
+    /*slideLimit = hardwareMap.get(DigitalChannel.class, "slideLimit");
+    l11 = hardwareMap.get(DigitalChannel.class, "limit11");
+    liftLimit = hardwareMap.get(DigitalChannel.class, "liftLimit");
+    l13 = hardwareMap.get(DigitalChannel.class, "limit13");
+    l20 = hardwareMap.get(DigitalChannel.class, "limit20");
+    l21 = hardwareMap.get(DigitalChannel.class, "limit21");
+    l22 = hardwareMap.get(DigitalChannel.class, "limit22");
+    l23 = hardwareMap.get(DigitalChannel.class, "limit23");
 
-    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
+    slideLimit.setMode(DigitalChannel.Mode.INPUT);
     l11.setMode(DigitalChannel.Mode.INPUT);
-    l12.setMode(DigitalChannel.Mode.INPUT);
+    liftLimit.setMode(DigitalChannel.Mode.INPUT);
     l13.setMode(DigitalChannel.Mode.INPUT);
     l20.setMode(DigitalChannel.Mode.INPUT);
     l21.setMode(DigitalChannel.Mode.INPUT);
     l22.setMode(DigitalChannel.Mode.INPUT);
-    l23.setMode(DigitalChannel.Mode.INPUT);
+    l23.setMode(DigitalChannel.Mode.INPUT);*/
+
+    claw = hardwareMap.get(Servo.class, "claw");
+
     waitForStart();
     int i = 0;
     while (opModeIsActive()) {
+      double val = gamepad1.left_stick_x;
+      if(gamepad2.a == true){
+        claw.setPosition(val);
+      }
       i++;
-      telemetry.addData("slide Switch:", "%d: %s", i, val(lslideSwitch));
-      telemetry.addData("l11 Switch:", "%d: %s", i, val(l11));
-      telemetry.addData("l12 Switch:", "%d: %s", i, val(l12));
-      telemetry.addData("l13 Switch:", "%d: %s", i, val(l13));
-      telemetry.addData("l20 Switch:", "%d: %s", i, val(l20));
-      telemetry.addData("l21 Switch:", "%d: %s", i, val(l21));
-      telemetry.addData("l22 Switch:", "%d: %s", i, val(l22));
-      telemetry.addData("l23 Switch:", "%d: %s", i, val(l23));
+      telemetry.addData("Stick:", "%3.3f", val);
+      telemetry.addData("servo:", "%3.3f", claw.getPosition());
+      //telemetry.addData("liftLimit:", "%d: %s", i, val(liftLimit));
+      //telemetry.addData("slideLimit:", "%d: %s", i, val(slideLimit));
       sleep(10);
       telemetry.update();
     }

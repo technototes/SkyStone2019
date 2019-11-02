@@ -50,6 +50,7 @@ public class TTRobot {
   private LinearSlidePosition position = LinearSlidePosition.In;
 
   private DigitalChannel lslideSwitch = null;
+  private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
@@ -58,7 +59,7 @@ public class TTRobot {
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
   private CRServo turn = null;
-  private CRServo claw = null;
+  private Servo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
   private Servo basePlateGrabber = null;
@@ -89,11 +90,12 @@ public class TTRobot {
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(CRServo.class, "grabTurn");
-    claw = hardwareMap.get(CRServo.class, "claw");
+    claw = hardwareMap.get(Servo.class, "claw");
     // basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
-    lslideSwitch = hardwareMap.get(DigitalChannel.class, "mLimitSwitch");
+    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
+    liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -124,6 +126,7 @@ public class TTRobot {
     // Set the digital channel mode to input
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
+    liftSwitch.setMode(DigitalChannel.Mode.INPUT);
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
       || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
@@ -215,14 +218,14 @@ public class TTRobot {
   // Grabber stuff:
   public void grabberClutch() {
     if (isGrabberOpened) {
-      claw.setPower(-1);
+      //claw.setPosition();
       isGrabberOpened = false;
     } else {
-      claw.setPower(1);
+      //claw.setPower(1);
     }
   }
 
-  public void open() {
+  /*public void open() {
     claw.setPower(1);
   }
 
@@ -230,7 +233,7 @@ public class TTRobot {
     claw.setPower(-1);
   }
 
-  /*public GrabberPosition getGrabberPosition() {
+  public GrabberPosition getGrabberPosition() {
     // TODO: Check this...
     double pos = turn.getPosition();
     if (pos < GRABBERPOSITIONCUTOFF) {
@@ -243,9 +246,9 @@ public class TTRobot {
     slide.setPower(-speed);
   }
 
-  public void turnn(double speed) {
+  /*public void turnn(double speed) {
     turn.setPower(speed);
-  }
+  }*/
 
   public void rleft() {
     turn.setPower(1);

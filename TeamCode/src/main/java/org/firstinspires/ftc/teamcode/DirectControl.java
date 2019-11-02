@@ -34,16 +34,16 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.lbump() == Button.Pressed) {
+      /*if (control.lbump() == Button.Pressed) {
         robot.open();
       }
       if (control.rbump() == Button.Pressed) {
         robot.close();
-      }
+      }*/
       if (control.buttonX() == Button.Pressed) {
         robot.rleft();
       }
-      if (control.buttonA() == Button.Pressed) {
+      if (control.buttonB() == Button.Pressed) {
         robot.rright();
       }
       // redid this to work with magnetic limit switch
