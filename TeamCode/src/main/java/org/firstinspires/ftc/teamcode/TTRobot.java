@@ -529,4 +529,8 @@ public class TTRobot {
     // return scaled value.
     return stepVal;
   }
+
+  public void gyroHold (double speed, double angle, double holdTime) {
+
+  }
 }
