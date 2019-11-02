@@ -56,10 +56,18 @@ public class DirectControl extends LinearOpMode {
           robot.lslide(LinearSlideOperation.Retract);
       }*/
       double slide = control.lstick().X;
-      if(Math.abs(slide)>robot.STICKDEADZONE){
+      /*if(Math.abs(slide)>robot.STICKDEADZONE){
         robot.simpleSlide(slide);
       }else{
         robot.simpleSlide(0);
+      }
+       */
+      if(Math.abs(slide)>robot.STICKDEADZONE){
+        if(slide>0){
+          robot.lslide(LinearSlideOperation.Extend);
+        }else{
+          robot.lslide((LinearSlideOperation.Retract));
+        }
       }
 
 

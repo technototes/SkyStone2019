@@ -156,63 +156,66 @@ public class TTRobot {
 
       return;
     }*/
+    //for(int i = 0; i < 1000; i++){
     if (position == LinearSlidePosition.In) {
-      if (inOrOut == LinearSlideOperation.Extend) {
-        while (lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
+
+        if (inOrOut == LinearSlideOperation.Extend) {
+          while (!lslideSwitch.getState()) {
+            slide.setPower(LINEARSLIDEPOWER);
+          }
+          while (lslideSwitch.getState()) {
+            slide.setPower(LINEARSLIDEPOWER);
+          }
+          position = LinearSlidePosition.middleIn;
         }
+      } else if (position == LinearSlidePosition.middleIn) {
+        if (inOrOut == LinearSlideOperation.Extend) {
         while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
-        position = LinearSlidePosition.middleIn;
-      }
-    } else if (position == LinearSlidePosition.middleIn) {
-      if (inOrOut == LinearSlideOperation.Extend) {
         while (lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
-        }
-        while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleOut;
       } else {
-        while (lslideSwitch.getState()) {
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while (!lslideSwitch.getState()) {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.In;
       }
     } else if (position == LinearSlidePosition.middleOut) {
       if (inOrOut == LinearSlideOperation.Extend) {
-        while (lslideSwitch.getState()) {
+        while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
-        while (!lslideSwitch.getState()) {
+        while (lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.Out;
       } else {
-        while (lslideSwitch.getState()) {
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while (!lslideSwitch.getState()) {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleIn;
       }
     } else {
       if (inOrOut == LinearSlideOperation.Retract) {
-        while (lslideSwitch.getState()) {
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while (!lslideSwitch.getState()) {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleOut;
       }
     }
+    //}
   }
 
   // Grabber stuff:
@@ -268,9 +271,13 @@ public class TTRobot {
 
   // Lift stuff:
   public void setLift(double speed) {
-
-    lLiftMotor.setPower(speed);
-    rLiftMotor.setPower(speed);
+    if(!liftSwitch.getState() && speed > 0){
+      lLiftMotor.setPower(0);
+      rLiftMotor.setPower(0);
+    }else {
+      lLiftMotor.setPower(speed);
+      rLiftMotor.setPower(speed);
+    }
   }
 
   public boolean isLiftAtUpperLimit() {

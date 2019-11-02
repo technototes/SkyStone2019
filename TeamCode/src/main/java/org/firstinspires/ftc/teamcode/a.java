@@ -3,17 +3,19 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "test")
+@TeleOp(name = "test limit")
 public class a extends LinearOpMode {
 
   private Servo claw;
   private Servo turn;
+  private CRServo slide;
   private boolean openclose = true;
-
+  private DigitalChannel slideLimit;
   private void sleep(int n) {
     try {
       Thread.sleep(n);
@@ -21,17 +23,17 @@ public class a extends LinearOpMode {
   }
   @Override
   public void runOpMode() {
-    /*slideLimit = hardwareMap.get(DigitalChannel.class, "slideLimit");
-    l11 = hardwareMap.get(DigitalChannel.class, "limit11");
+    slideLimit = hardwareMap.get(DigitalChannel.class, "slideLimit");
+    /*l11 = hardwareMap.get(DigitalChannel.class, "limit11");
     liftLimit = hardwareMap.get(DigitalChannel.class, "liftLimit");
     l13 = hardwareMap.get(DigitalChannel.class, "limit13");
     l20 = hardwareMap.get(DigitalChannel.class, "limit20");
     l21 = hardwareMap.get(DigitalChannel.class, "limit21");
     l22 = hardwareMap.get(DigitalChannel.class, "limit22");
     l23 = hardwareMap.get(DigitalChannel.class, "limit23");
-
+*/
     slideLimit.setMode(DigitalChannel.Mode.INPUT);
-    l11.setMode(DigitalChannel.Mode.INPUT);
+  /*  l11.setMode(DigitalChannel.Mode.INPUT);
     liftLimit.setMode(DigitalChannel.Mode.INPUT);
     l13.setMode(DigitalChannel.Mode.INPUT);
     l20.setMode(DigitalChannel.Mode.INPUT);
@@ -40,8 +42,9 @@ public class a extends LinearOpMode {
     l23.setMode(DigitalChannel.Mode.INPUT);*/
 
     claw = hardwareMap.get(Servo.class, "claw");
-    turn = hardwareMap.get(Servo.class, "grabTurn");
 
+    turn = hardwareMap.get(Servo.class, "grabTurn");
+    slide = hardwareMap.get(CRServo.class, "servo");
     waitForStart();
     int i = 0;
     while (opModeIsActive()) {
@@ -60,6 +63,12 @@ public class a extends LinearOpMode {
       }else if (gamepad2.b == true){
         turn.setPosition(0.6); // CLosed
         telemetry.addLine("Close 0.6");
+      }
+      double sval = gamepad2.left_stick_x;
+      if (!slideLimit.getState() && sval < 0) {
+        slide.setPower(0);
+      } else {
+        slide.setPower(sval);
       }
       i++;
       //telemetry.addData("Stick:", "%3.3f", val);
