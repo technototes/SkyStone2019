@@ -58,7 +58,7 @@ public class TTRobot {
   private DcMotor rrMotor = null;
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
-  private CRServo turn = null;
+  private Servo turn = null;
   private Servo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
@@ -89,7 +89,7 @@ public class TTRobot {
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "servo");
-    turn = hardwareMap.get(CRServo.class, "grabTurn");
+    turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
     // basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
@@ -216,23 +216,12 @@ public class TTRobot {
   }
 
   // Grabber stuff:
-  public void grabberClutch() {
-    if (isGrabberOpened) {
-      //claw.setPosition();
-      isGrabberOpened = false;
-    } else {
-      //claw.setPower(1);
-    }
+  public void claw(double val){
+    claw.setPosition(val);
   }
-
-  /*public void open() {
-    claw.setPower(1);
+  public void turnn(double val){
+    turn.setPosition(val);
   }
-
-  public void close() {
-    claw.setPower(-1);
-  }
-
   public GrabberPosition getGrabberPosition() {
     // TODO: Check this...
     double pos = turn.getPosition();
@@ -241,7 +230,7 @@ public class TTRobot {
     } else {
       return GrabberPosition.Vertical;
     }
-  }*/
+  }
   public void simpleSlide(double speed) {
     slide.setPower(-speed);
   }
@@ -249,14 +238,6 @@ public class TTRobot {
   /*public void turnn(double speed) {
     turn.setPower(speed);
   }*/
-
-  public void rleft() {
-    turn.setPower(1);
-  }
-
-  public void rright() {
-    turn.setPower(-1);
-  }
 
   /*public void snapGrabberPosition(GrabberPosition position) {
     switch (position) {
@@ -282,6 +263,7 @@ public class TTRobot {
 
   // Lift stuff:
   public void setLift(double speed) {
+
     lLiftMotor.setPower(speed);
     rLiftMotor.setPower(speed);
   }

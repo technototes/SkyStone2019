@@ -9,19 +9,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "test")
 public class a extends LinearOpMode {
-  /*private DigitalChannel l20;
-  private DigitalChannel l21;
-  private DigitalChannel l22;
-  private DigitalChannel l23;
-  private DigitalChannel slideLimit;
-  private DigitalChannel l11;
-  private DigitalChannel liftLimit;
-  private DigitalChannel l13;*/
 
-  private Controller control;
-  private Controller driver;
   private Servo claw;
+  private Servo turn;
+  private boolean openclose = true;
 
+  private void sleep(int n) {
+    try {
+      Thread.sleep(n);
+    } catch (Exception e){}
+  }
   @Override
   public void runOpMode() {
     /*slideLimit = hardwareMap.get(DigitalChannel.class, "slideLimit");
@@ -43,17 +40,31 @@ public class a extends LinearOpMode {
     l23.setMode(DigitalChannel.Mode.INPUT);*/
 
     claw = hardwareMap.get(Servo.class, "claw");
+    turn = hardwareMap.get(Servo.class, "grabTurn");
 
     waitForStart();
     int i = 0;
     while (opModeIsActive()) {
-      double val = gamepad1.left_stick_x;
-      if(gamepad2.a == true){
-        claw.setPosition(val);
+      //double val = gamepad1.left_stick_x;
+      final double clawMin = claw.MIN_POSITION;
+      if(gamepad2.a == true) {
+        claw.setPosition(0.4); // Open
+        telemetry.addLine("Open .4");
+      }else if (gamepad2.y == true){
+        claw.setPosition(0.6); // CLosed
+        telemetry.addLine("Close .6");
+      }
+      if(gamepad2.x == true) {
+        turn.setPosition(0.4); // Open
+        telemetry.addLine("Open 0.4");
+      }else if (gamepad2.b == true){
+        turn.setPosition(0.6); // CLosed
+        telemetry.addLine("Close 0.6");
       }
       i++;
-      telemetry.addData("Stick:", "%3.3f", val);
+      //telemetry.addData("Stick:", "%3.3f", val);
       telemetry.addData("servo:", "%3.3f", claw.getPosition());
+      telemetry.addData("spin:", "%3.3f", turn.getPosition());
       //telemetry.addData("liftLimit:", "%d: %s", i, val(liftLimit));
       //telemetry.addData("slideLimit:", "%d: %s", i, val(slideLimit));
       sleep(10);
@@ -61,3 +72,4 @@ public class a extends LinearOpMode {
     }
   }
 }
+
