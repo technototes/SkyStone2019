@@ -171,10 +171,10 @@ public class TTRobot {
     double power = 0;
     switch (operation) {
       case Extend:
-        power = -LINEARSLIDEPOWER;
+        power = LINEARSLIDEPOWER;
         break;
       case Retract:
-        power = LINEARSLIDEPOWER;
+        power = -LINEARSLIDEPOWER;
         break;
     }
 
