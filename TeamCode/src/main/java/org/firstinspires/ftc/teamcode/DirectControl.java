@@ -65,11 +65,20 @@ public class DirectControl extends LinearOpMode {
       else if (slide.isRight()) {
         robot.lslide(LinearSlideOperation.Retract);
       }
-      if(driver.buttonX() == Button.Pressed){
-        robot.bpGrabber();
+      Direction dcontrols = driver.dpad();
+      if(dcontrols.isUp()){
+        robot.bpGrabber(1);
+      }else if(dcontrols.isDown()){
+        robot.bpGrabber(-1);
+      }else{
+        robot.bpGrabber(0);
       }
-      if(driver.buttonY() == Button.Pressed){
-        robot.capstone();
+      if(dcontrols.isLeft()){
+        robot.capstone(1);
+      }else if(dcontrols.isRight()){
+        robot.capstone(-1);
+      }else{
+        robot.capstone(0);
       }
       // Lift control:
       Direction dir = control.dpad();
@@ -122,16 +131,16 @@ public class DirectControl extends LinearOpMode {
       }*/
 
 
-      if(driver.dpad().isDown()){
+      if(control.dpad().isDown()){
         robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
       }
-      if(driver.dpad().isUp()){
+      if(control.dpad().isUp()){
         robot.joystickDrive(new Direction(0,FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
       }
-      if(driver.dpad().isLeft()){
+      if(control.dpad().isLeft()){
         robot.joystickDrive(new Direction(-FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
       }
-      if(driver.dpad().isRight()){
+      if(control.dpad().isRight()){
         robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
       }
       if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {

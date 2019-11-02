@@ -64,7 +64,7 @@ public class TTRobot {
   private Servo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
-  private Servo basePlateGrabber = null;
+  private CRServo basePlateGrabber = null;
   private TouchSensor touch = null;
   private CRServo cap = null;
 
@@ -93,7 +93,7 @@ public class TTRobot {
     slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
-    basePlateGrabber = hardwareMap.get(Servo.class, "bpGrabber");
+    basePlateGrabber = hardwareMap.get(CRServo.class, "bpGrabber");
     cap = hardwareMap.get(CRServo.class, "cap");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
@@ -293,19 +293,13 @@ public class TTRobot {
   }
 
 
-  private boolean hook = false;
 
-  public void bpGrabber() {
-    if(hook) {
-      basePlateGrabber.setPosition();
-    }else{
-      basePlateGrabber.setPosition();
-    }
-  //TODO find positions
+  public void bpGrabber(double speed) {
+    basePlateGrabber.setPower(speed);
   }
 
-  public void capstone() {
-    //TODO
+  public void capstone(double speed) {
+    cap.setPower(speed);
   }
 
   public boolean isLiftAtUpperLimit() {
