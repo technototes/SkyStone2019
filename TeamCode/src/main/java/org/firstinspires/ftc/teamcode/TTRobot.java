@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,7 +38,7 @@ public class TTRobot {
   // the grab rotation 'vertical' position
   private static final double VERTICALGRABBERPOSITION = 0.5;
   // the power of the linear slide
-  private static final double LINEARSLIDEPOWER = 0.5;
+  private static final double LINEARSLIDEPOWER = -0.5;
 
   // This is the middle 'dead zone' of the analog sticks
   public static final double STICKDEADZONE = 0.25;
@@ -53,7 +54,7 @@ public class TTRobot {
   private DcMotor rrMotor = null;
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
-  private Servo turn = null;
+  private CRServo turn = null;
   private CRServo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
@@ -82,12 +83,13 @@ public class TTRobot {
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
-    // slide = hardwareMap.get(CRServo.class, "servo");
-    turn = hardwareMap.get(Servo.class, "grabTurn");
+    slide = hardwareMap.get(CRServo.class, "servo");
+    turn = hardwareMap.get(CRServo.class, "grabTurn");
     claw = hardwareMap.get(CRServo.class, "claw");
     // basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
+    lslideSwitch = hardwareMap.get(DigitalChannel.class, "mLimitSwitch");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -106,7 +108,7 @@ public class TTRobot {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
     parameters.calibrationDataFile =
-        "AdafruitIMUCalibration.json"; // see the calibration sample opmode
+      "AdafruitIMUCalibration.json"; // see the calibration sample opmode
     imu = hardwareMap.get(BNO055IMU.class, "imu1");
     imu.initialize(parameters);
   }
@@ -117,9 +119,9 @@ public class TTRobot {
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
     // Shamelessly copied from example code...
-    while (!imu.isGyroCalibrated() || !imu.isSystemCalibrated()) {
+    /*while (!imu.isGyroCalibrated() || !imu.isSystemCalibrated()) {
       sleep(10);
-    }
+    }*/
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
@@ -134,7 +136,7 @@ public class TTRobot {
   }
 
   public void lslide(LinearSlideOperation inOrOut) {
-    if (position == LinearSlidePosition.In && inOrOut == LinearSlideOperation.Retract) {
+    /*if (position == LinearSlidePosition.In && inOrOut == LinearSlideOperation.Retract) {
       // if driver is trying to go in don't let them
 
       return;
@@ -143,6 +145,63 @@ public class TTRobot {
       // if drive is trying to go in don't let them
 
       return;
+    }*/
+    if(position == LinearSlidePosition.In){
+      if(inOrOut == LinearSlideOperation.Extend){
+        while(lslideSwitch.getState()) {
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.middleIn;
+      }
+    }else if(position == LinearSlidePosition.middleIn){
+      if(inOrOut == LinearSlideOperation.Extend){
+        while(lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.middleOut;
+      }else{
+        while(lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.In;
+      }
+    }else if(position == LinearSlidePosition.middleOut){
+      if(inOrOut == LinearSlideOperation.Extend){
+        while(lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.Out;
+      }else{
+        while(lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.middleIn;
+      }
+    }else{
+      if(inOrOut == LinearSlideOperation.Retract){
+        while(lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        while(!lslideSwitch.getState()){
+          slide.setPower(-LINEARSLIDEPOWER);
+        }
+        position = LinearSlidePosition.middleOut;
+      }
     }
   }
 
@@ -155,8 +214,14 @@ public class TTRobot {
       claw.setPower(1);
     }
   }
+  public void open(){
+    claw.setPower(1);
+  }
+  public void close(){
+    claw.setPower(-1);
+  }
 
-  public GrabberPosition getGrabberPosition() {
+  /*public GrabberPosition getGrabberPosition() {
     // TODO: Check this...
     double pos = turn.getPosition();
     if (pos < GRABBERPOSITIONCUTOFF) {
@@ -164,9 +229,18 @@ public class TTRobot {
     } else {
       return GrabberPosition.Vertical;
     }
+  }*/
+  public void simpleSlide(double speed){
+    slide.setPower(-speed);
+  }
+  public void rleft(){
+    turn.setPower(1);
+  }
+  public void rright(){
+    turn.setPower(-1);
   }
 
-  public void snapGrabberPosition(GrabberPosition position) {
+  /*public void snapGrabberPosition(GrabberPosition position) {
     switch (position) {
       case Horizontal:
         turn.setPosition(HORIZONTALGRABBERPOSITION);
@@ -186,7 +260,7 @@ public class TTRobot {
         turn.setPosition(turn.getPosition() + 0.1);
         break;
     }
-  }
+  }*/
 
   // Lift stuff:
   public void setLift(double speed) {
@@ -224,7 +298,7 @@ public class TTRobot {
 
   public double gyroHeading() {
     Orientation angles1 =
-        imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+      imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
@@ -269,14 +343,14 @@ public class TTRobot {
     rightStickX = -stepInputRotate(j2.X);
 
     if (Math.abs(leftStickY) > STICKDEADZONE
-        || Math.abs(leftStickX) > STICKDEADZONE
-        || Math.abs(rightStickX) > STICKDEADZONE) {
+      || Math.abs(leftStickX) > STICKDEADZONE
+      || Math.abs(rightStickX) > STICKDEADZONE) {
       //                robotHeadingRad = Math.toRadians(((360 - robot.gyro.getHeading()) % 360));
       robotHeadingRad = Math.toRadians(gyroAngle);
       powerCompY =
-          (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
+        (Math.cos(robotHeadingRad) * leftStickY) + (Math.sin(robotHeadingRad) * leftStickX);
       powerCompX =
-          -(Math.sin(robotHeadingRad) * leftStickY) + (Math.cos(robotHeadingRad) * leftStickX);
+        -(Math.sin(robotHeadingRad) * leftStickY) + (Math.cos(robotHeadingRad) * leftStickX);
 
       powerFrontLeft = powerCompY + powerCompX + rightStickX;
       powerFrontRight = -powerCompY + powerCompX + rightStickX;
@@ -303,7 +377,7 @@ public class TTRobot {
     double rrPower = -power * Math.cos(-Math.PI * angle - Math.PI / 4) + tturn;
     double rlPower = power * Math.cos(-Math.PI * angle + Math.PI / 4) + tturn;
     telemetry.addData(
-        "drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
+      "drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
     this.motorFrontLeft(flPower);
     this.motorFrontRight(frPower);
     this.motorRearLeft(rlPower);
@@ -358,11 +432,11 @@ public class TTRobot {
     //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
     robotHeadingRad = Math.toRadians(this.gyroHeading());
     powerCompY =
-        (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
-            + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
     powerCompX =
-        -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
-            + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
     frontLeftSpeed = powerCompY + powerCompX;
     frontRightSpeed = -powerCompY + powerCompX;
@@ -378,12 +452,12 @@ public class TTRobot {
 
       // Display drive status for the driver.
       telemetry.addData(
-          "Speed",
-          "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f",
-          frontLeftSpeed,
-          frontRightSpeed,
-          rearLeftSpeed,
-          rearRightSpeed);
+        "Speed",
+        "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f",
+        frontLeftSpeed,
+        frontRightSpeed,
+        rearLeftSpeed,
+        rearRightSpeed);
       /*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
       imu.getgetIntegratedZValue());*/
       telemetry.addData("Gyro", "Heading: " + gyroHeading());

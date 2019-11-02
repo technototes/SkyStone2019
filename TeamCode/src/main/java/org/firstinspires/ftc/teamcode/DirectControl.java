@@ -20,20 +20,31 @@ public class DirectControl extends LinearOpMode {
     control = new Controller(gamepad2, telemetry, null);
     robot.init(hardwareMap, telemetry);
     robot.calibrate(); // OOPS!
+    telemetry.addLine("Hello!");
+    telemetry.update();
     waitForStart();
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
-      if (control.buttonA() == Button.Pressed) {
+      /*if (control.buttonA() == Button.Pressed) {
         if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
           robot.snapGrabberPosition(GrabberPosition.Horizontal);
         } else { // It'sHORIZONTAL!
           robot.snapGrabberPosition(GrabberPosition.Vertical);
         }
-      }
+      }*/
       // Handle Grabber clutch
-      if (control.buttonX() == Button.Pressed) {
-        robot.grabberClutch();
+      if (control.lbump() == Button.Pressed) {
+        robot.open();
+      }
+      if (control.rbump() == Button.Pressed) {
+        robot.close();
+      }
+    if (control.ltrigger() > robot.STICKDEADZONE) {
+        robot.rleft();
+      }
+      if (control.rtrigger() > robot.STICKDEADZONE) {
+        robot.rright();
       }
       // redid this to work with magnetic limit switch
       /*Direction dpad = control.dpad();
@@ -42,6 +53,11 @@ public class DirectControl extends LinearOpMode {
       }else if(dpad.X == -1){
           robot.lslide(LinearSlideOperation.Retract);
       }*/
+      double slide = control.lstick().X;
+      if(Math.abs(slide)>robot.STICKDEADZONE){
+        robot.simpleSlide(slide);
+      }
+
 
       // Lift control:
       Direction dir = control.lstick();
