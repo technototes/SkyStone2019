@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Direct Control")
 public class DirectControl extends LinearOpMode {
+  private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
   private Controller control;
   private Controller driver;
@@ -126,16 +127,16 @@ public class DirectControl extends LinearOpMode {
 
 
       if(driver.dpad().isDown()){
-        robot.joystickDrive(new Direction(-0,-0.5), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
       }
       if(driver.dpad().isUp()){
-        robot.joystickDrive(new Direction(0,0.5), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(0,FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
       }
       if(driver.dpad().isLeft()){
-        robot.joystickDrive(new Direction(-0.5,0), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(-FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
       }
       if(driver.dpad().isRight()){
-        robot.joystickDrive(new Direction(0.5,0), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
       }
       if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
         robot.joystickDrive(L2, D, 0);
