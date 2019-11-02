@@ -48,6 +48,10 @@ public class DirectControl extends LinearOpMode {
         robot.turnn(0.6); // CLosed
         telemetry.addLine("Close 0.6");
       }
+      if (control.rbump() == Button.Pressed) {
+        robot.turnn();
+      }
+
       // redid this to work with magnetic limit switch
       /*Direction dpad = control.dpad();
       if(dpad.X == 1){
@@ -55,10 +59,14 @@ public class DirectControl extends LinearOpMode {
       }else if(dpad.X == -1){
           robot.lslide(LinearSlideOperation.Retract);
       }*/
-      double slide = control.lstick().X;
-      /*if(Math.abs(slide)>robot.STICKDEADZONE){
-        robot.simpleSlide(slide);
-      }else{
+      Direction slide = control.dpad();
+      if (slide.isRight()) {
+        robot.simpleSlide(1);
+      }
+      else if (slide.isLeft()){
+        robot.simpleSlide(-1);
+      }
+      else {
         robot.simpleSlide(0);
       }
        */
@@ -72,13 +80,19 @@ public class DirectControl extends LinearOpMode {
 
 
       // Lift control:
-      Direction dir = control.lstick();
-      if (Math.abs(dir.Y) > robot.STICKDEADZONE) robot.setLift(dir.Y);
+      Direction dir = control.dpad();
+      if (dir.isUp()) {
+        robot.setLift(1.0);
+      }
+      else if (dir.isDown()) {
+        robot.setLift(-1);
+      }
       else {
         robot.setLift(0);
       }
 
       // Driver control:
+      Direction Dpad = driver.dpad();
       Direction L = driver.lstick();
       Direction R1 = driver.rstick();
       Direction R2 = control.rstick();
@@ -103,6 +117,7 @@ public class DirectControl extends LinearOpMode {
       } else {
         // DO NOTHING, not "return;" :D
       }*/
+
     }
     telemetry.update();
   }
