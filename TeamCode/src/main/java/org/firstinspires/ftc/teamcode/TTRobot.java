@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -19,7 +18,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -27,8 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 public class TTRobot {
   enum LinearSlidePosition {
     In,
-    middleIn,
-    middleOut,
+    Middle,
     Out
   }
 
@@ -49,7 +46,7 @@ public class TTRobot {
   public static final double TRIGGERTHRESHOLD = 0.25;
 
   private boolean isGrabberOpened = true;
-  private LinearSlidePosition position = LinearSlidePosition.In;
+  private LinearSlidePosition slidePosition = LinearSlidePosition.In;
 
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
@@ -150,51 +147,78 @@ public class TTRobot {
   public boolean isLinearSlideFullyRetracted() {
     return retracted.isPressed();
   }
-
   private void moveSlideNext(LinearSlideOperation op) {
     double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
-    while (!lslideSwitch.getState()) {
+    while (slideSwitchSignaled()) {
       sleep(10);
       slide.setPower(power);
     }
-    while (lslideSwitch.getState()) {
+    while (!slideSwitchSignaled()) {
       sleep(10);
       slide.setPower(power);
     }
     slide.setPower(0);
-    
   }
+
+  private boolean slideSwitchSignaled() {
+    return !lslideSwitch.getState();
+  }
+
 
   private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
 
-  public void lslide(LinearSlideOperation inOrOut) {
-    if (position == LinearSlidePosition.In) {
-      if (inOrOut == LinearSlideOperation.Extend) {
-        moveSlideNext(LinearSlideOperation.Extend);
-        position = LinearSlidePosition.middleIn;
-      }
-    } else if (position == LinearSlidePosition.middleIn) {
-      if (inOrOut == LinearSlideOperation.Extend) {
-        moveSlideNext(LinearSlideOperation.Extend);
-        position = LinearSlidePosition.middleOut;
-      } else {
-        moveSlideNext(LinearSlideOperation.Retract);
-        position = LinearSlidePosition.In;
-      }
-    } else if (position == LinearSlidePosition.middleOut) {
-      if (inOrOut == LinearSlideOperation.Extend) {
-        moveSlideNext(LinearSlideOperation.Extend);
-        position = LinearSlidePosition.Out;
-      } else {
-        moveSlideNext(LinearSlideOperation.Retract);
-        position = LinearSlidePosition.middleIn;
-      }
-    } else {
-      if (inOrOut == LinearSlideOperation.Retract) {
-        moveSlideNext(LinearSlideOperation.Retract);
-        position = LinearSlidePosition.middleOut;
-      }
+  public void lslide(LinearSlideOperation operation) {
+    double power = (operation == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
+    switch (slidePosition) {
+      case In:
+        switch (operation) {
+          case Extend:
+            if (!slideSwitchSignaled()) {
+              slidePosition = LinearSlidePosition.Middle;
+            }
+            break;
+
+          default:
+            // Do nothing
+            power = 0;
+            break;
+        }
+        break;
+
+      case Middle:
+        // Hit a limit
+        if (slideSwitchSignaled()) {
+          // Stop the slide
+          power = 0;
+
+          // Update the state
+          switch (operation) {
+            case Extend:
+              slidePosition = LinearSlidePosition.Out;
+              break;
+            case Retract:
+              slidePosition = LinearSlidePosition.In;
+              break;
+          }
+        }
+        break;
+
+      case Out:
+        switch (operation) {
+          case Retract:
+            if (!slideSwitchSignaled()) {
+              slidePosition = LinearSlidePosition.Middle;
+            }
+            break;
+          default:
+            // Do nothing
+            power = 0;
+            break;
+        }
+        break;
     }
+
+    slide.setPower(power);
   }
 
   // Grabber stuff:
@@ -238,8 +262,8 @@ public class TTRobot {
     }
   }
 
-  public void turnGrabber(GrabberPosition position) {
-    switch (position) {
+  public void turnGrabber(GrabberPosition slidePosition) {
+    switch (slidePosition) {
       case Horizontal:
         turn.setPosition(turn.getPosition() - 0.1);
         break;
@@ -297,9 +321,9 @@ public class TTRobot {
 
   public void bpGrabber() {
     if(hook) {
-      basePlateGrabber.setPosition();
+      basePlateGrabber.setPosition(0);
     }else{
-      basePlateGrabber.setPosition();
+      basePlateGrabber.setPosition(0);
     }
   //TODO find positions
   }

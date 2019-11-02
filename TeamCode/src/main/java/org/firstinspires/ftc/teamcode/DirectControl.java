@@ -65,6 +65,7 @@ public class DirectControl extends LinearOpMode {
       else if (slide.isRight()) {
         robot.lslide(LinearSlideOperation.Retract);
       }
+
       if(driver.buttonX() == Button.Pressed){
         robot.bpGrabber();
       }
