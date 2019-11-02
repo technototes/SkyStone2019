@@ -35,23 +35,20 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if(control.buttonA() == Button.Pressed) {
+      if(control.ltrigger() > robot.TRIGGERTHRESHOLD) {
         robot.claw(0.4); // Open
         telemetry.addLine("Open .4");
-      }else if (control.buttonY() == Button.Pressed){
+      }else if (control.rtrigger() > robot.TRIGGERTHRESHOLD){
         robot.claw(0.6); // CLosed
         telemetry.addLine("Close .6");
       }
       // Grabber rotation
-      if(control.buttonX() == Button.Pressed) {
+      if(control.lbump() == Button.Pressed) {
         robot.turnn(0.4);
         telemetry.addLine("Open 0.4");
-      }else if (control.buttonB() == Button.Pressed){
+      }else if (control.rbump() == Button.Pressed){
         robot.turnn(0.6);
         telemetry.addLine("Close 0.6");
-      }
-      if (control.rbump() == Button.Pressed) {
-        robot.turnn(1.0);
       }
 
       // redid this to work with magnetic limit switch
@@ -62,19 +59,18 @@ public class DirectControl extends LinearOpMode {
           robot.lslide(LinearSlideOperation.Retract);
       }*/
       Direction slide = control.dpad();
-      if (slide.isRight()) {
-        robot.simpleSlide(1);
+      if (slide.isLeft()) {
+        robot.lslide(LinearSlideOperation.Extend);
       }
-      else if (slide.isLeft()){
-        robot.simpleSlide(-1);
+      else if (slide.isRight()) {
+        robot.lslide(LinearSlideOperation.Retract);
       }
-      else {
-        robot.simpleSlide(0);
+      if(driver.buttonX() == Button.Pressed){
+        robot.bpGrabber();
       }
-
-
-
-
+      if(driver.buttonY() == Button.Pressed){
+        robot.capstone();
+      }
       // Lift control:
       Direction dir = control.dpad();
       if (dir.isUp()) {

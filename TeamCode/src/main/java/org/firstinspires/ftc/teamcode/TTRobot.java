@@ -46,6 +46,8 @@ public class TTRobot {
   // This is the middle 'dead zone' of the analog sticks
   public static final double STICKDEADZONE = 0.25;
 
+  public static final double TRIGGERTHRESHOLD = 0.25;
+
   private boolean isGrabberOpened = true;
   private LinearSlidePosition position = LinearSlidePosition.In;
 
@@ -64,9 +66,9 @@ public class TTRobot {
   private TouchSensor retracted = null;
   private Servo basePlateGrabber = null;
   private TouchSensor touch = null;
+  private CRServo cap = null;
 
   private Telemetry telemetry = null;
-
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
   private BNO055IMU imu;
@@ -91,7 +93,8 @@ public class TTRobot {
     slide = hardwareMap.get(CRServo.class, "servo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
-    // basePlateGrabber = hardwareMap.get(Servo.class, "BPGrabber");
+    basePlateGrabber = hardwareMap.get(Servo.class, "bpGrabber");
+    cap = hardwareMap.get(CRServo.class, "cap");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
@@ -160,6 +163,7 @@ public class TTRobot {
     }
     slide.setPower(0);
   }
+
   public void lslide(LinearSlideOperation inOrOut) {
     if (position == LinearSlidePosition.In) {
       if (inOrOut == LinearSlideOperation.Extend) {
@@ -243,25 +247,56 @@ public class TTRobot {
   }*/
 
   // Lift stuff:
+  enum LiftState {
+    Above,
+    At,
+    AtOrBelow,
+    Below
+  }
+
+  LiftState liftPosition = LiftState.AtOrBelow;
+
+  // Override, just in case we're stuck in "only go up" mode
+  public void overrideLiftLimit() {
+    liftPosition = LiftState.Above;
+  }
+
+  private void setLiftPower(double val) {
+    lLiftMotor.setPower(val);
+    rLiftMotor.setPower(val);
+  }
+
   // Positive is down, Negative is up!
   public void setLift(double speed) {
     // We have to support the limit switch having turned off
-    // and then back on.
-    // States: Normal
-    // OnlyUp: below, At
-    if (!liftSwitch.getState()) {
-      //onlyUp = true;
+    // and then back up
+    if (false) {
+      boolean isLimitSet = !liftSwitch.getState();
+      switch (liftPosition) {
+        case Above:
+          setLiftPower(speed);
+          return;
+        case Below:
+          setLiftPower(-Math.abs(speed));
+          return;
+        case At:
+        case AtOrBelow:
+      }
     }
-
     if (!liftSwitch.getState() && speed > 0) {
-      lLiftMotor.setPower(0);
-      rLiftMotor.setPower(0);
+      setLiftPower(0);
     } else {
-      lLiftMotor.setPower(speed);
-      rLiftMotor.setPower(speed);
+      setLiftPower(speed);
     }
   }
+  private boolean hook = false;
+  public void bpGrabber(){
 
+    //TODO
+  }
+  public void capstone(){
+    //TODO
+  }
   public boolean isLiftAtUpperLimit() {
     // TODO: Read the upper limit switch
     return false;
@@ -293,7 +328,7 @@ public class TTRobot {
   public double gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
+    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
 
   /*
@@ -512,7 +547,7 @@ public class TTRobot {
     return stepVal;
   }
 
-  public void gyroHold (double speed, double angle, double holdTime) {
+  public void gyroHold(double speed, double angle, double holdTime) {
 
   }
 }
