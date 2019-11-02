@@ -162,6 +162,7 @@ public class TTRobot {
       slide.setPower(power);
     }
     slide.setPower(0);
+    
   }
 
   private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
