@@ -127,6 +127,9 @@ public class TTRobot {
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
+
+    // TODO: Add initialization for the slide and lift?
+
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
       || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
@@ -145,84 +148,54 @@ public class TTRobot {
     return retracted.isPressed();
   }
 
+  private void moveSlideNext(LinearSlideOperation op) {
+    double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
+    while (!lslideSwitch.getState()) {
+      sleep(10);
+      slide.setPower(power);
+    }
+    while (lslideSwitch.getState()) {
+      sleep(10);
+      slide.setPower(power);
+    }
+    slide.setPower(0);
+  }
   public void lslide(LinearSlideOperation inOrOut) {
-    /*if (position == LinearSlidePosition.In && inOrOut == LinearSlideOperation.Retract) {
-      // if driver is trying to go in don't let them
-
-      return;
-
-    } else if (position == LinearSlidePosition.Out && inOrOut == LinearSlideOperation.Extend) {
-      // if drive is trying to go in don't let them
-
-      return;
-    }*/
-    //for(int i = 0; i < 1000; i++){
     if (position == LinearSlidePosition.In) {
-
-        if (inOrOut == LinearSlideOperation.Extend) {
-          while (!lslideSwitch.getState()) {
-            slide.setPower(LINEARSLIDEPOWER);
-          }
-          while (lslideSwitch.getState()) {
-            slide.setPower(LINEARSLIDEPOWER);
-          }
-          position = LinearSlidePosition.middleIn;
-        }
-      } else if (position == LinearSlidePosition.middleIn) {
-        if (inOrOut == LinearSlideOperation.Extend) {
-        while (!lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
-        }
-        while (lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
-        }
+      if (inOrOut == LinearSlideOperation.Extend) {
+        moveSlideNext(LinearSlideOperation.Extend);
+        position = LinearSlidePosition.middleIn;
+      }
+    } else if (position == LinearSlidePosition.middleIn) {
+      if (inOrOut == LinearSlideOperation.Extend) {
+        moveSlideNext(LinearSlideOperation.Extend);
         position = LinearSlidePosition.middleOut;
       } else {
-        while (!lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        while (lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
+        moveSlideNext(LinearSlideOperation.Retract);
         position = LinearSlidePosition.In;
       }
     } else if (position == LinearSlidePosition.middleOut) {
       if (inOrOut == LinearSlideOperation.Extend) {
-        while (!lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
-        }
-        while (lslideSwitch.getState()) {
-          slide.setPower(LINEARSLIDEPOWER);
-        }
+        moveSlideNext(LinearSlideOperation.Extend);
         position = LinearSlidePosition.Out;
       } else {
-        while (!lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        while (lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
+        moveSlideNext(LinearSlideOperation.Retract);
         position = LinearSlidePosition.middleIn;
       }
     } else {
       if (inOrOut == LinearSlideOperation.Retract) {
-        while (!lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
-        while (lslideSwitch.getState()) {
-          slide.setPower(-LINEARSLIDEPOWER);
-        }
+        moveSlideNext(LinearSlideOperation.Retract);
         position = LinearSlidePosition.middleOut;
       }
     }
-    //}
   }
 
   // Grabber stuff:
-  public void claw(double val){
+  public void claw(double val) {
     claw.setPosition(val);
   }
-  public void turnn(double val){
+
+  public void turnn(double val) {
     turn.setPosition(val);
   }
 
@@ -270,11 +243,20 @@ public class TTRobot {
   }*/
 
   // Lift stuff:
+  // Positive is down, Negative is up!
   public void setLift(double speed) {
-    if(!liftSwitch.getState() && speed > 0){
+    // We have to support the limit switch having turned off
+    // and then back on.
+    // States: Normal
+    // OnlyUp: below, At
+    if (!liftSwitch.getState()) {
+      //onlyUp = true;
+    }
+
+    if (!liftSwitch.getState() && speed > 0) {
       lLiftMotor.setPower(0);
       rLiftMotor.setPower(0);
-    }else {
+    } else {
       lLiftMotor.setPower(speed);
       rLiftMotor.setPower(speed);
     }

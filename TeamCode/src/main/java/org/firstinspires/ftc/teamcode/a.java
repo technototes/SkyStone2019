@@ -10,17 +10,38 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "test limit")
 public class a extends LinearOpMode {
+  enum LinearSlidePosition {
+    In,
+    middleIn,
+    middleOut,
+    Out
+  }
 
+  private LinearSlidePosition position = LinearSlidePosition.In;
+  private double LINEARSLIDEPOWER = 1;
   private Servo claw;
   private Servo turn;
   private CRServo slide;
   private boolean openclose = true;
   private DigitalChannel slideLimit;
+
   private void sleep(int n) {
     try {
       Thread.sleep(n);
-    } catch (Exception e){}
+    } catch (Exception e) {
+    }
   }
+
+  private void moveSlideNext(LinearSlideOperation op) {
+    double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
+    while (!slideLimit.getState()) {
+      slide.setPower(power);
+    }
+    while (slideLimit.getState()) {
+      slide.setPower(power);
+    }
+  }
+
   @Override
   public void runOpMode() {
     slideLimit = hardwareMap.get(DigitalChannel.class, "slideLimit");
@@ -50,17 +71,17 @@ public class a extends LinearOpMode {
     while (opModeIsActive()) {
       //double val = gamepad1.left_stick_x;
       final double clawMin = claw.MIN_POSITION;
-      if(gamepad2.a == true) {
+      if (gamepad2.a == true) {
         claw.setPosition(0.4); // Open
         telemetry.addLine("Open .4");
-      }else if (gamepad2.y == true){
+      } else if (gamepad2.y == true) {
         claw.setPosition(0.6); // CLosed
         telemetry.addLine("Close .6");
       }
-      if(gamepad2.x == true) {
+      if (gamepad2.x == true) {
         turn.setPosition(0.4); // Open
         telemetry.addLine("Open 0.4");
-      }else if (gamepad2.b == true){
+      } else if (gamepad2.b == true) {
         turn.setPosition(0.6); // CLosed
         telemetry.addLine("Close 0.6");
       }
@@ -70,15 +91,45 @@ public class a extends LinearOpMode {
       } else {
         slide.setPower(sval);
       }
-      i++;
-      //telemetry.addData("Stick:", "%3.3f", val);
-      telemetry.addData("servo:", "%3.3f", claw.getPosition());
-      telemetry.addData("spin:", "%3.3f", turn.getPosition());
-      //telemetry.addData("liftLimit:", "%d: %s", i, val(liftLimit));
-      //telemetry.addData("slideLimit:", "%d: %s", i, val(slideLimit));
-      sleep(10);
-      telemetry.update();
+      LinearSlideOperation inOrOut = LinearSlideOperation.Extend;
+      if (position == LinearSlidePosition.In) {
+        if (inOrOut == LinearSlideOperation.Extend) {
+          moveSlideNext(LinearSlideOperation.Extend);
+          position = LinearSlidePosition.middleIn;
+        }
+      } else if (position == LinearSlidePosition.middleIn) {
+        if (inOrOut == LinearSlideOperation.Extend) {
+          moveSlideNext(LinearSlideOperation.Extend);
+          position = LinearSlidePosition.middleOut;
+        } else {
+          moveSlideNext(LinearSlideOperation.Retract);
+          position = LinearSlidePosition.In;
+        }
+      } else if (position == LinearSlidePosition.middleOut) {
+        if (inOrOut == LinearSlideOperation.Extend) {
+          moveSlideNext(LinearSlideOperation.Extend);
+          position = LinearSlidePosition.Out;
+        } else {
+          moveSlideNext(LinearSlideOperation.Retract);
+          position = LinearSlidePosition.middleIn;
+        }
+      } else {
+        if (inOrOut == LinearSlideOperation.Retract) {
+          moveSlideNext(LinearSlideOperation.Retract);
+          position = LinearSlidePosition.middleOut;
+        }
+      }
+      //}
     }
+    i++;
+    //telemetry.addData("Stick:", "%3.3f", val);
+    telemetry.addData("servo:", "%3.3f", claw.getPosition());
+    telemetry.addData("spin:", "%3.3f", turn.getPosition());
+    //telemetry.addData("liftLimit:", "%d: %s", i, val(liftLimit));
+    //telemetry.addData("slideLimit:", "%d: %s", i, val(slideLimit));
+    sleep(10);
+    telemetry.update();
   }
 }
+
 

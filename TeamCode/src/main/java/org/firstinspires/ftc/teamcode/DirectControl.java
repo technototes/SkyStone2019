@@ -41,11 +41,12 @@ public class DirectControl extends LinearOpMode {
         robot.claw(0.6); // CLosed
         telemetry.addLine("Close .6");
       }
+      // Grabber rotation
       if(control.buttonX() == Button.Pressed) {
-        robot.turnn(0.4); // Open
+        robot.turnn(0.4);
         telemetry.addLine("Open 0.4");
       }else if (control.buttonB() == Button.Pressed){
-        robot.turnn(0.6); // CLosed
+        robot.turnn(0.6);
         telemetry.addLine("Close 0.6");
       }
       // redid this to work with magnetic limit switch
@@ -95,7 +96,11 @@ public class DirectControl extends LinearOpMode {
       if (Math.abs(L.Y) > robot.STICKDEADZONE) {
         L2.Y = L.Y;
       }
-      robot.joystickDrive(L2, D, robot.gyroHeading());
+      if(driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed){
+        robot.joystickDrive(L2, D, 0);
+      }else {
+        robot.joystickDrive(L2, D, robot.gyroHeading());
+      }
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
       } else if (control.buttonA() == Button.Pressed) {
