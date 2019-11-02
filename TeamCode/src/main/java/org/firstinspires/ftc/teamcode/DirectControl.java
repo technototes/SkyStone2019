@@ -49,7 +49,7 @@ public class DirectControl extends LinearOpMode {
         telemetry.addLine("Close 0.6");
       }
       if (control.rbump() == Button.Pressed) {
-        robot.turnn();
+        robot.turnn(1.0);
       }
 
       // redid this to work with magnetic limit switch
@@ -69,14 +69,8 @@ public class DirectControl extends LinearOpMode {
       else {
         robot.simpleSlide(0);
       }
-       */
-      if(Math.abs(slide)>robot.STICKDEADZONE){
-        if(slide>0){
-          robot.lslide(LinearSlideOperation.Extend);
-        }else{
-          robot.lslide((LinearSlideOperation.Retract));
-        }
-      }
+
+
 
 
       // Lift control:

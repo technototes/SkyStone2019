@@ -25,4 +25,9 @@ public class Direction {
   public boolean isDown() {
     return (Math.abs(X) < .1) && (Y < -.9);
   }
-}
+
+  public void turbo(double value) {
+    X = X * value;
+    Y = Y * value;
+    }
+  }
