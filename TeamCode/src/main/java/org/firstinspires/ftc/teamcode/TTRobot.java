@@ -222,20 +222,25 @@ public class TTRobot {
   public void turnn(double val){
     turn.setPosition(val);
   }
-  public GrabberPosition getGrabberPosition() {
-    // TODO: Check this...
-    double pos = turn.getPosition();
-    if (pos < GRABBERPOSITIONCUTOFF) {
-      return GrabberPosition.Horizontal;
-    } else {
-      return GrabberPosition.Vertical;
+
+  public void setClawPosition(ClawPosition position) {
+    switch (position) {
+      case Open:
+        claw.setPosition(0.4); // Open
+        break;
+      case Close:
+        claw.setPosition(0.6); // Closed
+        break;
     }
   }
+
+  public void setGrabberPosition(GrabberPosition position) {
+  }
+
   public void simpleSlide(double speed) {
     slide.setPower(-speed);
   }
-
-  /*public void turnn(double speed) {
+/*public void turnn(double speed) {
     turn.setPower(speed);
   }*/
 
