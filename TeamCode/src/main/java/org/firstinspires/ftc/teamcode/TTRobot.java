@@ -233,6 +233,9 @@ public class TTRobot {
   public void simpleSlide(double speed){
     slide.setPower(-speed);
   }
+  public void turnn(double speed){
+    turn.setPower(speed);
+  }
   public void rleft(){
     turn.setPower(1);
   }

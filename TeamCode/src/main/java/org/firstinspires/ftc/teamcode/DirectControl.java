@@ -40,10 +40,10 @@ public class DirectControl extends LinearOpMode {
       if (control.rbump() == Button.Pressed) {
         robot.close();
       }
-    if (control.ltrigger() > robot.STICKDEADZONE) {
+      if (control.buttonX() == Button.Pressed) {
         robot.rleft();
       }
-      if (control.rtrigger() > robot.STICKDEADZONE) {
+      if (control.buttonA() == Button.Pressed) {
         robot.rright();
       }
       // redid this to work with magnetic limit switch
@@ -56,6 +56,8 @@ public class DirectControl extends LinearOpMode {
       double slide = control.lstick().X;
       if(Math.abs(slide)>robot.STICKDEADZONE){
         robot.simpleSlide(slide);
+      }else{
+        robot.simpleSlide(0);
       }
 
 
@@ -84,13 +86,13 @@ public class DirectControl extends LinearOpMode {
         L2.Y = L.Y;
       }
       robot.joystickDrive(L2, D, robot.gyroHeading());
-      if (control.buttonY() == Button.Pressed) {
+      /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
       } else if (control.buttonA() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Retract);
       } else {
         // DO NOTHING, not "return;" :D
-      }
+      }*/
     }
     telemetry.update();
   }

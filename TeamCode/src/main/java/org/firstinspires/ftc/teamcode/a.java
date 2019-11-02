@@ -17,11 +17,12 @@ public class a extends LinearOpMode {
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "mLimitSwitch");
 
     waitForStart();
+    int i = 0;
     while (opModeIsActive()) {
-
-      telemetry.addLine(lslideSwitch.getState() ? "true" : "false");
-
+      i++;
+      telemetry.addData("Switch:", "%d: %s", i, lslideSwitch.getState() ? "true" : "false");
+      sleep(10);
+      telemetry.update();
     }
-    telemetry.update();
   }
 }
