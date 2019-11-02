@@ -250,11 +250,10 @@ public class TTRobot {
   enum LiftState {
     Above,
     At,
-    AtOrBelow,
     Below
   }
 
-  LiftState liftPosition = LiftState.AtOrBelow;
+  LiftState liftPosition = LiftState.Below;
 
   // Override, just in case we're stuck in "only go up" mode
   public void overrideLiftLimit() {
@@ -270,33 +269,38 @@ public class TTRobot {
   public void setLift(double speed) {
     // We have to support the limit switch having turned off
     // and then back up
-    if (false) {
-      boolean isLimitSet = !liftSwitch.getState();
-      switch (liftPosition) {
-        case Above:
-          setLiftPower(speed);
-          return;
-        case Below:
-          setLiftPower(-Math.abs(speed));
-          return;
-        case At:
-        case AtOrBelow:
-      }
-    }
-    if (!liftSwitch.getState() && speed > 0) {
-      setLiftPower(0);
-    } else {
-      setLiftPower(speed);
+    boolean isLimitSet = !liftSwitch.getState();
+    switch (liftPosition) {
+      case Above:
+        if (isLimitSet)
+          liftPosition = LiftState.At;
+        setLiftPower(speed);
+        break;
+      case Below:
+        if (isLimitSet)
+          liftPosition = LiftState.At;
+        setLiftPower(-Math.abs(speed));
+        break;
+      case At:
+        if (!isLimitSet)
+          liftPosition = (speed < 0) ? LiftState.Below : LiftState.Above;
+        setLiftPower(-Math.abs(speed));
+        break;
     }
   }
+
+
   private boolean hook = false;
-  public void bpGrabber(){
+
+  public void bpGrabber() {
 
     //TODO
   }
-  public void capstone(){
+
+  public void capstone() {
     //TODO
   }
+
   public boolean isLiftAtUpperLimit() {
     // TODO: Read the upper limit switch
     return false;
