@@ -168,7 +168,16 @@ public class TTRobot {
   private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
 
   public void lslide(LinearSlideOperation operation) {
-    double power = (operation == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
+    double power = 0;
+    switch (operation) {
+      case Extend:
+        power = -LINEARSLIDEPOWER;
+        break;
+      case Retract:
+        power = LINEARSLIDEPOWER;
+        break;
+    }
+
     switch (slidePosition) {
       case In:
         switch (operation) {
@@ -323,11 +332,11 @@ public class TTRobot {
 
 
   public void bpGrabber(double speed) {
-    basePlateGrabber.setPower(speed);
+    basePlateGrabber.setPower(-speed);
   }
 
   public void capstone(double speed) {
-    cap.setPower(speed);
+    cap.setPower(-speed);
   }
 
   public boolean isLiftAtUpperLimit() {
