@@ -15,7 +15,7 @@ public class a extends LinearOpMode {
   @Override
   public void runOpMode() {
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "mLimitSwitch");
-
+    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     waitForStart();
     int i = 0;
     while (opModeIsActive()) {

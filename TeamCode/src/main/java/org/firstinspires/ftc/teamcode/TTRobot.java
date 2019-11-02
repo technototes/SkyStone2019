@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -29,6 +31,7 @@ public class TTRobot {
     middleOut,
     Out
   }
+
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
@@ -78,7 +81,8 @@ public class TTRobot {
     }
   }
 
-  public TTRobot() {}
+  public TTRobot() {
+  }
 
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
@@ -117,11 +121,14 @@ public class TTRobot {
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
+    // Set the digital channel mode to input
+    // Output mode can be used to blink LED's
+    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     // Shamelessly copied from example code...
-    /*while (!imu.isGyroCalibrated() || !imu.isSystemCalibrated()) {
+    while (imu.getCalibrationStatus().calibrationStatus != 0
+      || imu.getSystemStatus() != BNO055IMU.SystemStatus.RUNNING_FUSION) {
       sleep(10);
-    }*/
+    }
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
@@ -146,58 +153,58 @@ public class TTRobot {
 
       return;
     }*/
-    if(position == LinearSlidePosition.In){
-      if(inOrOut == LinearSlideOperation.Extend){
-        while(lslideSwitch.getState()) {
+    if (position == LinearSlidePosition.In) {
+      if (inOrOut == LinearSlideOperation.Extend) {
+        while (lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleIn;
       }
-    }else if(position == LinearSlidePosition.middleIn){
-      if(inOrOut == LinearSlideOperation.Extend){
-        while(lslideSwitch.getState()){
+    } else if (position == LinearSlidePosition.middleIn) {
+      if (inOrOut == LinearSlideOperation.Extend) {
+        while (lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleOut;
-      }else{
-        while(lslideSwitch.getState()){
+      } else {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.In;
       }
-    }else if(position == LinearSlidePosition.middleOut){
-      if(inOrOut == LinearSlideOperation.Extend){
-        while(lslideSwitch.getState()){
+    } else if (position == LinearSlidePosition.middleOut) {
+      if (inOrOut == LinearSlideOperation.Extend) {
+        while (lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.Out;
-      }else{
-        while(lslideSwitch.getState()){
+      } else {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleIn;
       }
-    }else{
-      if(inOrOut == LinearSlideOperation.Retract){
-        while(lslideSwitch.getState()){
+    } else {
+      if (inOrOut == LinearSlideOperation.Retract) {
+        while (lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
-        while(!lslideSwitch.getState()){
+        while (!lslideSwitch.getState()) {
           slide.setPower(-LINEARSLIDEPOWER);
         }
         position = LinearSlidePosition.middleOut;
@@ -214,10 +221,12 @@ public class TTRobot {
       claw.setPower(1);
     }
   }
-  public void open(){
+
+  public void open() {
     claw.setPower(1);
   }
-  public void close(){
+
+  public void close() {
     claw.setPower(-1);
   }
 
@@ -230,16 +239,19 @@ public class TTRobot {
       return GrabberPosition.Vertical;
     }
   }*/
-  public void simpleSlide(double speed){
+  public void simpleSlide(double speed) {
     slide.setPower(-speed);
   }
-  public void turnn(double speed){
+
+  public void turnn(double speed) {
     turn.setPower(speed);
   }
-  public void rleft(){
+
+  public void rleft() {
     turn.setPower(1);
   }
-  public void rright(){
+
+  public void rright() {
     turn.setPower(-1);
   }
 
@@ -386,6 +398,7 @@ public class TTRobot {
     this.motorRearLeft(rlPower);
     this.motorRearRight(rrPower);
   }
+
   // set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and
   // input angle to snap to.
   public double snapToAngle(double gyroAngle) {
