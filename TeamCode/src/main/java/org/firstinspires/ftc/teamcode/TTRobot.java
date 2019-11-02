@@ -293,7 +293,7 @@ public class TTRobot {
   public double gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
+    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
 
   /*
@@ -401,13 +401,9 @@ public class TTRobot {
   public void snap() {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
-    snap(newangle);
+
   }
 
-  // Turn the robot to a specific angle
-  public void snap(double angle) {
-    drive(0.0, 0.0, 0.0, angle);
-  }
 
   public void timeDrive(double speed, double time, double angle) {
     ElapsedTime driveTime = new ElapsedTime();
@@ -513,6 +509,8 @@ public class TTRobot {
   }
 
   public void gyroHold (double speed, double angle, double holdTime) {
-
+    Direction zero = new Direction(0,0);
+    //double currentAngle = gyroHeading();
+    joystickDrive(zero, zero, angle);
   }
 }

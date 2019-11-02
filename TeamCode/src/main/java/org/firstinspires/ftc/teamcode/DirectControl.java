@@ -36,25 +36,24 @@ public class DirectControl extends LinearOpMode {
       }*/
       // Handle Grabber clutch
       if(control.buttonA() == Button.Pressed) {
-        robot.claw(0.4); // Open
-        telemetry.addLine("Open .4");
-      }else if (control.buttonY() == Button.Pressed){
-        robot.claw(0.6); // CLosed
-        telemetry.addLine("Close .6");
+        robot.gyroHold(1.0, 0, 3);
+      }
+      if (control.buttonY() == Button.Pressed){
+        robot.gyroHold(1, 180, 3);
       }
       // Grabber rotation
       if(control.buttonX() == Button.Pressed) {
-        robot.turnn(0.4);
+        robot.gyroHold(1,90, 3);
         telemetry.addLine("Open 0.4");
-      }else if (control.buttonB() == Button.Pressed){
-        robot.turnn(0.6);
-        telemetry.addLine("Close 0.6");
+      }
+      if (control.buttonB() == Button.Pressed){
+        robot.gyroHold(1, 270, 3);
       }
       if (control.rbump() == Button.Pressed) {
         robot.turnn(1.0);
       }
 
-      // redid this to work with magnetic limit switch
+      // redid this to work with magneticx limit switch
       /*Direction dpad = control.dpad();
       if(dpad.X == 1){
           robot.lslide(LinearSlideOperation.Extend);
