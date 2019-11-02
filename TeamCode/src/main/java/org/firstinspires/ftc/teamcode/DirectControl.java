@@ -109,6 +109,17 @@ public class DirectControl extends LinearOpMode {
       if (Math.abs(L.Y) > robot.STICKDEADZONE) {
         L2.Y = L.Y;
       }
+
+      //Turbo Mode (insert Tristan happy face)
+      if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0 )) {
+        L2.turbo(0.5);
+        D.turbo(0.5);
+      } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0 )) {
+        L2.turbo(2.0);
+        D.turbo(2.0);
+      }
+
+
       robot.joystickDrive(L2, D, robot.gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
@@ -117,6 +128,21 @@ public class DirectControl extends LinearOpMode {
       } else {
         // DO NOTHING, not "return;" :D
       }*/
+
+
+      Direction fineDir = new Direction(0,0);
+      if(driver.dpad().isDown()){
+        robot.joystickDrive(new Direction(-0,-0.5), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isUp()){
+        robot.joystickDrive(new Direction(0,0.5), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isLeft()){
+        robot.joystickDrive(new Direction(-0.5,0), new Direction(0,0), robot.gyroHeading());
+      }
+      if(driver.dpad().isRight()){
+        robot.joystickDrive(new Direction(0.5,0), new Direction(0,0), robot.gyroHeading());
+      }
 
     }
     telemetry.update();
