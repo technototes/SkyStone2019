@@ -164,6 +164,8 @@ public class TTRobot {
     slide.setPower(0);
   }
 
+  private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
+
   public void lslide(LinearSlideOperation inOrOut) {
     if (position == LinearSlidePosition.In) {
       if (inOrOut == LinearSlideOperation.Extend) {
@@ -293,8 +295,12 @@ public class TTRobot {
   private boolean hook = false;
 
   public void bpGrabber() {
-
-    //TODO
+    if(hook) {
+      basePlateGrabber.setPosition();
+    }else{
+      basePlateGrabber.setPosition();
+    }
+  //TODO find positions
   }
 
   public void capstone() {
