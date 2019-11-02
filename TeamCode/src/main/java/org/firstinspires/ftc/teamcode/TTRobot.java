@@ -270,6 +270,9 @@ public class TTRobot {
 
   // Positive is down, Negative is up!
   public void setLift(double speed) {
+    setLiftPower(speed);
+
+    /*
     // We have to support the limit switch having turned off
     // and then back up
     boolean isLimitSet = !liftSwitch.getState();
@@ -290,6 +293,7 @@ public class TTRobot {
         setLiftPower(-Math.abs(speed));
         break;
     }
+    */
   }
 
 
