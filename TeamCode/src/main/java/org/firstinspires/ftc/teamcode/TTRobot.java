@@ -32,7 +32,7 @@ public class TTRobot {
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the power of the linear slide
-  private static final double LINEARSLIDEPOWER = -0.5;
+  private static final double LINEARSLIDEPOWER = -1.0;
 
   // Dead zones
 
@@ -159,6 +159,9 @@ public class TTRobot {
     return retracted.isPressed();
   }
 
+  // This is synchronous: It freezes all other robot states until it finishes
+  // moving the slide.
+  @Deprecated
   private void moveSlideNext(LinearSlideOperation op) {
     double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
     while (slideSwitchSignaled()) {
