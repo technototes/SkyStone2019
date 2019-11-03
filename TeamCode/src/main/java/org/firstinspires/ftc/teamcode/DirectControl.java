@@ -153,9 +153,7 @@ public class DirectControl extends LinearOpMode {
         robot.joystickDrive(L2, D, robot.gyroHeading());
       }
       telemetry.update();
-      if(driver.buttonY() == Button.Pressed && driver.buttonX() == Button.Pressed){
-        robot.driveToLine(1, 5000);
-      }
+
     }
   }
 }

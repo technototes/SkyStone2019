@@ -596,9 +596,10 @@ public class TTRobot {
   public void driveToLine(double speed,  double time) {
     final int STEP = 50;
     while(gray() && time > 0){
+
       timeDrive(1 , STEP, 0);
       time -= STEP;
-      telemetry.addLine(String.format("RGB: %d, %d, %d", sensorColorBottom.red(), sensorColorBottom.green(), sensorColorBottom.blue()));
+
     }
   }
 
@@ -606,6 +607,10 @@ public class TTRobot {
     int red = sensorColorBottom.red();
     int green = sensorColorBottom.green();
     int blue = sensorColorBottom.blue();
+    telemetry.addData(
+      "RGB",
+      "%d %d %d",
+      red, green, blue);
     if(Math.abs(red-blue) > 50){
       return false;
     }else{
