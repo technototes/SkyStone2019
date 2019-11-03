@@ -128,7 +128,7 @@ public class TTRobot {
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-    // TODO: Add initialization for the slide and lift?
+    // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
     while (imu.getCalibrationStatus().calibrationStatus != 0
@@ -163,7 +163,6 @@ public class TTRobot {
   private boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
   }
-
 
   private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
 
@@ -250,8 +249,8 @@ public class TTRobot {
     }
   }
 
-  public void setGrabberPosition(GrabberPosition position) {
-  }
+  /*public void setGrabberPosition(GrabberPosition position) {
+  }*/
 
   public void simpleSlide(double speed) {
     slide.setPower(-speed);
@@ -297,36 +296,18 @@ public class TTRobot {
   }
 
   private void setLiftPower(double val) {
+    if (val > 0)
+      val = val / 5.0;
     lLiftMotor.setPower(val);
     rLiftMotor.setPower(val);
   }
 
   // Positive is down, Negative is up!
   public void setLift(double speed) {
-    setLiftPower(speed);
-
-    /*
-    // We have to support the limit switch having turned off
-    // and then back up
-    boolean isLimitSet = !liftSwitch.getState();
-    switch (liftPosition) {
-      case Above:
-        if (isLimitSet)
-          liftPosition = LiftState.At;
-        setLiftPower(speed);
-        break;
-      case Below:
-        if (isLimitSet)
-          liftPosition = LiftState.At;
-        setLiftPower(-Math.abs(speed));
-        break;
-      case At:
-        if (!isLimitSet)
-          liftPosition = (speed < 0) ? LiftState.Below : LiftState.Above;
-        setLiftPower(-Math.abs(speed));
-        break;
+    // If we're at the lower limit, only allow upward motion
+    if (isLiftAtLowerLimit() || speed < 0) {
+      setLiftPower(speed);
     }
-    */
   }
 
 
@@ -345,8 +326,7 @@ public class TTRobot {
   }
 
   public boolean isLiftAtLowerLimit() {
-    // TODO: Read the lower limit switch
-    return false;
+    return !liftSwitch.getState();
   }
 
   // Drive train:
