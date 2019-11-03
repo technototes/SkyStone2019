@@ -29,6 +29,8 @@ public class TTRobot {
     Out
   }
 
+  // The scaling factor for running in snail mode
+  private static final double SNAILMODESCALE = 0.5;
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the grab rotation position for snapping to horizontal or vertical
@@ -43,6 +45,7 @@ public class TTRobot {
   // This is the middle 'dead zone' of the analog sticks
   public static final double STICKDEADZONE = 0.05;
 
+  // Triggers must be pushed at least this far
   public static final double TRIGGERTHRESHOLD = 0.25;
 
   private boolean isGrabberOpened = true;
@@ -288,9 +291,11 @@ public class TTRobot {
   boolean turboMode = false;
   public void speedSnail() {
     snailMode = true;
+    turboMode = false;
   }
   public void speedTurbo() {
     turboMode = true;
+    snailMode = false;
   }
   public void speedNormal() {
     turboMode = false;
@@ -316,7 +321,7 @@ public class TTRobot {
       scale = 1.0 / scale;
     }
     if (snailMode) {
-      scale *= .5;
+      scale = SNAILMODESCALE;
     } else if (!turboMode) {
       scale = 1.0;
     }
