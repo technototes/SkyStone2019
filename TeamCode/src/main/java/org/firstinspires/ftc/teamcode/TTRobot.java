@@ -196,7 +196,7 @@ public class TTRobot {
         power = -LINEARSLIDEPOWER;
         break;
     }
-
+/*
     switch (slidePosition) {
       case In:
         switch (operation) {
@@ -245,7 +245,7 @@ public class TTRobot {
         }
         break;
     }
-
+*/
     slide.setPower(power);
   }
 
@@ -594,7 +594,7 @@ public class TTRobot {
   }
 
   public boolean driveToLine(double speed, double direction) {
-    final double STEP = 0.1;
+    final double STEP = 0.05;
     if(gray()){
       timeDrive(speed, STEP, direction);
       return false;
