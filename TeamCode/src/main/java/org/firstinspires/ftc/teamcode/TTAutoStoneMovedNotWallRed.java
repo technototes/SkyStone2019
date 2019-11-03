@@ -15,13 +15,13 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
 
   // States
   private enum AutoState {
-    INITIALIZE,
 
-    LINE_UP_STONE,
-    PICK_UP_STONE,
 
-    GO_TO_BASE_PLATE,
-    PLACE_STONE,
+
+
+
+
+
     GO_TO_LINE,
 
     STOP
@@ -34,7 +34,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
     ThreeAndSix
   }
 
-  private AutoState currentState = AutoState.INITIALIZE;
+  private AutoState currentState = AutoState.GO_TO_LINE;
   private SkyStonePos skystonepos = SkyStonePos.UNKNOWN;
   private ElapsedTime runtime = new ElapsedTime();
   private ElapsedTime timer = new ElapsedTime();
@@ -73,7 +73,8 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
 
       switch (currentState) {
-        case INITIALIZE:
+        /*
+        \case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());
           runtime.reset();
 
@@ -82,8 +83,8 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
               tfod.activate();
           }
           */
-          currentState = AutoState.LINE_UP_STONE;
-          break;
+
+        /*
         case LINE_UP_STONE:
           telemetry.addData("state", currentState.toString());
           runtime.reset();
@@ -112,31 +113,8 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
           robot.claw.setPosition(x);
           robot.liftMotor.setPower(x);
           */
-          break;
-        case GO_TO_BASE_PLATE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
-          // driving to the baseplate
-          robot.timeDrive(x, y, z);
-          // distDriveRear(x, y, z);
-          // gyroHold(x, y, z);
-          robot.timeDrive(x, y, z);
-          break;
-        case PLACE_STONE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
-          /*
-          robot.liftMotor.setPower(x);
-          robot.claw.setPosition(x);
-          robot.timeDrive(x, y, z);
-          robot.motorLift(x);
-          robot.claw.setPosition(x);
-          robot.motorLift(x);
-          robot.timeDrive(x, y, z);
-          robot.claw.setPosition(x);
-          robot.motorLift(x);
-          */
-          break;
+
+
 
         case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());

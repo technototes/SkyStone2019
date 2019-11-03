@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -32,7 +35,7 @@ public class TTRobot {
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
   // the power of the linear slide
-  private static final double LINEARSLIDEPOWER = -1.0;
+  private static final double LINEARSLIDEPOWER = 1.0;
 
   // Dead zones
 
@@ -75,6 +78,7 @@ public class TTRobot {
   private CRServo basePlateGrabber = null;
   private TouchSensor touch = null;
   private CRServo cap = null;
+  private ColorSensor sensorColorBottom = null;
 
   private Telemetry telemetry = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
@@ -115,6 +119,7 @@ public class TTRobot {
 
     lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
     //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
@@ -588,7 +593,23 @@ public class TTRobot {
     return stepVal;
   }
 
-  public void gyroHold(double speed, double angle, double holdTime) {
+  public void driveToLine(double speed,  double time) {
+    final int STEP = 50;
+    while(gray() && time > 0){
+      timeDrive(1 , STEP, 0);
+      time -= STEP;
+      telemetry.addLine(String.format("RGB: %d, %d, %d", sensorColorBottom.red(), sensorColorBottom.green(), sensorColorBottom.blue()));
+    }
+  }
 
+  public boolean gray(){
+    int red = sensorColorBottom.red();
+    int green = sensorColorBottom.green();
+    int blue = sensorColorBottom.blue();
+    if(Math.abs(red-blue) > 50){
+      return false;
+    }else{
+      return true;
+    }
   }
 }
