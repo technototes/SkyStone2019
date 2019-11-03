@@ -268,10 +268,6 @@ public class TTRobot {
     rLiftMotor.setPower(val);
   }
 
-  public boolean isLiftAtLowerLimit() {
-    return !liftSwitch.getState();
-  }
-
   // Positive is down, Negative is up!
   public void setLift(double speed) {
     // If we're at the lower limit, only allow upward motion
@@ -299,6 +295,10 @@ public class TTRobot {
   public void speedNormal() {
     turboMode = false;
     snailMode = false;
+  }
+
+  public boolean isLiftAtLowerLimit() {
+    return !liftSwitch.getState();
   }
 
   // Drive train:
