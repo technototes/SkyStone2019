@@ -15,19 +15,20 @@ public class Controller {
   }
 
   Direction dpad() {
+    float X = 0, Y = 0;
     if (pad.dpad_down) {
-      return getStick("d", 0, 1);
+      Y = 1;
     }
     if (pad.dpad_up) {
-      return getStick("d", 0, -1);
+      Y = -1;
     }
     if (pad.dpad_left) {
-      return getStick("d", -1, 0);
+      X = -1;
     }
     if (pad.dpad_right) {
-      return getStick("d", 1, 0);
+      X = 1;
     }
-    return Direction.None;
+    return getStick("d", X, Y);
   }
 
   Button buttonA() {
