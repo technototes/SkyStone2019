@@ -23,30 +23,38 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class TTRobot {
-  enum LinearSlidePosition {
-    In,
-    Middle,
-    Out
-  }
+  // Scaling values
 
   // The scaling factor for running in snail mode
   private static final double SNAILMODESCALE = 0.5;
+  // The amount we divide speed by when dropping the lift
+  private static final double DOWNWARDLIFTSCALE = 3.0;
   // The power applied to the wheels for robot rotation
   private static final double TURNSPEEDFACTOR = 0.5;
+  // the power of the linear slide
+  private static final double LINEARSLIDEPOWER = -0.5;
+
+  // Dead zones
+
+  // This is the middle 'dead zone' of the analog sticks
+  public static final double STICKDEADZONE = 0.05;
+  // Triggers must be pushed at least this far
+  public static final double TRIGGERTHRESHOLD = 0.25;
+
+  // Unused stuff
+
   // the grab rotation position for snapping to horizontal or vertical
   private static final double GRABBERPOSITIONCUTOFF = 0.25;
   // the grab rotation 'horizontal' position
   private static final double HORIZONTALGRABBERPOSITION = 0.0;
   // the grab rotation 'vertical' position
   private static final double VERTICALGRABBERPOSITION = 0.5;
-  // the power of the linear slide
-  private static final double LINEARSLIDEPOWER = -0.5;
 
-  // This is the middle 'dead zone' of the analog sticks
-  public static final double STICKDEADZONE = 0.05;
-
-  // Triggers must be pushed at least this far
-  public static final double TRIGGERTHRESHOLD = 0.25;
+  enum LinearSlidePosition {
+    In,
+    Middle,
+    Out
+  }
 
   private boolean isGrabberOpened = true;
   private LinearSlidePosition slidePosition = LinearSlidePosition.In;
@@ -266,7 +274,7 @@ public class TTRobot {
 
   private void setLiftPower(double val) {
     if (val > 0)
-      val = val / 3.0;
+      val = val / DOWNWARDLIFTSCALE;
     lLiftMotor.setPower(val);
     rLiftMotor.setPower(val);
   }
@@ -289,14 +297,17 @@ public class TTRobot {
 
   boolean snailMode = false;
   boolean turboMode = false;
+
   public void speedSnail() {
     snailMode = true;
     turboMode = false;
   }
+
   public void speedTurbo() {
     turboMode = true;
     snailMode = false;
   }
+
   public void speedNormal() {
     turboMode = false;
     snailMode = false;
