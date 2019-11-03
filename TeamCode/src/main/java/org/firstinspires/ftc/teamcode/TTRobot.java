@@ -593,13 +593,13 @@ public class TTRobot {
     return stepVal;
   }
 
-  public void driveToLine(double speed,  double time) {
-    final int STEP = 50;
-    while(gray() && time > 0){
-
-      timeDrive(1 , STEP, 0);
-      time -= STEP;
-
+  public boolean driveToLine(double speed) {
+    final double STEP = 0.1;
+    if(gray()){
+      timeDrive(speed, STEP, 0);
+      return false;
+    }else {
+      return true;
     }
   }
 
