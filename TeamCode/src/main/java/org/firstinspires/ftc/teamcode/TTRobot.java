@@ -41,7 +41,7 @@ public class TTRobot {
   private static final double LINEARSLIDEPOWER = -0.5;
 
   // This is the middle 'dead zone' of the analog sticks
-  public static final double STICKDEADZONE = 0.25;
+  public static final double STICKDEADZONE = 0.05;
 
   public static final double TRIGGERTHRESHOLD = 0.25;
 
@@ -147,6 +147,7 @@ public class TTRobot {
   public boolean isLinearSlideFullyRetracted() {
     return retracted.isPressed();
   }
+
   private void moveSlideNext(LinearSlideOperation op) {
     double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
     while (slideSwitchSignaled()) {
@@ -287,7 +288,47 @@ public class TTRobot {
     cap.setPower(-speed);
   }
 
+  boolean snailMode = false;
+  boolean turboMode = false;
+  public void speedSnail() {
+    snailMode = true;
+  }
+  public void speedTurbo() {
+    turboMode = true;
+  }
+  public void speedNormal() {
+    turboMode = false;
+    snailMode = false;
+  }
+
   // Drive train:
+  private void setDrivePower(double fl, double fr, double rl, double rr) {
+    // First, scale the values
+    double afl = Math.abs(fl);
+    double afr = Math.abs(fr);
+    double arl = Math.abs(rl);
+    double arr = Math.abs(rr);
+    double scale = Math.max(Math.max(afl, afr), Math.max(arl, arr));
+    // No divide by zeros
+    if (scale < .0001) {
+      scale = 1.0;
+    } else {
+      scale = 1.0 / scale;
+    }
+    if (snailMode) {
+      scale *= .5;
+    } else if (!turboMode) {
+      scale = 1.0;
+    }
+
+    telemetry.addData(
+      "scaled", "%3.2f fl %3.2f fr %3.2f rr %3.2f rl %3.2f", scale, fl, fr, rr, rl);
+    flMotor.setPower(Range.clip(fl * scale, -1, 1));
+    frMotor.setPower(Range.clip(fr * scale, -1, 1));
+    rlMotor.setPower(Range.clip(rl * scale, -1, 1));
+    rrMotor.setPower(Range.clip(rr * scale, -1, 1));
+  }
+
   // These should just be used by the drive train
   public void motorFrontLeft(double power) {
     flMotor.setPower(Range.clip(power, -1, 1));
@@ -372,10 +413,11 @@ public class TTRobot {
       powerRearRight = 0.0;
     }
 
-    motorFrontLeft(powerFrontLeft);
+    setDrivePower(powerFrontLeft, powerFrontRight, powerRearLeft, powerRearRight);
+    /*motorFrontLeft(powerFrontLeft);
     motorFrontRight(powerFrontRight);
     motorRearLeft(powerRearLeft);
-    motorRearRight(powerRearRight);
+    motorRearRight(powerRearRight);*/
   }
 
   public void drive(double joystickAngle, double gyroAngle, double power, double turn) {

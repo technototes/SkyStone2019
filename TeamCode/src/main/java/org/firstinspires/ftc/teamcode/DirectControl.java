@@ -116,11 +116,11 @@ public class DirectControl extends LinearOpMode {
 
       //Turbo Mode (insert Tristan happy face)
       if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0 )) {
-        L2.turbo(0.5);
-        D.turbo(0.5);
+        robot.speedSnail();
       } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0 )) {
-        L2.turbo(2.0);
-        D.turbo(2.0);
+        robot.speedTurbo();
+      } else {
+        robot.speedNormal();
       }
 
 
@@ -152,7 +152,7 @@ public class DirectControl extends LinearOpMode {
       else {
         robot.joystickDrive(L2, D, robot.gyroHeading());
       }
+      telemetry.update();
     }
-    telemetry.update();
   }
 }
