@@ -72,19 +72,20 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
         case GO_TO_PLATE:
           telemetry.addData("state", currentState.toString());//make sure
 
-          robot.timeDrive(1, 2, 180);
+          robot.timeDrive(1, 1.2, 180);
           currentState = AutoState.GRAB_PLATE;
           break;
         case GRAB_PLATE:
           telemetry.addData("state", currentState.toString());
 
-          robot.bpGrabber(-1);
+          robot.bpGrabber(1);
+          robot.timeDrive(0,1,0);
           currentState = AutoState.BRING_PLATE;
           break;
         case BRING_PLATE:
           telemetry.addData("state", currentState.toString());
-          robot.bpGrabber(-1);
-          robot.timeDrive(1, 2, 0);
+          robot.bpGrabber(1);
+          robot.timeDrive(1, 1.5, 0);//may need to bve tweaked according to testing
           currentState = AutoState.LET_GO;
           break;
         case LET_GO:
@@ -92,6 +93,7 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
           robot.bpGrabber(0);
 
           currentState = AutoState.GO_TO_LINE;
+          robot.timeDrive(1, 1, 270);
           break;
         case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());
