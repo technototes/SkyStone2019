@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
-@Autonomous(name = "TTAutoDriveToLine", group = "TT")
-public class TTAutoDriveToLine extends LinearOpMode {
+@Autonomous(name = "TTAutoDriveToLineRight", group = "TT")
+public class TTAutoDriveToLineRight extends LinearOpMode {
 
   // States
   private enum AutoState {
@@ -69,7 +69,7 @@ public class TTAutoDriveToLine extends LinearOpMode {
 
         case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());
-          if(robot.driveToLine(0.5)){
+          if(robot.driveToLine(0.5, 90)){
             currentState = AutoState.STOP;
           }
           // distToLine(x, y, z);
