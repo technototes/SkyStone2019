@@ -134,7 +134,7 @@ public class DirectControl extends LinearOpMode {
       }*/
 
 
-      if(control.dpad().isDown()){
+      /*if(control.dpad().isDown()){
         robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
       }
       if(control.dpad().isUp()){
@@ -145,7 +145,7 @@ public class DirectControl extends LinearOpMode {
       }
       if(control.dpad().isRight()){
         robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
-      }
+      }*/
       if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
         robot.joystickDrive(L2, D, 0);
       }
