@@ -617,4 +617,12 @@ public class TTRobot {
       return true;
     }
   }
+
+  void setServoDirection(Servo.Direction direction) {
+    turn.setDirection (direction);
+  }
+  void setServoPosition(double position) {
+    turn.setPosition(position);
+  }
+
 }
