@@ -637,4 +637,12 @@ public class TTRobot {
   public void driveToLine(double speed, double direction) {
     lineDrive(speed, 5, direction);
   }
+
+  void setServoDirection(Servo.Direction direction) {
+    turn.setDirection (direction);
+  }
+  void setServoPosition(double position) {
+    turn.setPosition(position);
+  }
+
 }
