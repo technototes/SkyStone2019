@@ -69,17 +69,14 @@ public class TTAutoDriveToLineRight extends LinearOpMode {
 
         case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());
-          if(robot.driveToLine(0.5, 90)){
-            currentState = AutoState.STOP;
-          }
-
+          robot.driveToLine(0.5, 90);
+          robot.driveToLine(0.2, 270);
+          currentState = AutoState.STOP;
           // distToLine(x, y, z);
           break;
         case STOP:
           telemetry.addData("state", currentState.toString());
-          robot.timeDrive(0.5, 0.25, 90);
-          robot.timeDrive(0, 1, 0);
-          robot.timeDrive(0.5, 2, 0);
+
           stop();
           break;
 

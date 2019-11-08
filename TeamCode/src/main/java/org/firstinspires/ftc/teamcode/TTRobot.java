@@ -444,20 +444,6 @@ public class TTRobot {
     motorRearRight(powerRearRight);*/
   }
 
-  public void drive(double joystickAngle, double gyroAngle, double power, double turn) {
-    double tturn = turn * TURNSPEEDFACTOR;
-    double angle = joystickAngle + gyroAngle;
-    double flPower = power * Math.cos(-Math.PI * angle - Math.PI / 4) + tturn;
-    double frPower = -power * Math.cos(-Math.PI * angle + Math.PI / 4) + tturn;
-    double rrPower = -power * Math.cos(-Math.PI * angle - Math.PI / 4) + tturn;
-    double rlPower = power * Math.cos(-Math.PI * angle + Math.PI / 4) + tturn;
-    telemetry.addData(
-      "drive", "fl %3.2f fr %3.2f rr %3.2f rl %3.2f", flPower, frPower, rrPower, rlPower);
-    this.motorFrontLeft(flPower);
-    this.motorFrontRight(frPower);
-    this.motorRearLeft(rlPower);
-    this.motorRearRight(rrPower);
-  }
 
   // set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and
   // input angle to snap to.
@@ -487,7 +473,7 @@ public class TTRobot {
 
   // Turn the robot to a specific angle
   public void snap(double angle) {
-    drive(0.0, 0.0, 0.0, angle);
+    //drive(0.0, 0.0, 0.0, angle);
   }
 
   public void timeDrive(double speed, double time, double angle) {
@@ -521,10 +507,7 @@ public class TTRobot {
 
     // keep looping while we are still active, and BOTH motors are running.
     while (driveTime.seconds() < time) {
-      this.motorFrontLeft(frontLeftSpeed);
-      this.motorFrontRight(frontRightSpeed);
-      this.motorRearLeft(rearLeftSpeed);
-      this.motorRearRight(rearRightSpeed);
+      setDrivePower(frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
 
       // Display drive status for the driver.
       telemetry.addData(
@@ -541,12 +524,70 @@ public class TTRobot {
     }
 
     // Stop all motion;
-    this.motorFrontLeft(0);
-    this.motorFrontRight(0);
-    this.motorRearLeft(0);
-    this.motorRearRight(0);
-  }
+    setDrivePower(0, 0,0, 0);
 
+  }
+  public void lineDrive(double speed, double time, double angle) {
+    ElapsedTime driveTime = new ElapsedTime();
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
+
+    double frontLeftSpeed;
+    double frontRightSpeed;
+    double rearLeftSpeed;
+    double rearRightSpeed;
+
+    int red;
+    int green;
+    int blue;
+
+    driveTime.reset();
+
+    speed = Range.clip(speed, 0.0, 1.0);
+    //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+    robotHeadingRad = Math.toRadians(this.gyroHeading());
+    powerCompY =
+      (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    powerCompX =
+      -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+
+    frontLeftSpeed = powerCompY + powerCompX;
+    frontRightSpeed = -powerCompY + powerCompX;
+    rearLeftSpeed = powerCompY - powerCompX;
+    rearRightSpeed = -powerCompY - powerCompX;
+
+    // keep looping while we are still active, and BOTH motors are running.
+    do {
+
+      red = sensorColorBottom.red();
+      green = sensorColorBottom.green();
+      blue = sensorColorBottom.blue();
+
+      setDrivePower(frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+
+
+      // Display drive status for the driver.
+      telemetry.addData(
+        "Speed",
+        "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f",
+        frontLeftSpeed,
+        frontRightSpeed,
+        rearLeftSpeed,
+        rearRightSpeed);
+      /*        telemetry.addData("Gyro", "Heading: " + this.gyroHeading() + " | IntZValue: " +
+      imu.getgetIntegratedZValue());*/
+      telemetry.addData("Gyro", "Heading: " + gyroHeading());
+      // telemetry.update();
+    }while (driveTime.seconds() < time && !(Math.abs(red-blue) > 50));
+
+    // Stop all motion;
+    setDrivePower(0, 0, 0, 0);
+
+  }
   double stepInputRotate(double dVal) {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
@@ -593,28 +634,7 @@ public class TTRobot {
     return stepVal;
   }
 
-  public boolean driveToLine(double speed, double direction) {
-    final double STEP = 0.05;
-    if(gray()){
-      timeDrive(speed, STEP, direction);
-      return false;
-    }else {
-      return true;
-    }
-  }
-
-  public boolean gray(){
-    int red = sensorColorBottom.red();
-    int green = sensorColorBottom.green();
-    int blue = sensorColorBottom.blue();
-    telemetry.addData(
-      "RGB",
-      "%d %d %d",
-      red, green, blue);
-    if(Math.abs(red-blue) > 50){
-      return false;
-    }else{
-      return true;
-    }
+  public void driveToLine(double speed, double direction) {
+    lineDrive(speed, 5, direction);
   }
 }
