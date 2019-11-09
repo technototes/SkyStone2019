@@ -60,11 +60,13 @@ public class DirectControl extends LinearOpMode {
       }*/
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.lslide(LinearSlideOperation.Extend);
-      } else if (slide.isRight()) {
-        robot.lslide(LinearSlideOperation.Retract);
-      } else {
-        robot.lslide(LinearSlideOperation.None);
+        robot.lslide(-1.0);
+      }
+      else if (slide.isRight()) {
+        robot.lslide(1.0);
+      }
+      else {
+        robot.lslide(0);
       }
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
