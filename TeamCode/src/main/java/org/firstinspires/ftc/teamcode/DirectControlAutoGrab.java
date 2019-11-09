@@ -54,13 +54,25 @@ public class DirectControlAutoGrab extends LinearOpMode {
 
       if (control.buttonA() == Button.Pressed) {
 
-          robot.lslidePosition(0.4);
+          robot.lslide(0.6);
+        while (robot.isLiftAtLowerLimit() == false) {
           robot.setLift(-1.0);
+          robot.turnn(0.6);
+
+        }
           robot.claw(0.6);
 
+      }
 
+      if (control.buttonY() == Button.Pressed) {
+        robot.lslide(0.9);
 
+        while (robot.isLiftAtLowerLimit()) {
+          robot.setLift((-1.0));
+          robot.turnn(0.4);
+        }
 
+        robot.claw(0.6);
       }
 
       // redid this to work with magnetic limit switch
@@ -72,13 +84,13 @@ public class DirectControlAutoGrab extends LinearOpMode {
       }*/
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.lslide(LinearSlideOperation.Extend);
+        robot.lslide(1);
       }
       else if (slide.isRight()) {
-        robot.lslide(LinearSlideOperation.Retract);
+        robot.lslide(-1);
       }
       else {
-        robot.lslide(LinearSlideOperation.None);
+        robot.lslide(0);
       }
       Direction dcontrols = driver.dpad();
       if(dcontrols.isUp()){

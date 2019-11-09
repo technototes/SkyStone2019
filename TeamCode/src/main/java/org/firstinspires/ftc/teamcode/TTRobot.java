@@ -68,7 +68,7 @@ public class TTRobot {
 
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
-  private CRServo slide = null;
+  private Servo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
   private DcMotor rlMotor = null;
@@ -106,7 +106,7 @@ public class TTRobot {
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "servo");
+    slide = hardwareMap.get(Servo.class, "lslideServo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
     basePlateGrabber = hardwareMap.get(CRServo.class, "bpGrabber");
@@ -171,26 +171,11 @@ public class TTRobot {
   // This is synchronous: It freezes all other robot states until it finishes
   // moving the slide.
   @Deprecated
-  private void moveSlideNext(LinearSlideOperation op) {
-    double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
-    while (slideSwitchSignaled()) {
-      sleep(10);
-      slide.setPower(power);
-    }
-    while (!slideSwitchSignaled()) {
-      sleep(10);
-      slide.setPower(power);
-    }
-    slide.setPower(0);
+  public void lslide(double val) {
+    slide.setPosition(val);
   }
 
-  private boolean slideSwitchSignaled() {
-    return !lslideSwitch.getState();
-  }
-
-  private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
-
-  public void lslide(LinearSlideOperation operation) {
+  public void lslidePosition(LinearSlideOperation operation) {
     double power = 0;
     switch (operation) {
       case Extend:
@@ -200,6 +185,20 @@ public class TTRobot {
         power = -LINEARSLIDEPOWER;
         break;
     }
+
+
+
+
+//  public void lslidePosition(LinearSlideOperation operation) {
+//    double power = 0;
+//    switch (operation) {
+//      case Extend:
+//        power = LINEARSLIDEPOWER;
+//        break;
+//      case Retract:
+//        power = -LINEARSLIDEPOWER;
+//        break;
+//    }
 /*
     switch (slidePosition) {
       case In:
@@ -250,8 +249,9 @@ public class TTRobot {
         break;
     }
 */
-    slide.setPower(power);
+//    slide.setPower(power);
   }
+
 
   // Grabber stuff:
   public void claw(double val) {
@@ -273,9 +273,9 @@ public class TTRobot {
     }
   }
 
-  public void simpleSlide(double speed) {
-    slide.setPower(-speed);
-  }
+//  public void simpleSlide(L) {
+//    slide.setPower(-speed);
+//  }
 
   // Lift stuff:
   enum LiftState {
