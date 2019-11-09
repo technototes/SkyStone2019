@@ -84,6 +84,7 @@ public class TTRobot {
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
 
+
   private Telemetry telemetry = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
@@ -124,6 +125,7 @@ public class TTRobot {
     lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
+
 
     //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
@@ -648,5 +650,70 @@ public class TTRobot {
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
+  public void distRearDrive ( double speed,
+                              double dist,
+                              double angle) {
+
+    ElapsedTime driveTime = new ElapsedTime();
+
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
+
+    double  frontLeftSpeed;
+    double  frontRightSpeed;
+    double  rearLeftSpeed;
+    double  rearRightSpeed;
+
+    // Ensure that the opmode is still active
+    if (opModeIsActive()) {
+      driveTime.reset();
+
+      speed = Range.clip(speed, 0.0, 1.0);
+//            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+      robotHeadingRad = Math.toRadians(getRobotHeading());
+      powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+
+      frontLeftSpeed = powerCompY + powerCompX;
+      frontRightSpeed = -powerCompY + powerCompX;
+      rearLeftSpeed = powerCompY - powerCompX;
+      rearRightSpeed = -powerCompY - powerCompX;
+
+      // keep looping while we are still active, and BOTH motors are running.
+      while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && driveTime.seconds() < 3.0) {
+        flMotor.setPower(frontLeftSpeed);
+        frMotor.setPower(frontRightSpeed);
+        rlMotor.setPower(rearLeftSpeed);
+        rrMotor.setPower(rearRightSpeed);
+        
+
+        // Display drive status for the driver.
+        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+        //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
+        telemetry.addData("Gyro", "Heading: " + getRobotHeading());
+        telemetry.update();
+      }
+
+      // Stop all motion;
+      robot.motorFrontLeft.setPower(0);
+      robot.motorFrontRight.setPower(0);
+      robot.motorRearLeft.setPower(0);
+      robot.motorRearRight.setPower(0);
+    }
+  }
+
+
+  /**
+   *  Method to obtain & hold a heading for a finite amount of time
+   *  Move will stop once the requested time has elapsed
+   *
+   * @param speed      Desired speed of turn.
+   * @param angle      Absolute Angle (in Degrees) relative to last gyro reset.
+   *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
+   *                   If a relative angle is required, add/subtract from current heading.
+   * @param holdTime   Length of time (in seconds) to hold the specified heading.
+   */
 
 }
