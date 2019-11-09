@@ -44,6 +44,10 @@ public class TTRobot {
   // Triggers must be pushed at least this far
   public static final double TRIGGERTHRESHOLD = 0.25;
 
+  // Claw grab positions
+  public static final double CLAWOPENPOSITION = 0.4;
+  public static final double CLAWCLOSEPOSITION = 0.6;
+
   // Unused stuff
 
   // the grab rotation position for snapping to horizontal or vertical
