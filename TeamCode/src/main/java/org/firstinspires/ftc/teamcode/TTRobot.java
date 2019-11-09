@@ -472,8 +472,18 @@ public class TTRobot {
   }
 
   // Turn the robot to a specific angle
-  public void snap(double angle) {
-    //drive(0.0, 0.0, 0.0, angle);
+  public void snap(double targetAngle) {
+    double curAngle = this.gyroHeading();
+    double rotationAngle = curAngle - targetAngle;
+    //Finding fastest way to get to angle
+    rotationAngle = Math.mod(x - 180, 360) - 180
+    double Y = 0;
+    if (rotationAngle < 0) {
+      Y = -1.0
+    } else if (rotationAngle > 0) {
+      Y = 1.0;
+    }
+   joystickDrive(Direction.None, new Direction (0,Y), curAngle);
   }
 
   public void timeDrive(double speed, double time, double angle) {
@@ -524,9 +534,10 @@ public class TTRobot {
     }
 
     // Stop all motion;
-    setDrivePower(0, 0,0, 0);
+    setDrivePower(0, 0, 0, 0);
 
   }
+
   public void lineDrive(double speed, double time, double angle) {
     ElapsedTime driveTime = new ElapsedTime();
     double robotHeadingRad = 0.0;
@@ -582,12 +593,13 @@ public class TTRobot {
       imu.getgetIntegratedZValue());*/
       telemetry.addData("Gyro", "Heading: " + gyroHeading());
       // telemetry.update();
-    }while (driveTime.seconds() < time && !(Math.abs(red-blue) > 50));
+    } while (driveTime.seconds() < time && !(Math.abs(red - blue) > 50));
 
     // Stop all motion;
     setDrivePower(0, 0, 0, 0);
 
   }
+
   double stepInputRotate(double dVal) {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
@@ -639,8 +651,9 @@ public class TTRobot {
   }
 
   void setServoDirection(Servo.Direction direction) {
-    turn.setDirection (direction);
+    turn.setDirection(direction);
   }
+
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
