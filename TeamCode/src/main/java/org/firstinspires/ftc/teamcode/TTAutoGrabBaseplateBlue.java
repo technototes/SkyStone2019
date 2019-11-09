@@ -23,7 +23,6 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
     STOP
   }
 
-
   private AutoState currentState = AutoState.INITIALIZE;
   private ElapsedTime runtime = new ElapsedTime();
   private ElapsedTime timer = new ElapsedTime();
@@ -43,8 +42,8 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
     sleep(2000);
     // start calibrating the gyro.
     telemetry.addData(">", "Gyro Calibrating. Do Not move!");
-    //robot.calibrate();
-    //telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    // robot.calibrate();
+    // telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
 
     // Put vuforia Here
 
@@ -68,11 +67,11 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
           }
           */
           currentState = AutoState.GO_TO_PLATE;
-          robot.timeDrive(0.5,1,90);
-          robot.timeDrive(0.5,0.2,270);
+          robot.timeDrive(0.5, 1, 90);
+          robot.timeDrive(0.5, 0.2, 270);
           break;
         case GO_TO_PLATE:
-          telemetry.addData("state", currentState.toString());//make sure
+          telemetry.addData("state", currentState.toString()); // make sure
 
           robot.timeDrive(0.5, 2.4, 180);
           currentState = AutoState.GRAB_PLATE;
@@ -81,13 +80,13 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
 
           robot.bpGrabber(1);
-          robot.timeDrive(0,1,0);
+          robot.timeDrive(0, 1, 0);
           currentState = AutoState.BRING_PLATE;
           break;
         case BRING_PLATE:
           telemetry.addData("state", currentState.toString());
           robot.bpGrabber(1);
-          robot.timeDrive(0.5, 3, 0);//may need to bve tweaked according to testing
+          robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
           currentState = AutoState.LET_GO;
           break;
         case LET_GO:
@@ -99,9 +98,10 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
           break;
         case GO_TO_LINE:
           telemetry.addData("state", currentState.toString());
-          if(robot.driveToLine(0.5, 270)){
-            currentState = AutoState.STOP;
-          }
+          // if(
+          robot.driveToLine(0.5, 270); // ){
+          currentState = AutoState.STOP;
+          // }
 
           // distToLine(x, y, z);
           break;
