@@ -318,7 +318,7 @@ public class TTRobot {
    public void blockFlipper(double pos){
       basePlateGrabber.setPosition(pos);
   }
-  
+
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
@@ -701,7 +701,7 @@ public class TTRobot {
         frMotor.setPower(frontRightSpeed);
         rlMotor.setPower(rearLeftSpeed);
         rrMotor.setPower(rearRightSpeed);
-        
+
 
         // Display drive status for the driver.
         telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
