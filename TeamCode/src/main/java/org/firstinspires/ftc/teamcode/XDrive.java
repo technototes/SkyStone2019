@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.function.Predicate;
 
 // This is a self-contained implementation of XDrive
 // It supports 'turbo' and 'snail' mode.
@@ -24,6 +27,19 @@ public class XDrive {
   }
 
   // The 4 motors for the drive train
+  /*
+  fl  +-------+  fr
+     /         \
+    /           \
+   +             +
+   |    motor    |
+   |   position  |
+   +             +
+    \           /
+     \         /
+  rl  +-------+  rr
+  */
+
   private DcMotor flMotor;
   private DcMotor frMotor;
   private DcMotor rlMotor;
@@ -31,6 +47,14 @@ public class XDrive {
 
   // The current drive speed of the system
   private DriveSpeed speed = DriveSpeed.Normal;
+
+  // Stupid helper. Curse you, java!
+  private static void Sleep(long ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (Exception e) {
+    }
+  }
 
   /**
    * @param fl Front Left motor
@@ -203,6 +227,60 @@ public class XDrive {
     setPowerScaled(scale, flPower, frPower, rlPower, rrPower);
   }
 
+  /**
+   * To be clear: I haven't paid attention to what this is actually doing. I just moved it here
+   * <p>
+   * Drive the speed specified for @time seconds, while rotating to the position specified
+   * relative to the robot heading
+   *
+   * @param speed   Speed to move (0 to 1)
+   * @param time    Time (in seconds) to
+   * @param angle   The angle to which we should rotate
+   * @param heading The heading of the robot to begin with (from which angles are derived)
+   */
+  public void timeDrive(double speed, double time, double angle, double heading) {
+    driveWhile(speed, angle, heading, (ElapsedTime t) -> t.seconds() < time);
+  }
+
+  public void driveWhile(double speed, double angle, double heading, Predicate<ElapsedTime> check) {
+    // TODO: Maybe enable turbo mode? Not sure...
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
+
+    double frontLeftSpeed;
+    double frontRightSpeed;
+    double rearLeftSpeed;
+    double rearRightSpeed;
+
+    speed = Range.clip(speed, 0.0, 1.0);
+    robotHeadingRad = Math.toRadians(heading);
+    powerCompY =
+      (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    powerCompX =
+      -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
+        + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+
+    frontLeftSpeed = powerCompY + powerCompX;
+    frontRightSpeed = -powerCompY + powerCompX;
+    rearLeftSpeed = powerCompY - powerCompX;
+    rearRightSpeed = -powerCompY - powerCompX;
+
+    ElapsedTime t = new ElapsedTime();
+    t.reset();
+    // keep looping while we are still active, and BOTH motors are running.
+    while (check.test(t)) {
+      setPowerScaled(1.0, frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+      Sleep(10);
+    }
+    stop();
+  }
+
+  public void driveUntil(double speed, double angle, double heading, Predicate<ElapsedTime> check) {
+    driveWhile(speed, angle, heading, (ElapsedTime t) -> !check.test(t));
+  }
   /**
    * Stop the robot
    */

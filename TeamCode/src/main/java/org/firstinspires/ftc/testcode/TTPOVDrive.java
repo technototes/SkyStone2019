@@ -126,12 +126,12 @@ public class TTPOVDrive extends TTLinearOpMode {
         powerRearLeft = 0.0;
         powerRearRight = 0.0;
       }
-
+/*
       robot.motorFrontLeft(Range.clip(powerFrontLeft, -1.0, 1.0));
       robot.motorFrontRight(Range.clip(powerFrontRight, -1.0, 1.0));
       robot.motorRearLeft(Range.clip(powerRearLeft, -1.0, 1.0));
       robot.motorRearRight(Range.clip(powerRearRight, -1.0, 1.0));
-
+*/
       // Gamepad 1 - Y
       if (gamepad1.y) {
         gyroHold(0.35, 45.0, 2.0);
