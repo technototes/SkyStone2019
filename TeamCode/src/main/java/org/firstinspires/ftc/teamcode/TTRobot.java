@@ -189,8 +189,6 @@ public class TTRobot {
     }
 
 
-
-
 //  public void lslidePosition(LinearSlideOperation operation) {
 //    double power = 0;
 //    switch (operation) {
@@ -530,9 +528,10 @@ public class TTRobot {
     }
 
     // Stop all motion;
-    setDrivePower(0, 0,0, 0);
+    setDrivePower(0, 0, 0, 0);
 
   }
+
   public void lineDrive(double speed, double time, double angle) {
     ElapsedTime driveTime = new ElapsedTime();
     double robotHeadingRad = 0.0;
@@ -588,12 +587,13 @@ public class TTRobot {
       imu.getgetIntegratedZValue());*/
       telemetry.addData("Gyro", "Heading: " + gyroHeading());
       // telemetry.update();
-    }while (driveTime.seconds() < time && !(Math.abs(red-blue) > 50));
+    } while (driveTime.seconds() < time && !(Math.abs(red - blue) > 50));
 
     // Stop all motion;
     setDrivePower(0, 0, 0, 0);
 
   }
+
   double stepInputRotate(double dVal) {
     double stepVal = 0.0;
     double[] stepArray = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
@@ -645,14 +645,16 @@ public class TTRobot {
   }
 
   void setServoDirection(Servo.Direction direction) {
-    turn.setDirection (direction);
+    turn.setDirection(direction);
   }
+
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
-  public void distRearDrive ( double speed,
-                              double dist,
-                              double angle) {
+
+  public void distRearDrive(double speed,
+                            double dist,
+                            double angle) {
 
     ElapsedTime driveTime = new ElapsedTime();
 
@@ -661,59 +663,41 @@ public class TTRobot {
     double powerCompY = 0.0;
     double powerCompX = 0.0;
 
-    double  frontLeftSpeed;
-    double  frontRightSpeed;
-    double  rearLeftSpeed;
-    double  rearRightSpeed;
+    double frontLeftSpeed;
+    double frontRightSpeed;
+    double rearLeftSpeed;
+    double rearRightSpeed;
 
-    // Ensure that the opmode is still active
-    if (opModeIsActive()) {
-      driveTime.reset();
+    driveTime.reset();
 
-      speed = Range.clip(speed, 0.0, 1.0);
+    speed = Range.clip(speed, 0.0, 1.0);
 //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
-      robotHeadingRad = Math.toRadians(getRobotHeading());
-      powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
-      powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    robotHeadingRad = Math.toRadians(gyroHeading());
+    powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+    powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
-      frontLeftSpeed = powerCompY + powerCompX;
-      frontRightSpeed = -powerCompY + powerCompX;
-      rearLeftSpeed = powerCompY - powerCompX;
-      rearRightSpeed = -powerCompY - powerCompX;
+    frontLeftSpeed = powerCompY + powerCompX;
+    frontRightSpeed = -powerCompY + powerCompX;
+    rearLeftSpeed = powerCompY - powerCompX;
+    rearRightSpeed = -powerCompY - powerCompX;
 
-      // keep looping while we are still active, and BOTH motors are running.
-      while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && driveTime.seconds() < 3.0) {
-        flMotor.setPower(frontLeftSpeed);
-        frMotor.setPower(frontRightSpeed);
-        rlMotor.setPower(rearLeftSpeed);
-        rrMotor.setPower(rearRightSpeed);
-        
+    // keep looping while we are still active, and BOTH motors are running.
+    while (/*sensorRangeRear.getDistance(DistanceUnit.CM) > dist && */driveTime.seconds() < 3.0) {
+      flMotor.setPower(frontLeftSpeed);
+      frMotor.setPower(frontRightSpeed);
+      rlMotor.setPower(rearLeftSpeed);
+      rrMotor.setPower(rearRightSpeed);
 
-        // Display drive status for the driver.
-        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-        //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
-        telemetry.addData("Gyro", "Heading: " + getRobotHeading());
-        telemetry.update();
-      }
 
-      // Stop all motion;
-      robot.motorFrontLeft.setPower(0);
-      robot.motorFrontRight.setPower(0);
-      robot.motorRearLeft.setPower(0);
-      robot.motorRearRight.setPower(0);
+      // Display drive status for the driver.
+      telemetry.addData("Speed", "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+      //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
+      telemetry.addData("Gyro", "Heading: " + gyroHeading());
+      telemetry.update();
     }
+
+    // Stop all motion;
+    this.setDrivePower(0, 0, 0, 0);
   }
-
-
-  /**
-   *  Method to obtain & hold a heading for a finite amount of time
-   *  Move will stop once the requested time has elapsed
-   *
-   * @param speed      Desired speed of turn.
-   * @param angle      Absolute Angle (in Degrees) relative to last gyro reset.
-   *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
-   *                   If a relative angle is required, add/subtract from current heading.
-   * @param holdTime   Length of time (in seconds) to hold the specified heading.
-   */
-
 }
+
