@@ -18,9 +18,10 @@ public class XDrive {
   // The final value is 'max' and should probably be the same as the 'not quite max' value
 
   // The values in range to use for rotation driving
-  private static double[] ROT_STEPS = {0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.35};
+  private static double[] ROT_STEPS = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
+
   // The values in range to use for drive speeds (normal mode)
-  private static double[] DRIVE_STEPS = {0.0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.60};
+  private static double[] DRIVE_STEPS = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
 
   public enum DriveSpeed {
     Normal, Snail, Turbo
@@ -138,9 +139,9 @@ public class XDrive {
    */
   private void setPowerScaled(double scale, double fl, double fr, double rl, double rr) {
     flMotor.setPower(Range.clip(fl * scale, -1, 1));
-    frMotor.setPower(Range.clip(fl * scale, -1, 1));
-    rlMotor.setPower(Range.clip(fl * scale, -1, 1));
-    rrMotor.setPower(Range.clip(fl * scale, -1, 1));
+    frMotor.setPower(Range.clip(fr * scale, -1, 1));
+    rlMotor.setPower(Range.clip(rl * scale, -1, 1));
+    rrMotor.setPower(Range.clip(rr * scale, -1, 1));
   }
 
   /**
@@ -166,13 +167,13 @@ public class XDrive {
    */
   private static double getSteppedValue(double[] steps, double val) {
     // get the corresponding index for the scaleInput array.
-    int index = Math.abs((int) (Range.clip(val, -1.0, 1.0) * steps.length));
+    int index = Math.abs((int) (Range.clip(val, -1.0, 1.0) * (steps.length - 1)));
 
     // get value from the array.
     if (val < 0) {
-      return -ROT_STEPS[index];
+      return -steps[index];
     } else {
-      return ROT_STEPS[index];
+      return steps[index];
     }
   }
 
