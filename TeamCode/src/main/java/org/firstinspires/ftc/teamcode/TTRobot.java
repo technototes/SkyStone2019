@@ -383,18 +383,22 @@ public class TTRobot {
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
-    driveTrain.move(j1.X, j1.Y, j2.X, gyroAngle);
+    driveTrain.setStickVector(j1.X, j1.Y, j2.X, gyroAngle);
   }
 
   public void timeDrive(double speed, double time, double angle) {
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
   public void lineDrive(double speed, double time, double angle) {
-    driveTrain.driveWhile(speed, angle, gyroHeading(), (ElapsedTime tm) -> {
-      int red = sensorColorBottom.red();
-      int blue = sensorColorBottom.blue();
-      return tm.seconds() < time && !(Math.abs(red - blue) > 50);
-    });
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    ElapsedTime tm = new ElapsedTime();
+    int red, blue;
+    do {
+      sleep(10);
+      red = sensorColorBottom.red();
+      blue = sensorColorBottom.blue();
+    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50));
+    driveTrain.stop();
   }
 
   public void driveToLine(double speed, double direction) {
@@ -403,8 +407,12 @@ public class TTRobot {
 
   public void distRearDrive(double speed, double dist, double angle) {
     // TODO: We don't currently have a range sensor available in software
-    driveTrain.driveWhile(speed, angle, gyroHeading(), (ElapsedTime et) ->
-      (/*sensorRangeRear.getDistance(DistanceUnit.CM) > dist && */et.time() < 3.0)
-    );
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    ElapsedTime tm = new ElapsedTime();
+    do {
+      sleep(10);
+    } while (
+    /*sensorRangeRear.getDistance(DistanceUnit.CM) > dist && */ tm.time() < 3.0);
+    driveTrain.stop();
   }
 }

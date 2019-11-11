@@ -21,10 +21,14 @@ public class XDrive {
   private static double[] ROT_STEPS = {0.0, 0.15, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
 
   // The values in range to use for drive speeds (normal mode)
-  private static double[] DRIVE_STEPS = {0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56};
+  private static double[] DRIVE_STEPS = {
+    0.0, 0.2, 0.2, 0.25, 0.25, 0.33, 0.33, 0.44, 0.44, 0.56, 0.56
+  };
 
   public enum DriveSpeed {
-    Normal, Snail, Turbo
+    Normal,
+    Snail,
+    Turbo
   }
 
   // The 4 motors for the drive train
@@ -79,9 +83,7 @@ public class XDrive {
     speed = ds;
   }
 
-  /**
-   * @return The DriveSpeed currently set for the drive train
-   */
+  /** @return The DriveSpeed currently set for the drive train */
   public DriveSpeed getSpeed() {
     return speed;
   }
@@ -132,10 +134,10 @@ public class XDrive {
    * This overrides the current mode. Perhaps useful in autonomous operation
    *
    * @param scale The value by which to scale the power
-   * @param fl    Front Left Power
-   * @param fr    Front Right Power
-   * @param rl    Rear Left Power
-   * @param rr    Rear Right Power
+   * @param fl Front Left Power
+   * @param fr Front Right Power
+   * @param rl Rear Left Power
+   * @param rr Rear Right Power
    */
   private void setPowerScaled(double scale, double fl, double fr, double rl, double rr) {
     flMotor.setPower(Range.clip(fl * scale, -1, 1));
@@ -145,8 +147,8 @@ public class XDrive {
   }
 
   /**
-   * Set the power to the 4 different motors
-   * This is a helper, because it scales the speed according to the speed mode currently set
+   * Set the power to the 4 different motors This is a helper, because it scales the speed according
+   * to the speed mode currently set
    *
    * @param fl Front Left Power
    * @param fr Front Right Power
@@ -162,67 +164,52 @@ public class XDrive {
    * Get a value from an array of values based on an analog input
    *
    * @param steps: The array (of any length) of values to map
-   * @param val:   The analog value (from -1.0 to 1.0) to map
+   * @param val: The analog value (from -1.0 to 1.0) to map
    * @return The value snapped to the steps
    */
   private static double getSteppedValue(double[] steps, double val) {
     // get the corresponding index for the scaleInput array.
     int index = Math.abs((int) (Range.clip(val, -1.0, 1.0) * (steps.length - 1)));
-
     // get value from the array.
-    if (val < 0) {
-      return -steps[index];
-    } else {
-      return steps[index];
-    }
+    return (val < 0) ? -steps[index] : steps[index];
   }
 
   /**
-   * Move the robot in the direction specified, relative to the angle provided.
-   * For "absolute" driving, just leave gyroAngle at zero
+   * Sets the motors to go toward the X,Y heading, while rotating some amount relative to the angle
+   * provided. For "absolute" driving, just leave gyroAngle at zero
    *
-   * @param x:         The X direction to move (-1 to 1)
-   * @param y:         The Y direction to move (-1 to 1)
-   * @param rotation:  The rotation to apply (-1 to 1)
+   * @param x: The X direction to move (-1 to 1)
+   * @param y: The Y direction to move (-1 to 1)
+   * @param rotation: The rotation to apply (-1 to 1)
    * @param gyroAngle: The heading of the robot
    */
-  public void move(double x, double y, double rotation, double gyroAngle) {
-    moveAtSpeed(speed, x, y, rotation, gyroAngle);
+  public void setStickVector(double x, double y, double rotation, double gyroAngle) {
+    setStickVector(speed, x, y, rotation, gyroAngle);
   }
 
   /**
-   * Move the robot at the particular speed,
-   * in the direction specified, relative to the angle provided.
-   * For "absolute" driving, just leave gyroAngle at zero
+   * Sets the motors to go toward the X,Y heading, while rotating some amount relative to the angle
+   * provided. For "absolute" driving, just leave gyroAngle at zero
    *
-   * @param ds:        The speed to move the bot at (Normal, Turbo, or Snail)
-   * @param x:         The X direction to move (-1 to 1)
-   * @param y:         The Y direction to move (-1 to 1)
-   * @param rotation:  The rotation to apply (-1 to 1)
-   * @param gyroAngle: The heading of the robot
+   * @param ds: The speed to move the bot at (Normal, Turbo, or Snail)
+   * @param x: The X direction to move (-1 to 1)
+   * @param y: The Y direction to move (-1 to 1)
+   * @param rotation: The rotation to apply (-1 to 1)
+   * @param gyroAngle: The heading of the robot (in degrees!)
    */
-  public void moveAtSpeed(DriveSpeed ds, double x, double y, double rotation, double gyroAngle) {
-    double headingRad = 0.0;
-    double powerCompY = 0.0;
-    double powerCompX = 0.0;
-
-    double flPower = 0.0;
-    double frPower = 0.0;
-    double rlPower = 0.0;
-    double rrPower = 0.0;
-
+  public void setStickVector(DriveSpeed ds, double x, double y, double rotation, double gyroAngle) {
     y = -getSteppedValue(DRIVE_STEPS, y);
     x = getSteppedValue(DRIVE_STEPS, x);
     rotation = -getSteppedValue(ROT_STEPS, rotation);
 
-    headingRad = Math.toRadians(gyroAngle);
-    powerCompY = (Math.cos(headingRad) * y) + (Math.sin(headingRad) * x);
-    powerCompX = -(Math.sin(headingRad) * y) + (Math.cos(headingRad) * x);
+    double headingRad = Math.toRadians(gyroAngle);
+    double powerCompY = (Math.cos(headingRad) * y) + (Math.sin(headingRad) * x);
+    double powerCompX = -(Math.sin(headingRad) * y) + (Math.cos(headingRad) * x);
 
-    flPower = powerCompY + powerCompX + rotation;
-    frPower = -powerCompY + powerCompX + rotation;
-    rlPower = powerCompY - powerCompX + rotation;
-    rrPower = -powerCompY - powerCompX + rotation;
+    double flPower = powerCompY + powerCompX + rotation;
+    double frPower = -powerCompY + powerCompX + rotation;
+    double rlPower = powerCompY - powerCompX + rotation;
+    double rrPower = -powerCompY - powerCompX + rotation;
 
     double scale = getSpeedScale(ds, flPower, frPower, rlPower, rrPower);
     setPowerScaled(scale, flPower, frPower, rlPower, rrPower);
@@ -230,61 +217,48 @@ public class XDrive {
 
   /**
    * To be clear: I haven't paid attention to what this is actually doing. I just moved it here
-   * <p>
-   * Drive the speed specified for @time seconds, while rotating to the position specified
+   *
+   * <p>Drive the speed specified for @time seconds, while rotating to the position specified
    * relative to the robot heading
    *
-   * @param speed   Speed to move (0 to 1)
-   * @param time    Time (in seconds) to
-   * @param angle   The angle to which we should rotate
+   * @param speed Speed to move (0 to 1)
+   * @param time Time (in seconds) to
+   * @param angle The angle to which we should rotate
    * @param heading The heading of the robot to begin with (from which angles are derived)
    */
   public void timeDrive(double speed, double time, double angle, double heading) {
-    driveWhile(speed, angle, heading, (ElapsedTime t) -> t.seconds() < time);
-  }
-
-  public void driveWhile(double speed, double angle, double heading, Predicate<ElapsedTime> check) {
-    // TODO: Maybe enable turbo mode? Not sure...
-    double robotHeadingRad = 0.0;
-    double angleRad = Math.toRadians(angle);
-    double powerCompY = 0.0;
-    double powerCompX = 0.0;
-
-    double frontLeftSpeed;
-    double frontRightSpeed;
-    double rearLeftSpeed;
-    double rearRightSpeed;
-
-    speed = Range.clip(speed, 0.0, 1.0);
-    robotHeadingRad = Math.toRadians(heading);
-    powerCompY =
-      (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed))
-        + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
-    powerCompX =
-      -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed))
-        + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
-
-    frontLeftSpeed = powerCompY + powerCompX;
-    frontRightSpeed = -powerCompY + powerCompX;
-    rearLeftSpeed = powerCompY - powerCompX;
-    rearRightSpeed = -powerCompY - powerCompX;
-
+    setDriveVector(speed, angle, heading);
     ElapsedTime t = new ElapsedTime();
-    t.reset();
-    // keep looping while we are still active, and BOTH motors are running.
-    while (check.test(t)) {
-      setPowerScaled(1.0, frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+    while (t.seconds() < time) {
       Sleep(10);
     }
     stop();
   }
 
-  public void driveUntil(double speed, double angle, double heading, Predicate<ElapsedTime> check) {
-    driveWhile(speed, angle, heading, (ElapsedTime t) -> !check.test(t));
+  public void setDriveVector(double speed, double angle, double heading) {
+    // TODO: Maybe enable turbo mode? Not sure...
+    double angleRad = Math.toRadians(angle);
+
+    speed = Range.clip(speed, 0.0, 1.0);
+    double robotHeadingRad = Math.toRadians(heading);
+    double powerCompY =
+        speed
+            * (Math.cos(robotHeadingRad) * Math.cos(angleRad)
+                + Math.sin(robotHeadingRad) * Math.sin(angleRad));
+    double powerCompX =
+        speed
+            * (Math.cos(robotHeadingRad) * Math.sin(angleRad)
+                - Math.sin(robotHeadingRad) * Math.cos(angleRad));
+
+    double frontLeftSpeed = powerCompY + powerCompX;
+    double frontRightSpeed = -powerCompY + powerCompX;
+    double rearLeftSpeed = powerCompY - powerCompX;
+    double rearRightSpeed = -powerCompY - powerCompX;
+
+    setPowerScaled(1.0, frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
   }
-  /**
-   * Stop the robot
-   */
+
+  /** Stop the robot */
   public void stop() {
     setPowerScaled(1.0, 0, 0, 0, 0);
   }
