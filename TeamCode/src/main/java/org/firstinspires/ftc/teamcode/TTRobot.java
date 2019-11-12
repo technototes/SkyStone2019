@@ -15,8 +15,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
+import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -83,6 +83,7 @@ public class TTRobot {
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
+  private Range sensorRangeRear = null;
 
 
   private Telemetry telemetry = null;
@@ -116,6 +117,7 @@ public class TTRobot {
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
+    sensorRangeRear = hardwareMap.get(Range.class, "sensorRangeRear");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -667,12 +669,12 @@ public class TTRobot {
     double  rearRightSpeed;
 
     // Ensure that the opmode is still active
-    if (opModeIsActive()) {
+
       driveTime.reset();
 
       speed = Range.clip(speed, 0.0, 1.0);
 //            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
-      robotHeadingRad = Math.toRadians(getRobotHeading());
+      robotHeadingRad = Math.toRadians(gyroHeading());
       powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
       powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
 
@@ -692,16 +694,16 @@ public class TTRobot {
         // Display drive status for the driver.
         telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
         //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
-        telemetry.addData("Gyro", "Heading: " + getRobotHeading());
+        telemetry.addData("Gyro", "Heading: " + gyroHeading());
         telemetry.update();
       }
 
       // Stop all motion;
-      robot.motorFrontLeft.setPower(0);
-      robot.motorFrontRight.setPower(0);
-      robot.motorRearLeft.setPower(0);
-      robot.motorRearRight.setPower(0);
-    }
+      flMotor.setPower(0);
+      frMotor.setPower(0);
+      rrMotor.setPower(0);
+      rlMotor.setPower(0);
+
   }
 
 
