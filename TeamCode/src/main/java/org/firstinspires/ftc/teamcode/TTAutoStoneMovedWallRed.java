@@ -114,10 +114,11 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
           runtime.reset();
           // driving to the baseplate
+          robot.distRearDrive(x, y, z);
           robot.timeDrive(x, y, z);
           // distDriveRear(x, y, z);
           // gyroHold(x, y, z);
-          robot.timeDrive(x, y, z);
+
           break;
         case PLACE_STONE:
           telemetry.addData("state", currentState.toString());
