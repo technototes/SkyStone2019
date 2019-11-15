@@ -303,8 +303,8 @@ public class TTRobot {
     }
   }
 
-  public void bpGrabber(double speed) {
-    basePlateGrabber.setPower(-speed);
+   public void bpGrabber(double pos){
+      basePlateGrabber.setPosition(pos);
   }
 
   public void capstone(double speed) {
