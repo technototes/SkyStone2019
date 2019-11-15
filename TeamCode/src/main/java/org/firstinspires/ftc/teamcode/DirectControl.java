@@ -75,9 +75,9 @@ public class DirectControl extends LinearOpMode {
         robot.blockFlipper(0.8);
       }
       if(dcontrols.isDown()){
-        robot.bpGrabber(0.2);
+        robot.bpGrabber(0);
       }else{
-        robot.bpGrabber(0.8);
+        robot.bpGrabber(1);
       }
       if (dcontrols.isLeft()) {
         robot.capstone(-1);
@@ -89,7 +89,7 @@ public class DirectControl extends LinearOpMode {
       // Lift control:
       Direction dir = control.dpad();
       if (dir.isUp()) {
-        robot.setLift(1.0);
+        robot.setLift(1);
       } else if (dir.isDown()) {
         robot.setLift(-1);
       } else {
