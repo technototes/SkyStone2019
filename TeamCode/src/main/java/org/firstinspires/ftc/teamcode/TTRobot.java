@@ -15,8 +15,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
+import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -44,6 +44,10 @@ public class TTRobot {
   // Triggers must be pushed at least this far
   public static final double TRIGGERTHRESHOLD = 0.25;
 
+  // Claw grab positions
+  public static final double CLAWOPENPOSITION = 0.4;
+  public static final double CLAWCLOSEPOSITION = 0.6;
+
   // Unused stuff
 
   // the grab rotation position for snapping to horizontal or vertical
@@ -64,7 +68,7 @@ public class TTRobot {
 
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
-  private CRServo slide = null;
+  private Servo slide = null;
   private DcMotor flMotor = null;
   private DcMotor frMotor = null;
   private DcMotor rlMotor = null;
@@ -79,6 +83,8 @@ public class TTRobot {
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
+  private Range sensorRangeRear = null;
+
 
   private Telemetry telemetry = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
@@ -102,7 +108,7 @@ public class TTRobot {
   public void init(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "servo");
+    slide = hardwareMap.get(Servo.class, "lslideServo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
     basePlateGrabber = hardwareMap.get(CRServo.class, "bpGrabber");
@@ -111,6 +117,7 @@ public class TTRobot {
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
+    sensorRangeRear = hardwareMap.get(Range.class, "sensorRangeRear");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -120,6 +127,7 @@ public class TTRobot {
     lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
+
 
     //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
@@ -167,26 +175,11 @@ public class TTRobot {
   // This is synchronous: It freezes all other robot states until it finishes
   // moving the slide.
   @Deprecated
-  private void moveSlideNext(LinearSlideOperation op) {
-    double power = (op == LinearSlideOperation.Extend) ? LINEARSLIDEPOWER : -LINEARSLIDEPOWER;
-    while (slideSwitchSignaled()) {
-      sleep(10);
-      slide.setPower(power);
-    }
-    while (!slideSwitchSignaled()) {
-      sleep(10);
-      slide.setPower(power);
-    }
-    slide.setPower(0);
+  public void lslide(double val) {
+    slide.setPosition(val);
   }
 
-  private boolean slideSwitchSignaled() {
-    return !lslideSwitch.getState();
-  }
-
-  private LinearSlideOperation lastLinearSlideOperation = LinearSlideOperation.None;
-
-  public void lslide(LinearSlideOperation operation) {
+  public void lslidePosition(LinearSlideOperation operation) {
     double power = 0;
     switch (operation) {
       case Extend:
@@ -196,6 +189,20 @@ public class TTRobot {
         power = -LINEARSLIDEPOWER;
         break;
     }
+
+
+
+
+//  public void lslidePosition(LinearSlideOperation operation) {
+//    double power = 0;
+//    switch (operation) {
+//      case Extend:
+//        power = LINEARSLIDEPOWER;
+//        break;
+//      case Retract:
+//        power = -LINEARSLIDEPOWER;
+//        break;
+//    }
 /*
     switch (slidePosition) {
       case In:
@@ -246,8 +253,9 @@ public class TTRobot {
         break;
     }
 */
-    slide.setPower(power);
+//    slide.setPower(power);
   }
+
 
   // Grabber stuff:
   public void claw(double val) {
@@ -269,9 +277,9 @@ public class TTRobot {
     }
   }
 
-  public void simpleSlide(double speed) {
-    slide.setPower(-speed);
-  }
+//  public void simpleSlide(L) {
+//    slide.setPower(-speed);
+//  }
 
   // Lift stuff:
   enum LiftState {
@@ -295,10 +303,10 @@ public class TTRobot {
     }
   }
 
-  public void bpGrabber(double speed) {
-    basePlateGrabber.setPower(-speed);
+   public void bpGrabber(double pos){
+      basePlateGrabber.setPosition(pos);
   }
-
+  
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
@@ -657,5 +665,70 @@ public class TTRobot {
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
+  public void distRearDrive ( double speed,
+                              double dist,
+                              double angle) {
+
+    ElapsedTime driveTime = new ElapsedTime();
+
+    double robotHeadingRad = 0.0;
+    double angleRad = Math.toRadians(angle);
+    double powerCompY = 0.0;
+    double powerCompX = 0.0;
+
+    double  frontLeftSpeed;
+    double  frontRightSpeed;
+    double  rearLeftSpeed;
+    double  rearRightSpeed;
+
+    // Ensure that the opmode is still active
+
+      driveTime.reset();
+
+      speed = Range.clip(speed, 0.0, 1.0);
+//            robotHeadingRad = Math.toRadians(360 - robot.gyro.getHeading());
+      robotHeadingRad = Math.toRadians(gyroHeading());
+      powerCompY = (Math.cos(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.sin(robotHeadingRad) * (Math.sin(angleRad) * speed));
+      powerCompX = -(Math.sin(robotHeadingRad) * (Math.cos(angleRad) * speed)) + (Math.cos(robotHeadingRad) * (Math.sin(angleRad) * speed));
+
+      frontLeftSpeed = powerCompY + powerCompX;
+      frontRightSpeed = -powerCompY + powerCompX;
+      rearLeftSpeed = powerCompY - powerCompX;
+      rearRightSpeed = -powerCompY - powerCompX;
+
+      // keep looping while we are still active, and BOTH motors are running.
+      while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && driveTime.seconds() < 3.0) {
+        flMotor.setPower(frontLeftSpeed);
+        frMotor.setPower(frontRightSpeed);
+        rlMotor.setPower(rearLeftSpeed);
+        rrMotor.setPower(rearRightSpeed);
+        
+
+        // Display drive status for the driver.
+        telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+        //telemetry.addData("Gyro", "Heading: " + robot.gyro.getHeading() + " | IntZValue: " + robot.gyro.getIntegratedZValue());
+        telemetry.addData("Gyro", "Heading: " + gyroHeading());
+        telemetry.update();
+      }
+
+      // Stop all motion;
+      flMotor.setPower(0);
+      frMotor.setPower(0);
+      rrMotor.setPower(0);
+      rlMotor.setPower(0);
+
+  }
+
+
+  /**
+   *  Method to obtain & hold a heading for a finite amount of time
+   *  Move will stop once the requested time has elapsed
+   *
+   * @param speed      Desired speed of turn.
+   * @param angle      Absolute Angle (in Degrees) relative to last gyro reset.
+   *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
+   *                   If a relative angle is required, add/subtract from current heading.
+   * @param holdTime   Length of time (in seconds) to hold the specified heading.
+   */
 
 }

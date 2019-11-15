@@ -60,13 +60,13 @@ public class a extends LinearOpMode {
       }*/
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.lslide(LinearSlideOperation.Extend);
+        robot.lslidePosition(LinearSlideOperation.Extend);
       }
       else if (slide.isRight()) {
-        robot.lslide(LinearSlideOperation.Retract);
+        robot.lslidePosition(LinearSlideOperation.Retract);
       }
       else {
-        robot.lslide(LinearSlideOperation.None);
+        robot.lslidePosition(LinearSlideOperation.None);
       }
       Direction dcontrols = driver.dpad();
       if(dcontrols.isUp()){
