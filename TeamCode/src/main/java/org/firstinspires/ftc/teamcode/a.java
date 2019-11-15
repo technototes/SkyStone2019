@@ -51,23 +51,19 @@ public class a extends LinearOpMode {
         telemetry.addLine("Close 0.6");
       }
 
-      // redid this to work with magnetic limit switch
-      /*Direction dpad = control.dpad();
-      if(dpad.X == 1){
-          robot.lslide(LinearSlideOperation.Extend);
-      }else if(dpad.X == -1){
-          robot.lslide(LinearSlideOperation.Retract);
-      }*/
+      // Override the linear slide limit switches
+      boolean slideOverride=(control.rbump()==Button.Pressed) && (control.lbump()==Button.Pressed);
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.lslidePosition(LinearSlideOperation.Extend);
+        robot.setLinearSlideDirection(LinearSlideOperation.Extend, slideOverride);
       }
       else if (slide.isRight()) {
-        robot.lslidePosition(LinearSlideOperation.Retract);
+        robot.setLinearSlideDirection(LinearSlideOperation.Retract, slideOverride);
       }
       else {
-        robot.lslidePosition(LinearSlideOperation.None);
+        robot.setLinearSlideDirection(LinearSlideOperation.None, slideOverride);
       }
+
       Direction dcontrols = driver.dpad();
       if(dcontrols.isUp()){
         robot.bpGrabber(1);
