@@ -69,12 +69,15 @@ public class DirectControl extends LinearOpMode {
         robot.lslide(0);
       }
       Direction dcontrols = driver.dpad();
-      if (dcontrols.isUp()) {
-        robot.bpGrabber(1);
-      } else if (dcontrols.isDown()) {
-        robot.bpGrabber(-1);
-      } else {
-        robot.bpGrabber(0);
+      if(dcontrols.isUp()){
+        robot.blockFlipper(0.2);
+      }else{
+        robot.blockFlipper(0.8);
+      }
+      if(dcontrols.isDown()){
+        robot.bpGrabber(0.2);
+      }else{
+        robot.bpGrabber(0.8);
       }
       if (dcontrols.isLeft()) {
         robot.capstone(-1);
