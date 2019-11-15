@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import com.qualcomm.robotcore.util.Range;
@@ -84,7 +85,7 @@ public class TTRobot {
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
-  private Range sensorRangeRear = null;
+  private UltrasonicSensor sensorRangeRear = null;
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
@@ -120,7 +121,7 @@ public class TTRobot {
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
-    sensorRangeRear = hardwareMap.get(Range.class, "sensorRangeRear");
+    sensorRangeRear = hardwareMap.get(UltrasonicSensor.class, "sensorRangeRear");
 
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -281,10 +282,10 @@ public class TTRobot {
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
-        claw(0.4); // Open
+        claw(0); // Open
         break;
       case Close:
-        claw(0.6); // Closed
+        claw(1); // Closed
         break;
     }
   }
@@ -695,7 +696,7 @@ public class TTRobot {
       rearRightSpeed = -powerCompY - powerCompX;
 
       // keep looping while we are still active, and BOTH motors are running.
-      while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && driveTime.seconds() < 3.0) {
+      while (sensorRangeRear.getUltrasonicLevel() > dist && driveTime.seconds() < 3.0) {
         flMotor.setPower(frontLeftSpeed);
         frMotor.setPower(frontRightSpeed);
         rlMotor.setPower(rearLeftSpeed);
