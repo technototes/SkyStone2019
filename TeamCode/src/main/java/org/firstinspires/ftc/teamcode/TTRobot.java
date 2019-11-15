@@ -79,12 +79,13 @@ public class TTRobot {
   private Servo claw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
-  private CRServo basePlateGrabber = null;
+  private Servo basePlateGrabber = null;
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
   private Range sensorRangeRear = null;
-
+  private Servo lGrabber = null;
+  private Servo rGrabber = null;
 
   private Telemetry telemetry = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
@@ -111,7 +112,7 @@ public class TTRobot {
     slide = hardwareMap.get(Servo.class, "lslideServo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
     claw = hardwareMap.get(Servo.class, "claw");
-    basePlateGrabber = hardwareMap.get(CRServo.class, "bpGrabber");
+    basePlateGrabber = hardwareMap.get(Servo.class, "bpGrabber");
     cap = hardwareMap.get(CRServo.class, "cap");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
@@ -128,6 +129,8 @@ public class TTRobot {
     rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
+    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
+    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
 
     //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
@@ -151,7 +154,8 @@ public class TTRobot {
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
-
+    lGrabber.setDirection(Servo.Direction.FORWARD);
+    rGrabber.setDirection(Servo.Direction.REVERSE);
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
@@ -287,7 +291,10 @@ public class TTRobot {
     At,
     Below
   }
-
+  public void bpGrabber(double pos){
+    lGrabber.setPosition(pos);
+    rGrabber.setPosition(pos);
+  }
   private void setLiftPower(double val) {
     if (val > 0)
       val = val / DOWNWARDLIFTSCALE;
@@ -303,7 +310,7 @@ public class TTRobot {
     }
   }
 
-   public void bpGrabber(double pos){
+   public void blockFlipper(double pos){
       basePlateGrabber.setPosition(pos);
   }
   
