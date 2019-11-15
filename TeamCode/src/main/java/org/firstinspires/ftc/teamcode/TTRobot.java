@@ -76,7 +76,8 @@ public class TTRobot {
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
   private Servo turn = null;
-  private Servo claw = null;
+  private Servo lClaw = null;
+  private Servo rClaw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
   private Servo basePlateGrabber = null;
@@ -111,7 +112,8 @@ public class TTRobot {
     // Get handles to all the hardware
     slide = hardwareMap.get(Servo.class, "lslideServo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
-    claw = hardwareMap.get(Servo.class, "claw");
+    lClaw = hardwareMap.get(Servo.class, "lClaw");
+    rClaw = hardwareMap.get(Servo.class, "rClaw");
     basePlateGrabber = hardwareMap.get(Servo.class, "bpGrabber");
     cap = hardwareMap.get(CRServo.class, "cap");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
@@ -154,8 +156,12 @@ public class TTRobot {
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
+
     lGrabber.setDirection(Servo.Direction.FORWARD);
     rGrabber.setDirection(Servo.Direction.REVERSE);
+
+    lClaw.setDirection(Servo.Direction.FORWARD);
+    rClaw.setDirection(Servo.Direction.REVERSE);
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
@@ -263,7 +269,8 @@ public class TTRobot {
 
   // Grabber stuff:
   public void claw(double val) {
-    claw.setPosition(val);
+    lClaw.setPosition(val);
+    rClaw.setPosition(val);
   }
 
   public void turnn(double val) {
@@ -273,10 +280,10 @@ public class TTRobot {
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
-        claw.setPosition(0.4); // Open
+        claw(0.4); // Open
         break;
       case Close:
-        claw.setPosition(0.6); // Closed
+        claw(0.6); // Closed
         break;
     }
   }
