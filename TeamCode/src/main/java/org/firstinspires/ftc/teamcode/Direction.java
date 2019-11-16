@@ -11,19 +11,19 @@ public class Direction {
   public static Direction None = new Direction(0.0, 0.0);
 
   public boolean isOnlyRight() {
-    return (Math.abs(Y) < .1) && (X < -.9);
+    return (Math.abs(Y) < .3) && (X < -.7);
   }
 
   public boolean isOnlyLeft() {
-    return (Math.abs(Y) < .1) && (X > .9);
+    return (Math.abs(Y) < .3) && (X > .7);
   }
 
   public boolean isOnlyUp() {
-    return (Math.abs(X) < .1) && (Y > .9);
+    return (Math.abs(X) < .3) && (Y > .7);
   }
 
   public boolean isOnlyDown() {
-    return (Math.abs(X) < .1) && (Y < -.9);
+    return (Math.abs(X) < .3) && (Y < -.7);
   }
 
   public boolean isRight() {

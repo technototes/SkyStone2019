@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -11,6 +9,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -22,6 +21,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -81,11 +81,13 @@ public class TTRobot {
   private Servo rClaw = null;
   private TouchSensor extended = null;
   private TouchSensor retracted = null;
-  private Servo basePlateGrabber = null;
+  private Servo blockFlipper = null;
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
-  private UltrasonicSensor sensorRangeRear = null;
+  private DistanceSensor sensorRangeRear = null;
+  private DistanceSensor sensorRangeLeft = null;
+  private DistanceSensor sensorRangeRight = null;
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
@@ -115,14 +117,15 @@ public class TTRobot {
     turn = hardwareMap.get(Servo.class, "grabTurn");
     lClaw = hardwareMap.get(Servo.class, "lClaw");
     rClaw = hardwareMap.get(Servo.class, "rClaw");
-    basePlateGrabber = hardwareMap.get(Servo.class, "bpGrabber");
+    blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
     cap = hardwareMap.get(CRServo.class, "cap");
     // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
     // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
-    sensorRangeRear = hardwareMap.get(UltrasonicSensor.class, "sensorRangeRear");
-
+    sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
+    sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
+    sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
     flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
     rlMotor = hardwareMap.get(DcMotor.class, "motorRearLeft");
@@ -187,12 +190,6 @@ public class TTRobot {
     return !lslideSwitch.getState();
   }
 
-  // This is synchronous: It freezes all other robot states until it finishes
-  // moving the slide.  It also doesn't work...
-  @Deprecated
-  public void lslide(double val) {
-    //slide.setPosition(val);
-  }
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
   public void setLinearSlideDirection(LinearSlideOperation operation, boolean override) {
     double power = 0;
@@ -316,7 +313,7 @@ public class TTRobot {
   }
 
    public void blockFlipper(double pos){
-      basePlateGrabber.setPosition(pos);
+      blockFlipper.setPosition(pos);
   }
   
   public void capstone(double speed) {
@@ -696,7 +693,7 @@ public class TTRobot {
       rearRightSpeed = -powerCompY - powerCompX;
 
       // keep looping while we are still active, and BOTH motors are running.
-      while (sensorRangeRear.getUltrasonicLevel() > dist && driveTime.seconds() < 3.0) {
+      while (sensorRangeRear.getDistance(DistanceUnit.CM) < dist && driveTime.seconds() < 3.0) {
         flMotor.setPower(frontLeftSpeed);
         frMotor.setPower(frontRightSpeed);
         rlMotor.setPower(rearLeftSpeed);
