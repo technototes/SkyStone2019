@@ -10,20 +10,36 @@ public class Direction {
 
   public static Direction None = new Direction(0.0, 0.0);
 
-  public boolean isRight() {
+  public boolean isOnlyRight() {
     return (Math.abs(Y) < .1) && (X < -.9);
   }
 
-  public boolean isLeft() {
+  public boolean isOnlyLeft() {
     return (Math.abs(Y) < .1) && (X > .9);
   }
 
-  public boolean isUp() {
+  public boolean isOnlyUp() {
     return (Math.abs(X) < .1) && (Y > .9);
   }
 
-  public boolean isDown() {
+  public boolean isOnlyDown() {
     return (Math.abs(X) < .1) && (Y < -.9);
+  }
+
+  public boolean isRight() {
+    return (X < -.9);
+  }
+
+  public boolean isLeft() {
+    return (X > .9);
+  }
+
+  public boolean isUp() {
+    return (Y > .9);
+  }
+
+  public boolean isDown() {
+    return (Y < -.9);
   }
 
   public void turbo(double value) {
