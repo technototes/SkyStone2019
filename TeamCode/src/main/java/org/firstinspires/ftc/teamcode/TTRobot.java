@@ -652,6 +652,9 @@ public class TTRobot {
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
+
+
+
   public void distRearDrive ( double speed,
                               double dist,
                               double angle) {
@@ -703,7 +706,69 @@ public class TTRobot {
       frMotor.setPower(0);
       rrMotor.setPower(0);
       rlMotor.setPower(0);
+  }
 
+
+  public void gyroHold( double speed, double angle, double holdTime) {
+
+    ElapsedTime holdTimer = new ElapsedTime();
+
+    // keep looping while we have time remaining.
+    holdTimer.reset();
+    while (opModeIsActive() && (holdTimer.time() < holdTime)) {
+      // Update telemetry & Allow time for other processes to run.
+      onHeading(speed, angle, P_TURN_COEFF);
+      telemetry.update();
+    }
+
+    // Stop all motion;
+    flMotor.setPower(0.0);
+    frMotor.setPower(0.0);
+    rlMotor.setPower(0.0);
+    rrMotor.setPower(0.0);
+  }
+
+  /**
+   * Perform one cycle of closed loop heading control.
+   *
+   * @param speed     Desired speed of turn.
+   * @param angle     Absolute Angle (in Degrees) relative to last gyro reset.
+   *                  0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
+   *                  If a relative angle is required, add/subtract from current heading.
+   * @param PCoeff    Proportional Gain coefficient
+   * @return
+   */
+  boolean onHeading(double speed, double angle, double PCoeff) {
+    double   error ;
+    double   steer ;
+    boolean  onTarget = false ;
+    double turnSpeed;
+
+    // determine turn power based on +/- error
+    error = getError(angle);
+
+    if (Math.abs(error) <= HEADING_THRESHOLD) {
+      steer = 0.0;
+      turnSpeed  = 0.0;
+      onTarget = true;
+    }
+    else {
+      steer = getSteer(error, PCoeff);
+      turnSpeed = speed * steer;
+    }
+
+    // Send desired speeds to motors.
+    robot.motorFrontLeft.setPower(turnSpeed);
+    robot.motorFrontRight.setPower(turnSpeed);
+    robot.motorRearLeft.setPower(turnSpeed);
+    robot.motorRearRight.setPower(turnSpeed);
+
+    // Display it for the driver.
+    telemetry.addData("Target", "%5.2f", angle);
+    telemetry.addData("Err/St", "%5.2f/%5.2f", error, steer);
+    telemetry.addData("Speed.", "%5.2f", turnSpeed);
+
+    return onTarget;
   }
 
 
