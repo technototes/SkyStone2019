@@ -12,10 +12,10 @@ public class DirectControl extends LinearOpMode {
   private Controller control;
   private Controller driver;
 
-    @Override
-    public void runOpMode() {
-      robot = new TTRobot();
-      // If you want telemetry, include a name as a string
+  @Override
+  public void runOpMode() {
+    robot = new TTRobot();
+    // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
@@ -44,34 +44,32 @@ public class DirectControl extends LinearOpMode {
       }
       // Grabber rotation
       if (control.lbump() == Button.Pressed) {
-        robot.turnn(0.4);
+        robot.turnn(0);
         telemetry.addLine("Open 0.4");
       } else if (control.rbump() == Button.Pressed) {
-        robot.turnn(0.6);
+        robot.turnn(1);
         telemetry.addLine("Close 0.6");
       }
 
       // Override the linear slide limit switches
-      boolean slideOverride=(control.rbump()==Button.Pressed) && (control.lbump()==Button.Pressed);
+      boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
       Direction slide = control.dpad();
       if (slide.isLeft()) {
         robot.setLinearSlideDirection(LinearSlideOperation.Extend, slideOverride);
-      }
-      else if (slide.isRight()) {
+      } else if (slide.isRight()) {
         robot.setLinearSlideDirection(LinearSlideOperation.Retract, slideOverride);
-      }
-      else {
+      } else {
         robot.setLinearSlideDirection(LinearSlideOperation.None, slideOverride);
       }
       Direction dcontrols = driver.dpad();
-      if(dcontrols.isUp()){
-        robot.blockFlipper(0.2);
-      }else{
+      if (dcontrols.isUp()) {
+        robot.blockFlipper(0.15);
+      } else {
         robot.blockFlipper(0.8);
       }
-      if(dcontrols.isDown()){
+      if (dcontrols.isDown()) {
         robot.bpGrabber(0);
-      }else{
+      } else {
         robot.bpGrabber(1);
       }
       if (dcontrols.isLeft()) {
@@ -98,7 +96,7 @@ public class DirectControl extends LinearOpMode {
       Direction R2 = control.rstick();
       Direction D = new Direction(0, 0);
       Direction L2 = new Direction(0, 0);
-      if (Math.abs(R2.X) > robot.STICKDEADZONE) {
+      if (Math.abs(R2.X) > 0.5) {
         D.X = R2.X;
       } else if (Math.abs(R1.X) > robot.STICKDEADZONE) {
         D.X = R1.X;
