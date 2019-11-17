@@ -27,19 +27,19 @@ public class Direction {
   }
 
   public boolean isRight() {
-    return (X < -.9);
+    return (X < -.5);
   }
 
   public boolean isLeft() {
-    return (X > .9);
+    return (X > .5);
   }
 
   public boolean isUp() {
-    return (Y > .9);
+    return (Y > .5);
   }
 
   public boolean isDown() {
-    return (Y < -.9);
+    return (Y < -.5);
   }
 
   public void turbo(double value) {
