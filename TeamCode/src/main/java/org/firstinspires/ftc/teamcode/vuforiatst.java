@@ -204,7 +204,7 @@ public class vuforiatst extends LinearOpMode {
         AxesReference.EXTRINSIC, AxesOrder.XZX,
         AngleUnit.DEGREES, 90, 90, 0));
     redTarget.setLocationFtcFieldFromTarget(redTargetLocationOnField);
-    RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
+    //RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
 
     /*
      * To place the Stones Target on the Blue Audience wall:
@@ -220,7 +220,7 @@ public class vuforiatst extends LinearOpMode {
         AxesReference.EXTRINSIC, AxesOrder.XZX,
         AngleUnit.DEGREES, 90, 0, 0));
     blueTarget.setLocationFtcFieldFromTarget(blueTargetLocationOnField);
-    RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
+    //RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
 
     /**
      * We also need to tell Vuforia where the <em>cameras</em> are relative to the robot.
@@ -286,7 +286,7 @@ public class vuforiatst extends LinearOpMode {
       .multiplied(Orientation.getRotationMatrix(
         AxesReference.EXTRINSIC, AxesOrder.XZY,
         AngleUnit.DEGREES, 90, 90, 0));
-    RobotLog.ii(TAG, "camera=%s", format(robotFromCamera));
+    //RobotLog.ii(TAG, "camera=%s", format(robotFromCamera));
 
     /**
      * Let the trackable listeners we care about know where the camera is. We know that each
@@ -349,7 +349,7 @@ public class vuforiatst extends LinearOpMode {
        */
       if (lastLocation != null) {
         //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
-        telemetry.addData("Pos", format(lastLocation));
+        //telemetry.addData("Pos", format(lastLocation));
       } else {
         telemetry.addData("Pos", "Unknown");
       }

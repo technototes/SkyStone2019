@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -303,12 +305,18 @@ public class TTRobot {
     rLiftMotor.setPower(val);
   }
 
-  // Positive is down, Negative is up!
-  public void setLift(double speed) {
-    // If we're at the lower limit, only allow upward motion
-    if (!isLiftAtLowerLimit() || speed <= 0) {
-      setLiftPower(speed);
-    }
+  public void liftUp() {
+    if (!isLiftAtLowerLimit())
+      setLiftPower(1.0);
+  }
+
+  public void liftDown() {
+
+    setLiftPower(-1.0);
+  }
+
+  public void liftStop() {
+    setLiftPower(0);
   }
 
   public void blockFlipper(double pos) {
@@ -357,29 +365,38 @@ public class TTRobot {
     double test = 0.0;
     if (gyroAngle > 50 && gyroAngle < 130) {
       test = 90 - gyroAngle;
-
-    } else if (gyroAngle > 140 && gyroAngle < 220) {
+    } else if (gyroAngle > 140 && gyroAngle < 180) {
       test = 180 - gyroAngle;
-
-    } else if (gyroAngle > 230 && gyroAngle < 310) {
-      test = 270 - gyroAngle;
-
-    } else if ((gyroAngle >= 0 && gyroAngle < 40) || (gyroAngle > 320 && gyroAngle <= 360)) {
+    } else if (gyroAngle > -180 && gyroAngle < -140) {
+      test = -180 - gyroAngle;
+    } else if (gyroAngle > -130 && gyroAngle < -50) {
+      test = -90 - gyroAngle;
+    } else if (gyroAngle > -40 && gyroAngle < 40) {
       test = 0 - gyroAngle;
     }
     return test;
   }
 
   // Snap the robot to the closest 90 degree angle
-  public void snap() {
+  public double snap(Telemetry tel) {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
-    snap(newangle);
+    tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    return snap(newangle);
   }
 
   // Turn the robot to a specific angle
-  public void snap(double angle) {
-    //drive(0.0, 0.0, 0.0, angle);
+  private double snap(double targetAngle) {
+    if (targetAngle < -25) {
+      return -1.0;
+    } else if (targetAngle > 25) {
+      return 1.0;
+    } else if (targetAngle < -5) {
+      return -.1;
+    } else if (targetAngle > 5) {
+      return .1;
+    }
+    return 0;
   }
 
   // leave gyroAngle at zero to set relative angle

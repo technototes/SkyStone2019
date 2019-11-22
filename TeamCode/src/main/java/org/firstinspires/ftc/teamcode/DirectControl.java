@@ -25,6 +25,7 @@ public class DirectControl extends LinearOpMode {
     telemetry.addLine("Hello!");
     telemetry.update();
     waitForStart();
+    robot.turnn(1);
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
@@ -36,14 +37,13 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.claw(TTRobot.CLAWOPENPOSITION); // Open
-        telemetry.addLine("Open .4");
-      } else if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.claw(TTRobot.CLAWCLOSEPOSITION); // CLosed
-        telemetry.addLine("Close .6");
+      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
+        robot.setClawPosition(ClawPosition.Open); // Open
+      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
+        robot.setClawPosition(ClawPosition.Close); // CLosed
       }
       // Grabber rotation
+
       if (control.lbump() == Button.Pressed) {
         robot.turnn(0);
         telemetry.addLine("Open 0.4");
@@ -69,11 +69,11 @@ public class DirectControl extends LinearOpMode {
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Extend, slideOverride);
+        robot.setLinearSlideDirection(LinearSlideOperation.Extend, !slideOverride);
       } else if (slide.isRight()) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Retract, slideOverride);
+        robot.setLinearSlideDirection(LinearSlideOperation.Retract, !slideOverride);
       } else {
-        robot.setLinearSlideDirection(LinearSlideOperation.None, slideOverride);
+        robot.setLinearSlideDirection(LinearSlideOperation.None, !slideOverride);
       }
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
@@ -96,11 +96,11 @@ public class DirectControl extends LinearOpMode {
       // Lift control:
       Direction dir = control.dpad();
       if (dir.isUp()) {
-        robot.setLift(1);
+        robot.liftUp();
       } else if (dir.isDown()) {
-        robot.setLift(-1);
+        robot.liftDown();
       } else {
-        robot.setLift(0);
+        robot.liftStop();
       }
 
       // Driver control:
@@ -110,7 +110,7 @@ public class DirectControl extends LinearOpMode {
       Direction R2 = control.rstick();
       Direction D = new Direction(0, 0);
       Direction L2 = new Direction(0, 0);
-      if (Math.abs(R2.X) > 0.5) {
+      if (Math.abs(R2.X) > robot.STICKDEADZONE) {
         D.X = R2.X;
       } else if (Math.abs(R1.X) > robot.STICKDEADZONE) {
         D.X = R1.X;
@@ -130,7 +130,10 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.speedNormal();
       }
-
+      // If the snap-to-angle button has been pressed, override rotation with the snap angle
+      if (driver.buttonY() == Button.Pressed) {
+        D.X = robot.snap(telemetry);
+      }
       robot.joystickDrive(L2, D, robot.gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
@@ -157,6 +160,7 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.joystickDrive(L2, D, robot.gyroHeading());
       }
+
       telemetry.update();
     }
   }
