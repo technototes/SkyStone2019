@@ -24,6 +24,7 @@ public class DirectControl extends LinearOpMode {
     telemetry.addLine("Hello!");
     telemetry.update();
     waitForStart();
+    robot.turnn(1);
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
@@ -36,13 +37,12 @@ public class DirectControl extends LinearOpMode {
       }*/
       // Handle Grabber clutch
       if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.claw(TTRobot.CLAWOPENPOSITION); // Open
-        telemetry.addLine("Open .4");
+        robot.setClawPosition(ClawPosition.Open); // Open
       } else if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.claw(TTRobot.CLAWCLOSEPOSITION); // CLosed
-        telemetry.addLine("Close .6");
+        robot.setClawPosition(ClawPosition.Close); // CLosed
       }
       // Grabber rotation
+
       if (control.lbump() == Button.Pressed) {
         robot.turnn(0);
         telemetry.addLine("Open 0.4");
@@ -56,11 +56,9 @@ public class DirectControl extends LinearOpMode {
       Direction slide = control.dpad();
       if (slide.isLeft()) {
         robot.setLinearSlideDirection(LinearSlideOperation.Extend, !slideOverride);
-      }
-      else if (slide.isRight()) {
+      } else if (slide.isRight()) {
         robot.setLinearSlideDirection(LinearSlideOperation.Retract, !slideOverride);
-      }
-      else {
+      } else {
         robot.setLinearSlideDirection(LinearSlideOperation.None, !slideOverride);
       }
       Direction dcontrols = driver.dpad();
@@ -144,6 +142,9 @@ public class DirectControl extends LinearOpMode {
         robot.joystickDrive(L2, D, 0);
       } else {
         robot.joystickDrive(L2, D, robot.gyroHeading());
+      }
+      if (driver.buttonY() == Button.Pressed) {
+        robot.snap();
       }
       telemetry.update();
     }

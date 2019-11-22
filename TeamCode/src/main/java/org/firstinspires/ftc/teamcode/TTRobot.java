@@ -305,13 +305,12 @@ public class TTRobot {
     rLiftMotor.setPower(val);
   }
 
-  // Positive is down, Negative is up!
   public void liftUp() {
-    setLiftPower(-1.0);
+    setLiftPower(1.0);
   }
   public void liftDown() {
     if (!isLiftAtLowerLimit())
-      setLiftPower(1.0);
+      setLiftPower(-1.0);
   }
   public void liftStop() {
     setLiftPower(0);
