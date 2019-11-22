@@ -123,11 +123,11 @@ public abstract class TTLinearOpMode extends LinearOpMode {
 
       // keep looping while we are still active, and BOTH motors are running.
       while (opModeIsActive() && driveTime.seconds() < time) {
-        robot.motorFrontLeft(frontLeftSpeed);
+        /*robot.motorFrontLeft(frontLeftSpeed);
         robot.motorFrontRight(frontRightSpeed);
         robot.motorRearLeft(rearLeftSpeed);
         robot.motorRearRight(rearRightSpeed);
-
+*/
         // Display drive status for the driver.
         telemetry.addData(
             "Speed",
@@ -143,10 +143,11 @@ public abstract class TTLinearOpMode extends LinearOpMode {
       }
 
       // Stop all motion;
+      /*
       robot.motorFrontLeft(0);
       robot.motorFrontRight(0);
       robot.motorRearLeft(0);
-      robot.motorRearRight(0);
+      robot.motorRearRight(0);*/
     }
   }
 
@@ -173,10 +174,11 @@ public abstract class TTLinearOpMode extends LinearOpMode {
     }
 
     // Stop all motion;
+    /*
     robot.motorFrontLeft(0.0);
     robot.motorFrontRight(0.0);
     robot.motorRearLeft(0.0);
-    robot.motorRearRight(0.0);
+    robot.motorRearRight(0.0);*/
   }
 
   /**
@@ -208,10 +210,10 @@ public abstract class TTLinearOpMode extends LinearOpMode {
     }
 
     // Send desired speeds to motors.
-    robot.motorFrontLeft(turnSpeed);
+    /*robot.motorFrontLeft(turnSpeed);
     robot.motorFrontRight(turnSpeed);
     robot.motorRearLeft(turnSpeed);
-    robot.motorRearRight(turnSpeed);
+    robot.motorRearRight(turnSpeed);*/
 
     // Display it for the driver.
     telemetry.addData("Target", "%5.2f", angle);

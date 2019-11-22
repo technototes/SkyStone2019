@@ -54,7 +54,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
 
       if (control.buttonA() == Button.Pressed) {
 
-          robot.lslide(0.6);
+          robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
         while (robot.isLiftAtLowerLimit() == false) {
           robot.setLift(-1.0);
           robot.turnn(0.6);
@@ -65,7 +65,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
       }
 
       if (control.buttonY() == Button.Pressed) {
-        robot.lslide(0.9);
+        robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
 
         while (robot.isLiftAtLowerLimit()) {
           robot.setLift((-1.0));
@@ -83,6 +83,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
           robot.lslide(LinearSlideOperation.Retract);
       }*/
       Direction slide = control.dpad();
+      /*
       if (slide.isLeft()) {
         robot.lslide(1);
       }
@@ -92,6 +93,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
       else {
         robot.lslide(0);
       }
+      */
       Direction dcontrols = driver.dpad();
       if(dcontrols.isUp()){
         robot.bpGrabber(1);

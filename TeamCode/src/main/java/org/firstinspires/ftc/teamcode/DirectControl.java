@@ -44,37 +44,33 @@ public class DirectControl extends LinearOpMode {
       }
       // Grabber rotation
       if (control.lbump() == Button.Pressed) {
-        robot.turnn(0.4);
+        robot.turnn(0);
         telemetry.addLine("Open 0.4");
       } else if (control.rbump() == Button.Pressed) {
-        robot.turnn(0.6);
+        robot.turnn(1);
         telemetry.addLine("Close 0.6");
       }
 
-      // redid this to work with magnetic limit switch
-      /*Direction dpad = control.dpad();
-      if(dpad.X == 1){
-          robot.lslide(LinearSlideOperation.Extend);
-      }else if(dpad.X == -1){
-          robot.lslide(LinearSlideOperation.Retract);
-      }*/
+      // Override the linear slide limit switches
+      boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.lslide(-1.0);
-      }
-      else if (slide.isRight()) {
-        robot.lslide(1.0);
-      }
-      else {
-        robot.lslide(0);
+        robot.setLinearSlideDirection(LinearSlideOperation.Extend, slideOverride);
+      } else if (slide.isRight()) {
+        robot.setLinearSlideDirection(LinearSlideOperation.Retract, slideOverride);
+      } else {
+        robot.setLinearSlideDirection(LinearSlideOperation.None, slideOverride);
       }
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
-        robot.bpGrabber(1);
-      } else if (dcontrols.isDown()) {
-        robot.bpGrabber(-1);
+        robot.blockFlipper(0.15);
       } else {
+        robot.blockFlipper(0.8);
+      }
+      if (dcontrols.isDown()) {
         robot.bpGrabber(0);
+      } else {
+        robot.bpGrabber(1);
       }
       if (dcontrols.isLeft()) {
         robot.capstone(-1);
@@ -86,7 +82,7 @@ public class DirectControl extends LinearOpMode {
       // Lift control:
       Direction dir = control.dpad();
       if (dir.isUp()) {
-        robot.setLift(1.0);
+        robot.setLift(1);
       } else if (dir.isDown()) {
         robot.setLift(-1);
       } else {
@@ -100,7 +96,7 @@ public class DirectControl extends LinearOpMode {
       Direction R2 = control.rstick();
       Direction D = new Direction(0, 0);
       Direction L2 = new Direction(0, 0);
-      if (Math.abs(R2.X) > robot.STICKDEADZONE) {
+      if (Math.abs(R2.X) > 0.5) {
         D.X = R2.X;
       } else if (Math.abs(R1.X) > robot.STICKDEADZONE) {
         D.X = R1.X;
