@@ -304,11 +304,15 @@ public class TTRobot {
   }
 
   // Positive is down, Negative is up!
-  public void setLift(double speed) {
-    // If we're at the lower limit, only allow upward motion
-    if (!isLiftAtLowerLimit() || speed <= 0) {
-      setLiftPower(speed);
-    }
+  public void liftUp() {
+    setLiftPower(-1.0);
+  }
+  public void liftDown() {
+    if (!isLiftAtLowerLimit())
+      setLiftPower(1.0);
+  }
+  public void liftStop() {
+    setLiftPower(0);
   }
 
   public void blockFlipper(double pos) {

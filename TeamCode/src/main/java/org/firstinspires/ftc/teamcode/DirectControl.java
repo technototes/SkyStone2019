@@ -82,11 +82,11 @@ public class DirectControl extends LinearOpMode {
       // Lift control:
       Direction dir = control.dpad();
       if (dir.isUp()) {
-        robot.setLift(1);
+        robot.liftUp();
       } else if (dir.isDown()) {
-        robot.setLift(-1);
+        robot.liftDown();
       } else {
-        robot.setLift(0);
+        robot.liftStop();
       }
 
       // Driver control:
