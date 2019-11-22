@@ -307,12 +307,12 @@ public class TTRobot {
 
   public void liftUp() {
     if (!isLiftAtLowerLimit())
-      setLiftPower(1.0);
+      setLiftPower(-1.0);
   }
 
   public void liftDown() {
 
-    setLiftPower(-1.0);
+    setLiftPower(1.0);
   }
 
   public void liftStop() {
