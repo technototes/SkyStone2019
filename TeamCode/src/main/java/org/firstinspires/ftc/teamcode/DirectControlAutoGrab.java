@@ -65,7 +65,8 @@ public class DirectControlAutoGrab extends LinearOpMode {
       }
 
       if (control.buttonY() == Button.Pressed) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+        
+        robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
 
         while (robot.isLiftAtLowerLimit()) {
           robot.liftUp();
