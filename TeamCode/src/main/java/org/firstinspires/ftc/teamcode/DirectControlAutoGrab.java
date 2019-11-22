@@ -44,10 +44,10 @@ public class DirectControlAutoGrab extends LinearOpMode {
       }
       // Grabber rotation
       if(control.lbump() == Button.Pressed) {
-        robot.turnn(0.4);
+        robot.rotateClaw(0.4);
         telemetry.addLine("Open 0.4");
       }else if (control.rbump() == Button.Pressed){
-        robot.turnn(0.6);
+        robot.rotateClaw(0.6);
         telemetry.addLine("Close 0.6");
       }
 
@@ -57,7 +57,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
           robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
         while (robot.isLiftAtLowerLimit() == false) {
           robot.liftDown();
-          robot.turnn(0.6);
+          robot.rotateClaw(0.6);
 
         }
           robot.claw(0.6);
@@ -70,7 +70,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
 
         while (robot.isLiftAtLowerLimit()) {
           robot.liftUp();
-          robot.turnn(0.4);
+          robot.rotateClaw(0.4);
         }
 
         robot.claw(0.6);

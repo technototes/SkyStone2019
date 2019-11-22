@@ -14,8 +14,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import com.qualcomm.robotcore.util.Range;
@@ -74,10 +72,7 @@ public class TTRobot {
   private Servo turn = null;
   private Servo lClaw = null;
   private Servo rClaw = null;
-  private TouchSensor extended = null;
-  private TouchSensor retracted = null;
   private Servo blockFlipper = null;
-  private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
   private DistanceSensor sensorRangeRear = null;
@@ -115,8 +110,6 @@ public class TTRobot {
     rClaw = hardwareMap.get(Servo.class, "rClaw");
     blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
     cap = hardwareMap.get(CRServo.class, "cap");
-    // extended = hardwareMap.get(TouchSensor.class, "extLimitSwitch");
-    // retracted = hardwareMap.get(TouchSensor.class, "retLimitSwitch");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
     sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
@@ -135,8 +128,6 @@ public class TTRobot {
     DcMotor rlMotor = hardwareMap.get(DcMotor.class, "motorRearLeft");
     DcMotor rrMotor = hardwareMap.get(DcMotor.class, "motorRearRight");
     driveTrain = new XDrive(flMotor, frMotor, rlMotor, rrMotor);
-
-    //    touch = hardwareMap.get(TouchSensor.class, "touch");
 
     // Setup the IMU
     // Set up the parameters with which we will use our IMU. Note that integration
@@ -176,14 +167,6 @@ public class TTRobot {
   }
 
   // Linear slide stuff:
-  public boolean isLinearSlideFullyExtended() {
-    return extended.isPressed();
-  }
-
-  public boolean isLinearSlideFullyRetracted() {
-    return retracted.isPressed();
-  }
-
   private boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
   }
@@ -271,7 +254,7 @@ public class TTRobot {
     rClaw.setPosition(val);
   }
 
-  public void turnn(double val) {
+  public void rotateClaw(double val) {
     turn.setPosition(val);
   }
 

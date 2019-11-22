@@ -24,7 +24,7 @@ public class DirectControl extends LinearOpMode {
     telemetry.addLine("Hello!");
     telemetry.update();
     waitForStart();
-    robot.turnn(1);
+    robot.rotateClaw(1);
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
@@ -44,10 +44,10 @@ public class DirectControl extends LinearOpMode {
       // Grabber rotation
 
       if (control.lbump() == Button.Pressed) {
-        robot.turnn(0);
+        robot.rotateClaw(0);
         telemetry.addLine("Open 0.4");
       } else if (control.rbump() == Button.Pressed) {
-        robot.turnn(1);
+        robot.rotateClaw(1);
         telemetry.addLine("Close 0.6");
       }
 
