@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -209,7 +211,7 @@ public class TTRobot {
             }
             break;
           case Retract:
-            if (override)
+            if(override)
               break;
             //otherwise do not move
 
@@ -247,7 +249,7 @@ public class TTRobot {
             break;
 
           case Extend:
-            if (override)
+            if(override)
               break;
             //otherwise do not move
 
@@ -259,7 +261,7 @@ public class TTRobot {
         break;
     }
 
-    slide.setPower(power);
+   slide.setPower(power);
   }
 
 
