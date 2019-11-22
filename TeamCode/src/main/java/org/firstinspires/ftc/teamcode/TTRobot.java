@@ -211,7 +211,7 @@ public class TTRobot {
             }
             break;
           case Retract:
-            if(override)
+            if (override)
               break;
             //otherwise do not move
 
@@ -249,7 +249,7 @@ public class TTRobot {
             break;
 
           case Extend:
-            if(override)
+            if (override)
               break;
             //otherwise do not move
 
@@ -261,7 +261,7 @@ public class TTRobot {
         break;
     }
 
-   slide.setPower(power);
+    slide.setPower(power);
   }
 
 
@@ -306,12 +306,15 @@ public class TTRobot {
   }
 
   public void liftUp() {
-    setLiftPower(1.0);
-  }
-  public void liftDown() {
     if (!isLiftAtLowerLimit())
-      setLiftPower(-1.0);
+      setLiftPower(1.0);
   }
+
+  public void liftDown() {
+
+    setLiftPower(-1.0);
+  }
+
   public void liftStop() {
     setLiftPower(0);
   }
@@ -362,39 +365,38 @@ public class TTRobot {
     double test = 0.0;
     if (gyroAngle > 50 && gyroAngle < 130) {
       test = 90 - gyroAngle;
-
-    } else if (gyroAngle > 140 && gyroAngle < 220) {
+    } else if (gyroAngle > 140 && gyroAngle < 180) {
       test = 180 - gyroAngle;
-
-    } else if (gyroAngle > 230 && gyroAngle < 310) {
-      test = 270 - gyroAngle;
-
-    } else if ((gyroAngle >= 0 && gyroAngle < 40) || (gyroAngle > 320 && gyroAngle <= 360)) {
+    } else if (gyroAngle > -180 && gyroAngle < -140) {
+      test = -180 - gyroAngle;
+    } else if (gyroAngle > -130 && gyroAngle < -50) {
+      test = -90 - gyroAngle;
+    } else if (gyroAngle > -40 && gyroAngle < 40) {
       test = 0 - gyroAngle;
     }
     return test;
   }
 
   // Snap the robot to the closest 90 degree angle
-  public void snap() {
+  public double snap(Telemetry tel) {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
-    snap(newangle);
+    tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    return snap(newangle);
   }
 
   // Turn the robot to a specific angle
-  public void snap(double targetAngle) {
-    double curAngle = this.gyroHeading();
-    double rotationAngle = curAngle - targetAngle;
-    //Finding fastest way to get to angle
-    rotationAngle = ((rotationAngle - 180) % 360) - 180;
-    double Y = 0;
-    if (rotationAngle < 0) {
-      Y = -1.0;
-    } else if (rotationAngle > 0) {
-      Y = 1.0;
+  private double snap(double targetAngle) {
+    if (targetAngle < -25) {
+      return -1.0;
+    } else if (targetAngle > 25) {
+      return 1.0;
+    } else if (targetAngle < -5) {
+      return -.1;
+    } else if (targetAngle > 5) {
+      return .1;
     }
-   joystickDrive(Direction.None, new Direction (0,Y), curAngle);
+    return 0;
   }
 
   // leave gyroAngle at zero to set relative angle

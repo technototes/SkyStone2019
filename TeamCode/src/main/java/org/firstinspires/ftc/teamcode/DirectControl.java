@@ -36,9 +36,9 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
+      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
+      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Close); // CLosed
       }
       // Grabber rotation
@@ -116,7 +116,10 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.speedNormal();
       }
-
+      // If the snap-to-angle button has been pressed, override rotation with the snap angle
+      if (driver.buttonY() == Button.Pressed) {
+        D.X = robot.snap(telemetry);
+      }
       robot.joystickDrive(L2, D, robot.gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
@@ -143,9 +146,7 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.joystickDrive(L2, D, robot.gyroHeading());
       }
-      if (driver.buttonY() == Button.Pressed) {
-        robot.snap();
-      }
+
       telemetry.update();
     }
   }
