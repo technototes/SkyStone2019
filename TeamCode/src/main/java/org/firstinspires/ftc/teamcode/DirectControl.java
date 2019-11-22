@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -50,19 +49,6 @@ public class DirectControl extends LinearOpMode {
       } else if (control.rbump() == Button.Pressed) {
         robot.turnn(1);
         telemetry.addLine("Close 0.6");
-      }
-
-      if (control.buttonY() == Button.Pressed) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Extend);
-        robot.claw(TTRobot.CLAWOPENPOSITION);
-        while (robot.)
-        robot.setLift(-1.0);
-        robot.claw(TTRobot.CLAWCLOSEPOSITION);
-        robot.setLift(1.0);
-
-
-
-
       }
 
       // Override the linear slide limit switches
