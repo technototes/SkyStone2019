@@ -83,7 +83,6 @@ public class TTRobot {
   private TouchSensor touch = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
-  private Range sensorRangeRear = null;
 
 
   private Telemetry telemetry = null;
@@ -306,7 +305,7 @@ public class TTRobot {
    public void bpGrabber(double pos){
       basePlateGrabber.setPosition(pos);
   }
-  
+
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
@@ -484,7 +483,7 @@ public class TTRobot {
     double curAngle = this.gyroHeading();
     double rotationAngle = curAngle - targetAngle;
     //Finding fastest way to get to angle
-    rotationAngle = Math.mod(rotationAngle - 180, 360) - 180;
+    rotationAngle = ((rotationAngle - 180) % 360) - 180;
     double Y = 0;
     if (rotationAngle < 0) {
       Y = -1.0;
@@ -702,7 +701,7 @@ public class TTRobot {
         frMotor.setPower(frontRightSpeed);
         rlMotor.setPower(rearLeftSpeed);
         rrMotor.setPower(rearRightSpeed);
-        
+
 
         // Display drive status for the driver.
         telemetry.addData("Speed",  "FL %5.2f:FR %5.2f:RL %5.2f:RR %5.2f", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
