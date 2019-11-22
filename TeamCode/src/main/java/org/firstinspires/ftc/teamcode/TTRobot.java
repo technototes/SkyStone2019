@@ -378,8 +378,18 @@ public class TTRobot {
   }
 
   // Turn the robot to a specific angle
-  public void snap(double angle) {
-    //drive(0.0, 0.0, 0.0, angle);
+  public void snap(double targetAngle) {
+    double curAngle = this.gyroHeading();
+    double rotationAngle = curAngle - targetAngle;
+    //Finding fastest way to get to angle
+    rotationAngle = ((rotationAngle - 180) % 360) - 180;
+    double Y = 0;
+    if (rotationAngle < 0) {
+      Y = -1.0;
+    } else if (rotationAngle > 0) {
+      Y = 1.0;
+    }
+   joystickDrive(Direction.None, new Direction (0,Y), curAngle);
   }
 
   // leave gyroAngle at zero to set relative angle
