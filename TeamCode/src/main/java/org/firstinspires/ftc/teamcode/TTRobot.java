@@ -293,13 +293,12 @@ public class TTRobot {
   }
 
   public void liftUp() {
-    if (!isLiftAtLowerLimit())
       setLiftPower(-1.0);
   }
 
   public void liftDown() {
-
-    setLiftPower(1.0);
+    if (!isLiftAtLowerLimit())
+      setLiftPower(1.0);
   }
 
   public void liftStop() {
@@ -394,7 +393,7 @@ public class TTRobot {
     } else if(angleMag > 25.0) {
       motorMag = .7;
     }else if(angleMag > 15.0) {
-      motormag = .4;
+      motorMag = .4;
     }else if(angleMag > 5.0) {
       motorMag = .2;
     }else if(angleMag > 0.0) {
