@@ -47,7 +47,6 @@ public class TTRobot {
   public static final double CLAWCLOSEPOSITION = 0.6;
 
   // Unused stuff
-
   // the grab rotation position for snapping to horizontal or vertical
   private static final double GRABBERPOSITIONCUTOFF = 0.25;
   // the grab rotation 'horizontal' position
