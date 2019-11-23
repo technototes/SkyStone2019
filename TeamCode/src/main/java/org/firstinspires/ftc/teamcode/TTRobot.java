@@ -167,8 +167,12 @@ public class TTRobot {
   }
 
   // Linear slide stuff:
-  private boolean slideSwitchSignaled() {
+  public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
+  }
+
+  public boolean liftSwitchSignaled() {
+    return !liftSwitch.getState();
   }
 
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
