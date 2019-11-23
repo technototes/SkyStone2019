@@ -167,7 +167,7 @@ public class TTRobot {
   }
 
   // Linear slide stuff:
-  private boolean slideSwitchSignaled() {
+  public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
   }
 
@@ -184,19 +184,15 @@ public class TTRobot {
       case Retract:
         power = -LINEARSLIDEPOWER;
         break;
-
-
+      case None:
+        power = 0;
+        break;
     }
     slide.setPower(power);
-    while(slideSwitchSignaled()) {
+    while (!override && power != 0 && slideSwitchSignaled()) {
       slide.setPower(-power);
       sleep(1);
-
     }
-
-
-
-
   }
 
 
@@ -347,7 +343,7 @@ public class TTRobot {
   }
 
   public void liftUp() {
-      setLiftPower(-1.0);
+    setLiftPower(-1.0);
   }
 
   public void liftDown() {
@@ -439,21 +435,22 @@ public class TTRobot {
     }
     return 0;
   }
+
   private double scaledSnap(double targetAngle) {
-    double angleMag = Math.abs (targetAngle);
+    double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
-    if(angleMag > 35.0) {
+    if (angleMag > 35.0) {
       motorMag = 1.0;
-    } else if(angleMag > 25.0) {
+    } else if (angleMag > 25.0) {
       motorMag = .7;
-    }else if(angleMag > 15.0) {
+    } else if (angleMag > 15.0) {
       motorMag = .4;
-    }else if(angleMag > 5.0) {
+    } else if (angleMag > 5.0) {
       motorMag = .2;
-    }else if(angleMag > 0.0) {
+    } else if (angleMag > 0.0) {
       motorMag = 0.0;
     }
-    if(targetAngle < 0.0) {
+    if (targetAngle < 0.0) {
       motorMag = -motorMag;
     }
     return motorMag;
