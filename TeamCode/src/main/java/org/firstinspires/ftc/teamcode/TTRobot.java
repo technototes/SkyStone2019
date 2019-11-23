@@ -209,6 +209,7 @@ public class TTRobot {
         // Hit a limit
         if (!override && slideSwitchSignaled()) {
           // Stop the slide
+
           power = 0;
 
           // Update the state
@@ -243,6 +244,34 @@ public class TTRobot {
         }
         break;
     }
+
+    slide.setPower(power);
+  }
+
+
+  public void setLinearSlideDirectionEmily(LinearSlideOperation operation, boolean override) {
+    double power = 0;
+    switch (operation) {
+      case Extend:
+        power = LINEARSLIDEPOWER;
+        break;
+      case Retract:
+        power = -LINEARSLIDEPOWER;
+        break;
+
+    }
+
+
+    // Hit a limit
+    if (!override && slideSwitchSignaled()) {
+      // Stop the slide
+      while (slideSwitchSignaled() == true) {
+        slide.setPower(-power);
+        sleep(1);
+      }
+      power = 0;
+    }
+
 
     slide.setPower(power);
   }
