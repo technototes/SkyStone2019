@@ -292,13 +292,12 @@ public class TTRobot {
   }
 
   public void liftUp() {
-    if (!isLiftAtLowerLimit())
       setLiftPower(-1.0);
   }
 
   public void liftDown() {
-
-    setLiftPower(1.0);
+    if (!isLiftAtLowerLimit())
+      setLiftPower(1.0);
   }
 
   public void liftStop() {
@@ -368,7 +367,8 @@ public class TTRobot {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
     tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
-    return snap(newangle);
+    return scaledSnap(newangle);
+    //return snap(newangle); replaced with above scaledSnap
   }
 
   // Turn the robot to a specific angle
@@ -384,6 +384,27 @@ public class TTRobot {
     }
     return 0;
   }
+  private double scaledSnap(double targetAngle) {
+    double angleMag = Math.abs (targetAngle);
+    double motorMag = 0.0;
+    if(angleMag > 35.0) {
+      motorMag = 1.0;
+    } else if(angleMag > 25.0) {
+      motorMag = .7;
+    }else if(angleMag > 15.0) {
+      motorMag = .4;
+    }else if(angleMag > 5.0) {
+      motorMag = .2;
+    }else if(angleMag > 0.0) {
+      motorMag = 0.0;
+    }
+    if(targetAngle < 0.0) {
+      motorMag = -motorMag;
+    }
+    return motorMag;
+
+  }
+
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {

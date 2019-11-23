@@ -17,10 +17,10 @@ public class Controller {
   Direction dpad() {
     float X = 0, Y = 0;
     if (pad.dpad_down) {
-      Y = 1;
+      Y = -1;
     }
     if (pad.dpad_up) {
-      Y = -1;
+      Y = 1;
     }
     if (pad.dpad_left) {
       X = -1;

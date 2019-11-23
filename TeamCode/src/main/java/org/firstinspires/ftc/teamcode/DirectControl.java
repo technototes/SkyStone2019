@@ -118,8 +118,11 @@ public class DirectControl extends LinearOpMode {
       }
       // If the snap-to-angle button has been pressed, override rotation with the snap angle
       if (driver.buttonY() == Button.Pressed) {
+        robot.speedNormal();
         D.X = robot.snap(telemetry);
+
       }
+
       robot.joystickDrive(L2, D, robot.gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
