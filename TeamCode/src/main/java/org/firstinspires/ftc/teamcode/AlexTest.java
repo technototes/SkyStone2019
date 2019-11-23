@@ -69,7 +69,7 @@ public class AlexTest extends LinearOpMode {
               tfod.activate();
           }
           */
-          currentState = AutoState.EXTENDSLIDE;
+          currentState = AutoSt ate.EXTENDSLIDE;
           break;
 
 
