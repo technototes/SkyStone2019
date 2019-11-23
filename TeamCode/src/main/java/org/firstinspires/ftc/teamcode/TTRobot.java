@@ -145,7 +145,7 @@ public class TTRobot {
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    // Set the digital channel mode to input
+    // Set the digital channel mode to
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -167,13 +167,38 @@ public class TTRobot {
   }
 
   // Linear slide stuff:
-  public boolean slideSwitchSignaled() {
+  private boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
   }
 
   public boolean liftSwitchSignaled() {
     return !liftSwitch.getState();
   }
+
+  public void setLinearSlideDirectionRyan(LinearSlideOperation operation, boolean override) {
+    double power = 0;
+    switch (operation) {
+      case Extend:
+        power = LINEARSLIDEPOWER;
+        break;
+      case Retract:
+        power = -LINEARSLIDEPOWER;
+        break;
+
+
+    }
+    slide.setPower(power);
+    while(slideSwitchSignaled()) {
+      slide.setPower(-power);
+      sleep(1);
+
+    }
+
+
+
+
+  }
+
 
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
 

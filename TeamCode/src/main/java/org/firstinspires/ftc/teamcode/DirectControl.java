@@ -55,11 +55,11 @@ public class DirectControl extends LinearOpMode {
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
       Direction slide = control.dpad();
       if (slide.isLeft()) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Extend, !slideOverride);
+        robot.setLinearSlideDirectionRyan(LinearSlideOperation.Extend, !slideOverride);
       } else if (slide.isRight()) {
-        robot.setLinearSlideDirection(LinearSlideOperation.Retract, !slideOverride);
+        robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, !slideOverride);
       } else {
-        robot.setLinearSlideDirection(LinearSlideOperation.None, !slideOverride);
+        robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
       }
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
