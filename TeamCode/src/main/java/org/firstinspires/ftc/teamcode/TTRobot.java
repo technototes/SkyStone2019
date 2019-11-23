@@ -144,7 +144,7 @@ public class TTRobot {
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    // Set the digital channel mode to input
+    // Set the digital channel mode to
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -173,6 +173,27 @@ public class TTRobot {
   public boolean liftSwitchSignaled() {
     return !liftSwitch.getState();
   }
+
+  public void setLinearSlideDirectionRyan(LinearSlideOperation operation, boolean override) {
+    double power = 0;
+    switch (operation) {
+      case Extend:
+        power = LINEARSLIDEPOWER;
+        break;
+      case Retract:
+        power = -LINEARSLIDEPOWER;
+        break;
+      case None:
+        power = 0;
+        break;
+    }
+    slide.setPower(power);
+    while (!override && power != 0 && slideSwitchSignaled()) {
+      slide.setPower(-power);
+      sleep(1);
+    }
+  }
+
 
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
 
@@ -212,6 +233,7 @@ public class TTRobot {
         // Hit a limit
         if (!override && slideSwitchSignaled()) {
           // Stop the slide
+
           power = 0;
 
           // Update the state
@@ -246,6 +268,34 @@ public class TTRobot {
         }
         break;
     }
+
+    slide.setPower(power);
+  }
+
+
+  public void setLinearSlideDirectionEmily(LinearSlideOperation operation, boolean override) {
+    double power = 0;
+    switch (operation) {
+      case Extend:
+        power = LINEARSLIDEPOWER;
+        break;
+      case Retract:
+        power = -LINEARSLIDEPOWER;
+        break;
+
+    }
+
+
+    // Hit a limit
+    if (!override && slideSwitchSignaled()) {
+      // Stop the slide
+      while (slideSwitchSignaled() == true) {
+        slide.setPower(-power);
+        sleep(1);
+      }
+      power = 0;
+    }
+
 
     slide.setPower(power);
   }
@@ -292,7 +342,7 @@ public class TTRobot {
   }
 
   public void liftUp() {
-      setLiftPower(-1.0);
+    setLiftPower(-1.0);
   }
 
   public void liftDown() {
@@ -384,21 +434,22 @@ public class TTRobot {
     }
     return 0;
   }
+
   private double scaledSnap(double targetAngle) {
-    double angleMag = Math.abs (targetAngle);
+    double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
-    if(angleMag > 35.0) {
+    if (angleMag > 35.0) {
       motorMag = 1.0;
-    } else if(angleMag > 25.0) {
+    } else if (angleMag > 25.0) {
       motorMag = .7;
-    }else if(angleMag > 15.0) {
+    } else if (angleMag > 15.0) {
       motorMag = .4;
-    }else if(angleMag > 5.0) {
+    } else if (angleMag > 5.0) {
       motorMag = .2;
-    }else if(angleMag > 0.0) {
+    } else if (angleMag > 0.0) {
       motorMag = 0.0;
     }
-    if(targetAngle < 0.0) {
+    if (targetAngle < 0.0) {
       motorMag = -motorMag;
     }
     return motorMag;
