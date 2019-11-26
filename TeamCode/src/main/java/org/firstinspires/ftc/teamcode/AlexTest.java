@@ -18,7 +18,8 @@ public class AlexTest extends LinearOpMode {
     EXTENDSLIDE,
     DROPLIFT,
     GRABBLOCK,
-    RAISELIFT,
+    BRIDGE,
+    LINE,
     STOP
   }
 
@@ -75,21 +76,31 @@ public class AlexTest extends LinearOpMode {
 
         case EXTENDSLIDE:
 
-
-
           telemetry.addData("state", currentState.toString());
           driveTime.reset();
-          while (driveTime.seconds() < 3 && !robot.slideSwitchSignaled()) {
+          while (driveTime.seconds() < 2) {
+            robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+          }
+          while (driveTime.seconds() < 4 && !robot.slideSwitchSignaled()) {
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
           }
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
           driveTime.reset();
-          while (driveTime.seconds() < 1.12) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
+          robot.rotateClaw(1);
+          robot.claw(1.0);
+          while(driveTime.seconds() < 0.7) {
+            robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
           }
+          driveTime.reset();
+          while(driveTime.seconds() < 2 && !robot.liftSwitchSignaled()){
+            robot.liftDown();
+
+          }
+          robot.liftStop();
+
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
 
-          currentState = AutoState.DROPLIFT;
+          currentState = AutoState.GRABBLOCK;
 
           // distToLine(x, y, z);
           break;
@@ -111,16 +122,26 @@ public class AlexTest extends LinearOpMode {
 
           robot.claw(0.0);
           sleep(1000);
-          currentState = AutoState.RAISELIFT;
+          currentState = AutoState.BRIDGE;
           // distToLine(x, y, z);
           break;
-        case RAISELIFT:
+        case BRIDGE:
+
           telemetry.addData("state", currentState.toString());
-          driveTime.reset();
-          while(driveTime.seconds() < 1){
-            robot.liftDown();
+          Direction d = new Direction(-0.2, 0);
+          while(robot.gyroHeading() > -90) {
+            robot.joystickDrive(Direction.None, d, robot.gyroHeading());
+            telemetry.addData("gyro: ", robot.gyroHeading());
           }
-          robot.liftStop();
+
+          robot.joystickDrive(Direction.None, Direction.None, 0);
+          currentState = AutoState.LINE;
+          // distToLine(x, y, z);
+          break;
+        case LINE:
+          telemetry.addData("state", currentState.toString());
+          robot.driveToLine(0.5, 270);
+          robot.driveToLine(0.2, 90);
           currentState = AutoState.STOP;
           // distToLine(x, y, z);
           break;
