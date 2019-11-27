@@ -88,7 +88,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
           runtime.reset();
 
-          robot.timeDrive(0.25, 2.0, 180);
+          robot.timeDrive(0.25, 3.0, 180);
           robot.distRearDrive(0.25, 3.0, 270);
           robot.timeDrive(0.25, 2.0, 0);
           robot.syncTurn(270, 3);

@@ -576,4 +576,12 @@ public class TTRobot {
     double res = sens.getDistance(DistanceUnit.CM);
     return Range.clip(res, 0.01, cap);
   }
+
+  public void driveWallRear(double speed, double time, double angle, double distance) {
+    if (rearDistance < distance && (angle < 180 && angle > 0)) {
+
+      gyroHeading() = gyroHeading() + 3;
+    }
+    driveTrain.timeDrive(speed, time, angle, gyroHeading());
+  }
 }
