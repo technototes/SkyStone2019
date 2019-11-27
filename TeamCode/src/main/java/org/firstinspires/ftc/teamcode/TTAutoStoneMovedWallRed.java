@@ -45,7 +45,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
      */
     robot = new TTRobot(hardwareMap, telemetry);
 
-    telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    telemetry.addData(">", "Robot Heading = %f", robot.gyroHeading());
     telemetry.update();
 
     // Put vuforia Here

@@ -15,15 +15,13 @@ public class DirectControl extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    robot = new TTRobot(hardwareMap, telemetry);
-    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
-
     // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
-    control = new Controller(gamepad2, telemetry, null);
-    telemetry.addLine("Hello!");
-    telemetry.update();
+    control = new Controller(gamepad2, telemetry, "controller");
+    robot = new TTRobot(hardwareMap, telemetry);
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
+
     waitForStart();
     robot.rotateClaw(1);
     while (opModeIsActive()) {

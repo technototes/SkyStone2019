@@ -153,7 +153,7 @@ public class TTRobot {
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
-      sleep(2000);
+    sleep(2000);
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
@@ -370,7 +370,7 @@ public class TTRobot {
     turn.setPosition(position);
   }
 
-  public int getSkystonePosition(){
+  public int getSkystonePosition() {
     //add vuforia+tristan vision processing
     return 1;
   }
@@ -419,20 +419,22 @@ public class TTRobot {
     }
     return test;
   }
+
   //for autonomous only
-  public void toAngle(double to){
-    if(to > 0){
-      while(to > gyroHeading()){
+  public void toAngle(double to) {
+    if (to > 0) {
+      while (to > gyroHeading()) {
         Direction dir = new Direction(1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
-    }else{
-      while(to < gyroHeading()){
+    } else {
+      while (to < gyroHeading()) {
         Direction dir = new Direction(-1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
     }
   }
+
   // Snap the robot to the closest 90 degree angle
   public double snap(Telemetry tel) {
     double curr = gyroHeading();
@@ -441,6 +443,7 @@ public class TTRobot {
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
+
   // Turn the robot to a specific angle
   private double snap(double targetAngle) {
     if (targetAngle < -25) {
@@ -475,7 +478,7 @@ public class TTRobot {
     return motorMag;
   }
 
-  public void stop(){
+  public void stop() {
     driveTrain.stop();
   }
 
@@ -507,12 +510,17 @@ public class TTRobot {
 
   // This will travel toward the rear until it gets to 'dist'
   public void distRearDrive(double speed, double dist) {
-    // double distance = rearDistance();
-    driveTrain.setDriveVector(speed, -179, gyroHeading());
     ElapsedTime tm = new ElapsedTime();
+    double curDistance = 0;
     do {
+      curDistance = rearDistance();
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? 1 : -1;
+      double speedMult = (Math.abs(dist - curDistance) > 10) ? 1.0 : 0.5;
+      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
       sleep(10);
-    } while (rearDistance() > dist && tm.time() < 3.0);
+    } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0);
     driveTrain.stop();
   }
 
