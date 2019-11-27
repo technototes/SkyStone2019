@@ -40,16 +40,30 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
      */
     robot = new TTRobot(hardwareMap, telemetry);
 
+
+
     // Put vuforia Here
 
     waitForStart();
+
+    Truphoria tf = new Truphoria(hardwareMap, telemetry);
+
+    runtime.reset();
+    while(runtime.seconds() < 2){
+      tf.takeALook();
+      telemetry.addData("tfdata ", tf.whichColumn());
+      telemetry.addData("tfconf ", tf.confidence());
+      telemetry.update();
+    }
     /*
     if (tfod != null) {
         tfod.deactivate();
     }
     */
     // run until the end of the match (driver presses STOP)
-    int blockPos = robot.getSkystonePosition();
+    int blockPos = tf.whichColumn();
+
+    telemetry.update();
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
       switch (currentState) {
@@ -73,17 +87,16 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
               currentState = AutoState.GOTOBLOCK3;
               break;
           }
-          robot.timeDrive(0.5, 1, 270);
           break;
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, 90);
+          robot.distRightDrive(-0.5, 90);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK2:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, 70);
+          robot.distRightDrive(-0.5, 70);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK3:
@@ -93,7 +106,7 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
           break;
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
-          robot.timeDrive(0.5, 1, 0);
+          robot.distRearDrive(0.5, 75);
           currentState = AutoState.STOP;
           break;
         case STOP:
