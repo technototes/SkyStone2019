@@ -537,9 +537,9 @@ public class TTRobot {
 
   }
 
-  public void distLeftDrive(double speed, double leftDist) {
+  public void distLeftDrive(double speed, double angle, double leftDist) {
     // TODO: Check this angle
-    driveTrain.setDriveVector(speed, -90, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     do {
       sleep(10);
@@ -547,9 +547,9 @@ public class TTRobot {
     driveTrain.stop();
   }
 
-  public void distRightDrive(double speed, double rightDist) {
+  public void distRightDrive(double speed, double angle, double rightDist) {
     // TODO: Check this angle
-    driveTrain.setDriveVector(speed, 90, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
 
     ElapsedTime tm = new ElapsedTime();
     tm.reset();

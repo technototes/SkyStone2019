@@ -40,16 +40,31 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
      */
     robot = new TTRobot(hardwareMap, telemetry);
 
+
+
     // Put vuforia Here
 
     waitForStart();
+
+    Truphoria tf = new Truphoria(hardwareMap, telemetry);
+    robot.distRearDrive(0.5, 9);
+    robot.distLeftDrive(0.5, -90, 60);
+    runtime.reset();
+    while(runtime.seconds() < 2){
+      tf.takeALook();
+      telemetry.addData("tfdata ", tf.whichColumn());
+      telemetry.addData("tfconf ", tf.confidence());
+      telemetry.update();
+    }
     /*
     if (tfod != null) {
         tfod.deactivate();
     }
     */
     // run until the end of the match (driver presses STOP)
-    int blockPos = robot.getSkystonePosition();
+    int blockPos = tf.whichColumn();
+
+    telemetry.update();
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
       switch (currentState) {
@@ -61,7 +76,6 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
               tfod.activate();
           }
           */
-
           switch (blockPos) {
             case 0:
               currentState = AutoState.GOTOBLOCK1;
@@ -73,27 +87,26 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
               currentState = AutoState.GOTOBLOCK3;
               break;
           }
-          robot.timeDrive(0.5, 1, 90);
           break;
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90);
+          robot.distLeftDrive(0.5, 90, 74);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK2:
           telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 70);
+          robot.distLeftDrive(0.5, 90, 60);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK3:
           telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 50);
+          robot.distLeftDrive(0.5, -90, 47);
           currentState = AutoState.GOFORWARD;
           break;
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
-          robot.timeDrive(0.5, 1, 0);
+          robot.distRearDrive(0.5, 80);
           currentState = AutoState.STOP;
           break;
         case STOP:
