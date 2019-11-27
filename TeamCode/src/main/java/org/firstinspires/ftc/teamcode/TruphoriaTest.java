@@ -15,7 +15,8 @@ public class TruphoriaTest extends LinearOpMode {
   public void runOpMode() {
     truphoria = new Truphoria(hardwareMap, telemetry);
 
-    while (!isStopRequested()) {
+    waitForStart();
+    while (opModeIsActive()) {
       truphoria.takeALook();
       telemetry.addData("Vote data:", "Column %d, %2.1f%% Confidence",
         truphoria.whichColumn(), truphoria.confidence() * 100.0);
