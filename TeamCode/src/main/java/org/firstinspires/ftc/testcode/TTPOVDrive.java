@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.testcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -50,6 +51,7 @@ import java.util.Locale;
 import org.firstinspires.ftc.teamcode.TTRobot;
 
 @TeleOp(name = "TT POV Drive", group = "TT")
+@Disabled
 public class TTPOVDrive extends TTLinearOpMode {
 
   private ElapsedTime runtime = new ElapsedTime();

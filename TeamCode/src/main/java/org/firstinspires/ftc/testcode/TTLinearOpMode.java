@@ -33,6 +33,7 @@ import java.util.List;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -52,6 +53,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import org.firstinspires.ftc.teamcode.TTRobot;
 
+@Disabled
 public abstract class TTLinearOpMode extends LinearOpMode {
 
   static final double HEADING_THRESHOLD = 0.5; // As tight as we can make it with an integer gyro

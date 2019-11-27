@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Bitmap;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.ThreadPool;
 import com.vuforia.Frame;
@@ -37,6 +38,7 @@ import java.util.Locale;
 
 
 @TeleOp(name = "Direct Control test")
+@Disabled
 public class vuforiatst extends LinearOpMode {
   public static final String TAG = "Vuforia Navigation Sample";
 
