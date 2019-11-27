@@ -17,13 +17,11 @@ public class servotest extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    robot = new TTRobot();
+    robot = new TTRobot(hardwareMap, telemetry);
     // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
-    robot.init(hardwareMap, telemetry);
-    robot.calibrate(); // OOPS!
     telemetry.addLine("Hello!");
     telemetry.update();
     waitForStart();

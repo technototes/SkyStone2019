@@ -33,13 +33,10 @@ public class TTAutoDriveToLineLeft extends LinearOpMode {
      * Initialize the standard drive system variables.
      * The init() method of the hardware class does most of the work here
      */
-    robot = new TTRobot();
-    robot.init(hardwareMap, telemetry);
+    robot = new TTRobot(hardwareMap, telemetry);
 
     sleep(2000);
     // start calibrating the gyro.
-    telemetry.addData(">", "Gyro Calibrating. Do Not move!");
-    //robot.calibrate();
     //telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
 
     // Put vuforia Here

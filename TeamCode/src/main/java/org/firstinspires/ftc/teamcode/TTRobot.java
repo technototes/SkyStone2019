@@ -97,10 +97,7 @@ public class TTRobot {
     }
   }
 
-  public TTRobot() {
-  }
-
-  public void init(HardwareMap hardwareMap, Telemetry tel) {
+  public TTRobot(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "lslideServo");
@@ -138,9 +135,8 @@ public class TTRobot {
       "AdafruitIMUCalibration.json"; // see the calibration sample opmode
     imu = hardwareMap.get(BNO055IMU.class, "imu1");
     imu.initialize(parameters);
-  }
 
-  public void calibrate() {
+    // Calibrate
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);

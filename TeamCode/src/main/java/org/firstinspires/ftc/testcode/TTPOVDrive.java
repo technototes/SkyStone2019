@@ -75,9 +75,7 @@ public class TTPOVDrive extends TTLinearOpMode {
   @Override
   public void runOpMode() throws InterruptedException {
 
-    robot = new TTRobot();
-    robot.init(hardwareMap, telemetry);
-    robot.calibrate();
+    robot = new TTRobot(hardwareMap, telemetry);
 
     telemetry.addData("Status", "Initialized");
     telemetry.update();

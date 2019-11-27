@@ -43,15 +43,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
      * Initialize the standard drive system variables.
      * The init() method of the hardware class does most of the work here
      */
-    TTRobot robot = new TTRobot();
-    robot.init(hardwareMap, telemetry);
+    robot = new TTRobot(hardwareMap, telemetry);
 
-    sleep(2000);
-    // start calibrating the gyro.
-    telemetry.addData(">", "Gyro Calibrating. Do Not move!");
-    telemetry.update();
-    robot.calibrate();
-    telemetry.addData(">", "Robot Heading = %3.3f", robot.gyroHeading());
+    telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
     telemetry.update();
 
     // Put vuforia Here
