@@ -89,7 +89,7 @@ public class TTRobot {
   private Orientation angles;
   private Acceleration gravity;
 
-  private final void sleep(long milliseconds) {
+  public static final void sleep(long milliseconds) {
     try {
       Thread.sleep(milliseconds);
     } catch (InterruptedException e) {
@@ -380,6 +380,11 @@ public class TTRobot {
     turn.setPosition(position);
   }
 
+  public int getSkystonePosition(){
+    //add vuforia+tristan vision processing
+    return 1;
+  }
+
   // Drive train:
 
   public void speedSnail() {
@@ -465,9 +470,10 @@ public class TTRobot {
       motorMag = -motorMag;
     }
     return motorMag;
-
   }
-
+  public void stop(){
+    driveTrain.stop();
+  }
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
