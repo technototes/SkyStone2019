@@ -6,8 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@Disabled
-@TeleOp(name = "a test")
+@TeleOp(name = "Direct Drive Refactor test")
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
