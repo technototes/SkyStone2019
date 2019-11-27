@@ -48,7 +48,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
     telemetry.addData(">", "Robot Heading = %f", robot.gyroHeading());
     telemetry.update();
 
-    // Put vuforia Here
+    // Put truphoria Here
 
     waitForStart();
     /*
@@ -88,13 +88,20 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
           runtime.reset();
 
-          robot.timeDrive(0.25, 2.0, 180);
-          // TODO: Fix this
-          robot.driveWallRear(0.3, 5.0, 270, 20);
+          robot.timeDrive(0.10, 2.0, 180);
+
+          robot.syncTurn(0, 2);
+          robot.timeDrive(0.5, 1.0, 270);
+          robot.syncTurn(0, 2);
+          robot.timeDrive(0.5, 1.0, 270);
+          robot.syncTurn(0, 2);
+          robot.timeDrive(0.5, 1.0, 270);
+//          robot.driveWallRear(0.3, 5.0, 270, 20);
+          stop();
           robot.timeDrive(0.25, 2.0, 0);
           robot.syncTurn(270, 3);
 
-          stop();
+
 
           break;
 

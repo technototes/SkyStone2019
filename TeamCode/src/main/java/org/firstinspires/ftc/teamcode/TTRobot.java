@@ -533,10 +533,12 @@ public class TTRobot {
   public void distRightDrive(double speed, double rightDist) {
     // TODO: Check this angle
     driveTrain.setDriveVector(speed, 90, gyroHeading());
+
     ElapsedTime tm = new ElapsedTime();
+    tm.reset();
     do {
       sleep(10);
-    } while (getCappedRange(sensorRangeRight, 1500) > rightDist && tm.time() < 10.0);
+    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0);
     driveTrain.stop();
   }
 
