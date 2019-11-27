@@ -91,8 +91,8 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
   //
   // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
   //
-  private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = VuforiaLocalizer.CameraDirection.FRONT;
-  private static final boolean PHONE_IS_PORTRAIT = true;
+  public static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = VuforiaLocalizer.CameraDirection.FRONT;
+  public static final boolean PHONE_IS_PORTRAIT = true;
 
   /*
    * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -144,15 +144,15 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
      * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
      */
     int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-    VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+
 
     // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
-    parameters.vuforiaLicenseKey = VUFORIA_KEY;
-    parameters.cameraDirection = CAMERA_CHOICE;
-
-    //  Instantiate the Vuforia engine
-    vuforia = ClassFactory.getInstance().createVuforia(parameters);
+//    parameters.vuforiaLicenseKey = VUFORIA_KEY;
+//    parameters.cameraDirection = CAMERA_CHOICE;
+//
+//    //  Instantiate the Vuforia engine
+//    vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
     // Load the data sets for the trackable objects. These particular data
     // sets are stored in the 'assets' part of our application.
@@ -301,9 +301,9 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
       .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
     /**  Let all the trackable listeners know where the phone is.  */
-    for (VuforiaTrackable trackable : allTrackables) {
-      ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
-    }
+//    for (VuforiaTrackable trackable : allTrackables) {
+//      ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+//    }
 
     // WARNING:
     // In this sample, we do not wait for PLAY to be pressed.  Target Tracking is started immediately when INIT is pressed.
