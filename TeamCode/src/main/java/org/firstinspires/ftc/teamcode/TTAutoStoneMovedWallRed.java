@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 @Autonomous(name = "TTAutoStoneMovedWallRed", group = "TT")
-@Disabled
+
 public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
   // States
@@ -43,6 +43,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
      * Initialize the standard drive system variables.
      * The init() method of the hardware class does most of the work here
      */
+    TTRobot robot = new TTRobot();
     robot.init(hardwareMap, telemetry);
 
     sleep(2000);
