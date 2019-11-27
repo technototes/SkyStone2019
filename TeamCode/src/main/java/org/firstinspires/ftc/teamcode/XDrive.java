@@ -18,7 +18,7 @@ public class XDrive {
   // The final value is 'max' and should probably be the same as the 'not quite max' value
 
   // The values in range to use for rotation driving
-  private static double[] ROT_STEPS = {0.0, 0.0, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
+  public static double[] ROT_STEPS = {0.0, 0.0, 0.15, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.35, 0.35};
 
   // The values in range to use for drive speeds (normal mode)
   private static double[] DRIVE_STEPS = {
@@ -169,7 +169,7 @@ public class XDrive {
    * @param val:   The analog value (from -1.0 to 1.0) to map
    * @return The value snapped to the steps
    */
-  private static double getSteppedValue(double[] steps, double val) {
+  public static double getSteppedValue(double[] steps, double val) {
     // get the corresponding index for the scaleInput array.
     int index = Math.abs((int) (Range.clip(val, -1.0, 1.0) * (steps.length - 1)));
     // get value from the array.
@@ -223,7 +223,7 @@ public class XDrive {
    * <p>Drive the speed specified for @time seconds, while rotating to the position specified
    * relative to the robot heading
    *
-   * @param speed   Speed to move (0 to 1)
+   * @param speed   Speed to move (-1 to 1)
    * @param time    Time (in seconds) to
    * @param angle   The angle to which we should rotate
    * @param heading The heading of the robot to begin with (from which angles are derived)

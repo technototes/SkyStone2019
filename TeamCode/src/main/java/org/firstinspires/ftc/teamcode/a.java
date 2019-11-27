@@ -35,8 +35,21 @@ public class a extends LinearOpMode {
       // Allow the robot to move around
       manualCtrl.Steer();
 
-      if (control.buttonB().isPressed()) {
-        robot.distRearDrive(0.5, 15);
+      if (driver.buttonB().isPressed()) {
+        robot.distRearDrive(15);
+      }
+      if (control.buttonA().isPressed()) {
+        robot.stop();
+        robot.toAngleSync(180);
+      } else if (control.buttonB().isPressed()) {
+        robot.stop();
+        robot.toAngleSync(90);
+      } else if (control.buttonY().isPressed()) {
+        robot.stop();
+        robot.toAngleSync(0);
+      } else if (control.buttonX().isPressed()) {
+        robot.stop();
+        robot.toAngleSync(-90);
       }
       telemetry.update();
     }
