@@ -76,7 +76,7 @@ public class TTRobot {
   private ColorSensor sensorColorBottom = null;
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
-  private DistanceSensor sensorRangeRight = null;
+  public DistanceSensor sensorRangeRight = null;
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
@@ -581,6 +581,6 @@ public class TTRobot {
 
   private double getCappedRange(DistanceSensor sens, double cap) {
     double res = sens.getDistance(DistanceUnit.CM);
-    return (res == DistanceUnit.infinity) ? cap : Range.clip(res, 0.01, cap);
+    return Range.clip(res, 0.01, cap);
   }
 }
