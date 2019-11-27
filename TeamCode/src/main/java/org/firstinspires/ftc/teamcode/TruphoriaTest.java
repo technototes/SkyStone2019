@@ -29,11 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ThreadPool;
+import com.vuforia.Frame;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -82,8 +89,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name = "SKYSTONE Vuforia Nav", group = "Concept")
-public class VuforiaSkyStoneNavigation extends LinearOpMode {
+@TeleOp(name = "Truphoria Test")
+public class TruphoriaTest extends LinearOpMode {
 
   // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
   // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -146,14 +153,15 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
     int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
 
-    // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+    VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
-//    parameters.vuforiaLicenseKey = VUFORIA_KEY;
-//    parameters.cameraDirection = CAMERA_CHOICE;
+    parameters.vuforiaLicenseKey = VUFORIA_KEY;
+    parameters.cameraDirection = CAMERA_CHOICE;
 //
 //    //  Instantiate the Vuforia engine
-//    vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
+    vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    vuforia.enableConvertFrameToBitmap();
+    
     // Load the data sets for the trackable objects. These particular data
     // sets are stored in the 'assets' part of our application.
     VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
@@ -317,10 +325,39 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
     // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
     // Tap the preview window to receive a fresh image.
 
+    // Tap the preview window to receive a fresh image.
+
+    ElapsedTime tm = new ElapsedTime();
     targetsSkyStone.activate();
     while (!isStopRequested()) {
-
-      // check all the trackable targets to see which one (if any) is visible.
+      switch (curState) {
+        case Empty:
+          if (tm.seconds() > 5 && bitmap == null) {
+            this.captureFrameToFile();
+          } else {
+            telemetry.addData("Countdown", "in T minus %2.3f seconds %s", 5 - tm.seconds(), error);
+          }
+          break;
+        case Complete:
+          telemetry.addLine("Finished capturing an image.");
+          telemetry.addData("Info:", "Width:  Height:  %s",error);// bitmap.getWidth(), bitmap.getHeight(), error);
+          break;
+        case Error:
+          telemetry.addLine("Error!");
+          tm.reset();
+          curState = CaptureState.Empty;
+          break;
+        case Requested:
+          telemetry.addData("Requested", error);
+          break;
+        case Processing:
+          telemetry.addData("Processing", error);
+          break;
+        default:
+          telemetry.addData("Wut?", "Error: %s", error);
+          break;
+      }
+// check all the trackable targets to see which one (if any) is visible.
       targetVisible = false;
       for (VuforiaTrackable trackable : allTrackables) {
         if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
@@ -365,5 +402,36 @@ public class VuforiaSkyStoneNavigation extends LinearOpMode {
 
     // Disable Tracking when we are done;
     targetsSkyStone.deactivate();
+  }
+
+  // Hurray for threading synchronization...
+  enum CaptureState {Empty, Requested, Processing, Complete, Error}
+
+  volatile CaptureState curState = CaptureState.Empty;
+  volatile Bitmap bitmap = null;
+  volatile String error = "";
+
+  boolean captureFrameToFile() {
+    if (curState != CaptureState.Empty) {
+      return false;
+    }
+    curState = CaptureState.Requested;
+    telemetry.addLine("REQUESTED!");
+    vuforia.getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>() {
+      @Override
+      public void accept(Frame frame) {
+        if (curState != CaptureState.Requested) {
+          error = "Trying to get the frame, but ready is already true";
+          return;
+        } else {
+          error = "Processing";
+          curState = CaptureState.Processing;
+        }
+        bitmap = vuforia.convertFrameToBitmap(frame);
+        curState = (bitmap == null) ? CaptureState.Error :  CaptureState.Complete;
+        error = bitmap == null ? "failure" : "success";
+      }
+    }));
+    return true;
   }
 }
