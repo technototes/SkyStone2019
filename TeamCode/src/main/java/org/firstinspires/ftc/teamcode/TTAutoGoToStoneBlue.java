@@ -15,9 +15,8 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
   // States
   private enum AutoState {
     INITIALIZE,
-    GOTOBLOCK1,
-    GOTOBLOCK2,
-    GOTOBLOCK3,
+    GOTOBLOCK,
+
     GOFORWARD,
     STOP
   }
@@ -76,34 +75,24 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
           }
           */
 
-          switch (blockPos) {
-            case 2:
-              currentState = AutoState.GOTOBLOCK1;
-              break;
-            case 1:
-              currentState = AutoState.GOTOBLOCK2;
-              break;
-            case 0:
-              currentState = AutoState.GOTOBLOCK3;
-              break;
+        case GOTOBLOCK:
+          telemetry.addData("state", currentState.toString());
+
+          if (blockPos == 0) {
+            robot.timeDrive(0.25, 0.3, 90);
+            robot.timeDrive(0.25, 0.5, 0);
           }
+          if (blockPos == 1) {
+            robot.timeDrive(0.25, 0.5, 0);
+          }
+          if (blockPos ==  2) {
+            robot.timeDrive(0.25, 0.3, 270);
+            robot.timeDrive(0.25, 0.5, 0);
+          }
+
+          currentState = AutoState.GOFORWARD;
           break;
 
-        case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(-0.5, 90);
-          currentState = AutoState.GOFORWARD;
-          break;
-        case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(-0.5, 70);
-          currentState = AutoState.GOFORWARD;
-          break;
-        case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, 50);
-          currentState = AutoState.GOFORWARD;
-          break;
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
           robot.distRearDrive(0.5, 75);
