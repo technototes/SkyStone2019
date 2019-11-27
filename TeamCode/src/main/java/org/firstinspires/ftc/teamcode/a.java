@@ -16,15 +16,15 @@ public class a extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    robot = new TTRobot(hardwareMap, telemetry);
     // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
+    robot = new TTRobot(hardwareMap, telemetry);
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     telemetry.addLine("Hello!");
     telemetry.update();
-    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
     while (opModeIsActive()) {
@@ -36,7 +36,7 @@ public class a extends LinearOpMode {
       manualCtrl.Steer();
 
       if (control.buttonB().isPressed()) {
-        robot.distRearDrive(0.5, 15, 0);
+        robot.distRearDrive(0.5, 15);
       }
       telemetry.update();
     }
