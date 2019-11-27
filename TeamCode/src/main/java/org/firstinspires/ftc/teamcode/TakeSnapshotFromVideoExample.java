@@ -1,4 +1,4 @@
-package hourglass;
+/*package hourglass;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -59,10 +59,9 @@ public class TakeSnapshotFromVideoExample extends PApplet {
 	}
 
 	public void setup() {
-		/*
-		 * tl1 = fix(tl1); tl2 = fix(tl2); tl3 = fix(tl3); br1 = fix(br1); br2 =
-		 * fix(br2); br3 = fix(br3);
-		 */
+		 // tl1 = fix(tl1); tl2 = fix(tl2); tl3 = fix(tl3); br1 = fix(br1); br2 =
+		 // fix(br2); br3 = fix(br3);
+
 		println("Setting up");
 		test = loadImage("test.jpg");
 		println(test.pixelWidth + ", " + test.height);
@@ -154,7 +153,7 @@ public class TakeSnapshotFromVideoExample extends PApplet {
 		rect(tl3[0], tl3[1], (br3[0] - tl3[0]), (br3[1] - tl3[1]));
 	}
 }
-
+*/
 
 
 //to you don't have an excuse
