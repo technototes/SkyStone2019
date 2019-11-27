@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
+  private XDriveManualControl manualCtrl;
   private Controller control;
   private Controller driver;
 
@@ -24,11 +25,20 @@ public class a extends LinearOpMode {
 
     telemetry.addLine("Hello!");
     telemetry.update();
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
+
     waitForStart();
     while (opModeIsActive()) {
       Direction test = control.dpad();
       telemetry.addLine("IsUP: " + test.isUp() + " IsDown: " + test.isDown() + " IsLeft " + test.isLeft() + " IsRight: " + test.isRight());
       telemetry.addLine("IsOnlyUP: " + test.isOnlyUp() + " IsOnlyDown: " + test.isOnlyDown() + " IsOnlyLeft " + test.isOnlyLeft() + " IsOnlyRight: " + test.isOnlyRight());
+
+      // Allow the robot to move around
+      manualCtrl.Steer();
+
+      if (control.buttonB().isPressed()) {
+        robot.distRearDrive(0.5, 15, 0);
+      }
       telemetry.update();
     }
   }

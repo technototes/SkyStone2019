@@ -11,10 +11,13 @@ public class DirectControl extends LinearOpMode {
   private TTRobot robot;
   private Controller control;
   private Controller driver;
+  private XDriveManualControl manualCtrl;
 
   @Override
   public void runOpMode() {
     robot = new TTRobot(hardwareMap, telemetry);
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
+
     // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
@@ -86,68 +89,8 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.liftStop();
       }
-
-      // Driver control:
-      Direction Dpad = driver.dpad();
-      Direction L = driver.lstick();
-      Direction R1 = driver.rstick();
-      Direction R2 = control.rstick();
-      Direction D = new Direction(0, 0);
-      Direction L2 = new Direction(0, 0);
-      if (Math.abs(R2.X) > robot.STICKDEADZONE) {
-        D.X = R2.X;
-      } else if (Math.abs(R1.X) > robot.STICKDEADZONE) {
-        D.X = R1.X;
-      }
-      if (Math.abs(L.X) > robot.STICKDEADZONE) {
-        L2.X = L.X;
-      }
-      if (Math.abs(L.Y) > robot.STICKDEADZONE) {
-        L2.Y = L.Y;
-      }
-
-      // Turbo Mode (insert Tristan happy face)
-      if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0)) {
-        robot.speedSnail();
-      } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
-        robot.speedTurbo();
-      } else {
-        robot.speedNormal();
-      }
-      // If the snap-to-angle button has been pressed, override rotation with the snap angle
-      if (driver.buttonY() == Button.Pressed) {
-        robot.speedNormal();
-        D.X = robot.snap(telemetry);
-
-      }
-
-      robot.joystickDrive(L2, D, robot.gyroHeading());
-      /*if (control.buttonY() == Button.Pressed) {
-        robot.lslide(LinearSlideOperation.Extend);
-      } else if (control.buttonA() == Button.Pressed) {
-        robot.lslide(LinearSlideOperation.Retract);
-      } else {
-        // DO NOTHING, not "return;" :D
-      }*/
-
-      /*if(control.dpad().isDown()){
-        robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
-      }
-      if(control.dpad().isUp()){
-        robot.joystickDrive(new Direction(0,FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
-      }
-      if(control.dpad().isLeft()){
-        robot.joystickDrive(new Direction(-FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
-      }
-      if(control.dpad().isRight()){
-        robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
-      }*/
-      if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
-        robot.joystickDrive(L2, D, 0);
-      } else {
-        robot.joystickDrive(L2, D, robot.gyroHeading());
-      }
-
+      // This is just steering
+      manualCtrl.Steer();
       telemetry.update();
     }
   }
