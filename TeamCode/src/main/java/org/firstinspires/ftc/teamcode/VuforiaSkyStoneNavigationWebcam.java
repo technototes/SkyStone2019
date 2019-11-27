@@ -32,8 +32,16 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.*;
+import com.vuforia.Frame;
+import android.graphics.Bitmap;
+import java.io.*;
+import java.util.*;
 
+import org.firstinspires.ftc.robotcore.external.function.*;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+//import org.firstinspires.ftc.robotcore.external.function.Continuation;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -51,6 +59,12 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
+import com.qualcomm.robotcore.util.ThreadPool;
+
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.robotcore.internal.system.MemberwiseCloneable;
+
+import java.util.concurrent.Executor;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -367,5 +381,47 @@ public class VuforiaSkyStoneNavigationWebcam extends LinearOpMode {
 
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+    }
+    /**
+     * A simple utility that extracts positioning information from a transformation matrix
+     * and formats it in a form palatable to a human being.
+     */
+    String format(OpenGLMatrix transformationMatrix) {
+        return transformationMatrix.formatAsTransform();
+    }
+
+    /**
+     * Sample one frame from the Vuforia stream and write it to a .PNG image file on the robot
+     * controller in the /sdcard/FIRST/data directory. The images can be downloaded using Android
+     * Studio's Device File Explorer, ADB, or the Media Transfer Protocol (MTP) integration into
+     * Windows Explorer, among other means. The images can be useful during robot design and calibration
+     * in order to get a sense of what the camera is actually seeing and so assist in camera
+     * aiming and alignment.
+     */
+    private long captureCounter = 0;
+    void captureFrameToFile() {
+
+        vuforia.getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>()
+        {
+            @Override public void accept(Frame frame)
+            {
+
+                Bitmap bitmap = vuforia.convertFrameToBitmap(frame);
+                if (bitmap != null) {
+                    File file = new File(AppUtil.ROBOT_DATA_DIR, String.format(Locale.getDefault(), "VuforiaFrame-%d.png", captureCounter++));
+                    try {
+                        FileOutputStream outputStream = new FileOutputStream(file);
+                        try {
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream);
+                        } finally {
+                            outputStream.close();
+                            telemetry.log().add("captured %s", file.getName());
+                        }
+                    } catch (IOException e) {
+                        //RobotLog.ee(TAG, e, "exception in captureFrameToFile()");
+                    }
+                }
+            }
+        }));
     }
 }
