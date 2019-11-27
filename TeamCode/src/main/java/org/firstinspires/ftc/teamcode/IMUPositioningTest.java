@@ -55,7 +55,6 @@ import java.util.Locale;
  * @see <a href="http://www.adafruit.com/products/2472">Adafruit IMU</a>
  */
 @TeleOp(name = "IMU Positioning Test", group = "Sensor")
-@Disabled                            // Comment this out to add to the opmode list
 public class IMUPositioningTest extends LinearOpMode {
   //----------------------------------------------------------------------------------------------
   // State
@@ -81,16 +80,16 @@ public class IMUPositioningTest extends LinearOpMode {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
     parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+    parameters.calibrationDataFile =
+      "AdafruitIMUCalibration.json"; // see the calibration sample opmode
     parameters.loggingEnabled = true;
     parameters.loggingTag = "IMU";
     IMUAccelerationIntegratorTest integ = new IMUAccelerationIntegratorTest();
     parameters.accelerationIntegrationAlgorithm = integ;
-
     // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
     // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
     // and named "imu".
-    imu = hardwareMap.get(BNO055IMU.class, "imu");
+    imu = hardwareMap.get(BNO055IMU.class, "imu1");
     imu.initialize(parameters);
 
     // Set up our telemetry dashboard
@@ -100,7 +99,7 @@ public class IMUPositioningTest extends LinearOpMode {
     waitForStart();
 
     // Start the logging of measured acceleration
-    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 100);
 
     // Loop and update the dashboard
     while (opModeIsActive()) {

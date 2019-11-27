@@ -18,7 +18,6 @@ public class AlexTest extends LinearOpMode {
     EXTENDSLIDE,
     DROPLIFT,
     GRABBLOCK,
-    BRIDGE,
     LINE,
     STOP
   }
@@ -60,7 +59,6 @@ public class AlexTest extends LinearOpMode {
     // run until the end of the match (driver presses STOP)
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
-
       switch (currentState) {
         case INITIALIZE:
           telemetry.addData("state", currentState.toString());
@@ -70,6 +68,7 @@ public class AlexTest extends LinearOpMode {
               tfod.activate();
           }
           */
+
           currentState = AutoState.EXTENDSLIDE;
           break;
 
@@ -122,20 +121,7 @@ public class AlexTest extends LinearOpMode {
 
           robot.claw(0.0);
           sleep(1000);
-          currentState = AutoState.BRIDGE;
-          // distToLine(x, y, z);
-          break;
-        case BRIDGE:
-
-          telemetry.addData("state", currentState.toString());
-          Direction d = new Direction(-0.2, 0);
-          while(robot.gyroHeading() > -90) {
-            robot.joystickDrive(Direction.None, d, robot.gyroHeading());
-            telemetry.addData("gyro: ", robot.gyroHeading());
-          }
-
-          robot.joystickDrive(Direction.None, Direction.None, 0);
-          currentState = AutoState.LINE;
+          currentState = AutoState.STOP;
           // distToLine(x, y, z);
           break;
         case LINE:

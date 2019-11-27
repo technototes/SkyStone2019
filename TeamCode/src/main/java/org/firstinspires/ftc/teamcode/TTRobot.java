@@ -89,7 +89,7 @@ public class TTRobot {
   private Orientation angles;
   private Acceleration gravity;
 
-  private final void sleep(long milliseconds) {
+  public static final void sleep(long milliseconds) {
     try {
       Thread.sleep(milliseconds);
     } catch (InterruptedException e) {
@@ -380,6 +380,11 @@ public class TTRobot {
     turn.setPosition(position);
   }
 
+  public int getSkystonePosition(){
+    //add vuforia+tristan vision processing
+    return 1;
+  }
+
   // Drive train:
 
   public void speedSnail() {
@@ -465,9 +470,11 @@ public class TTRobot {
       motorMag = -motorMag;
     }
     return motorMag;
-
   }
 
+  public void stop(){
+    driveTrain.stop();
+  }
 
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
@@ -496,7 +503,6 @@ public class TTRobot {
   }
 
   public void distRearDrive(double speed, double dist, double angle) {
-    // TODO: We don't currently have a range sensor available in software
     driveTrain.setDriveVector(speed, angle, gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     do {
@@ -511,5 +517,66 @@ public class TTRobot {
     }
 
 
+  }
+
+  public void distLeftDrive(double speed, double leftDist) {
+    // TODO: Check this angle
+    driveTrain.setDriveVector(speed, -90, gyroHeading());
+    ElapsedTime tm = new ElapsedTime();
+    do {
+      sleep(10);
+    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0);
+    driveTrain.stop();
+  }
+
+  public void distRightDrive(double speed, double rightDist) {
+    // TODO: Check this angle
+    driveTrain.setDriveVector(speed, 90, gyroHeading());
+    ElapsedTime tm = new ElapsedTime();
+    do {
+      sleep(10);
+    } while (getCappedRange(sensorRangeRight, 1500) > rightDist && tm.time() < 10.0);
+    driveTrain.stop();
+  }
+
+  // This attempts to drive in a straight(ish) line toward a corner
+  public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
+    double rDist, ltDist;
+    ElapsedTime tm = new ElapsedTime();
+    do {
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      ltDist = getCappedRange(sensorRangeLeft, 1500);
+      // Let's figure out what angle to drive toward to make a straightish line
+      // TODO: I have no idea if this is the proper angle or not
+      // TODO: Might need to do something like 90 - angle
+      double angle = Math.atan2(rDist, -ltDist);
+      angle = AngleUnit.DEGREES.fromRadians(angle);
+      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      sleep(10);
+    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0);
+    driveTrain.stop();
+  }
+
+  // This attempts to drive in a straight(ish) line toward a corner
+  public void distRearRightDrive(double speed, double rearDist, double rightDist) {
+    double rDist, rtDist;
+    ElapsedTime tm = new ElapsedTime();
+    do {
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      rtDist = getCappedRange(sensorRangeLeft, 1500);
+      // Let's figure out what angle to drive toward to make a straightish line
+      // TODO: I have no idea if this is the proper angle or not
+      // TODO: Might need to do something like 90 - angle
+      double angle = Math.atan2(rDist, rtDist);
+      angle = AngleUnit.DEGREES.fromRadians(angle);
+      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      sleep(10);
+    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0);
+    driveTrain.stop();
+  }
+
+  private double getCappedRange(DistanceSensor sens, double cap) {
+    double res = sens.getDistance(DistanceUnit.CM);
+    return (res == DistanceUnit.infinity) ? cap : Range.clip(res, 0.01, cap);
   }
 }
