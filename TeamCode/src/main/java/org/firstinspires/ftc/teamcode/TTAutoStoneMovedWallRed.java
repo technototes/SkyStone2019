@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 @Autonomous(name = "TTAutoStoneMovedWallRed", group = "TT")
-@Disabled
+
 public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
   // States
@@ -50,7 +50,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
     telemetry.addData(">", "Gyro Calibrating. Do Not move!");
     telemetry.update();
     robot.calibrate();
-    telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    telemetry.addData(">", "Robot Heading = %3.3f", robot.gyroHeading());
     telemetry.update();
 
     // Put vuforia Here
@@ -93,12 +93,17 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
           runtime.reset();
 
-          robot.timeDrive(1.0, 2.0, 180);
-          robot.distRearDrive(1.0, 3.0, 270);
-          robot.timeDrive(1.0, 2.0, 0);
-          robot.syncTurn(270);
+          robot.timeDrive(0.25, 2.0, 180);
+          robot.distRearDrive(0.25, 3.0, 270);
+          robot.timeDrive(0.25, 2.0, 0);
+          robot.syncTurn(270, 3);
+
+          stop();
 
           break;
+
+
+
         case PLACE_STONE:
 
 

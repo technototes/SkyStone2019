@@ -510,10 +510,14 @@ public class TTRobot {
     } while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && tm.time() < 3.0);
     driveTrain.stop();
   }
-  public void syncTurn(double angle) {
+  public void syncTurn(double angle, double time) {
 
-    while (gyroHeading() < angle) {
-      joystickDrive(new Direction(0, 0), new Direction(1, 0), gyroHeading());
+    ElapsedTime runTime = new ElapsedTime();
+    runTime.reset();
+    while (runTime.seconds() < time) {
+      while (gyroHeading() < angle) {
+        joystickDrive(new Direction(0, 0), new Direction(1, 0), gyroHeading());
+      }
     }
 
 
