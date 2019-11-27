@@ -411,7 +411,20 @@ public class TTRobot {
     }
     return test;
   }
-
+  //for autonomous only
+  public void toAngle(double to){
+    if(to > 0){
+      while(to > gyroHeading()){
+        Direction dir = new Direction(1, 0);
+        joystickDrive(Direction.None, dir, 0);
+      }
+    }else{
+      while(to < gyroHeading()){
+        Direction dir = new Direction(-1, 0);
+        joystickDrive(Direction.None, dir, 0);
+      }
+    }
+  }
   // Snap the robot to the closest 90 degree angle
   public double snap(Telemetry tel) {
     double curr = gyroHeading();
@@ -420,7 +433,6 @@ public class TTRobot {
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
-
   // Turn the robot to a specific angle
   private double snap(double targetAngle) {
     if (targetAngle < -25) {
