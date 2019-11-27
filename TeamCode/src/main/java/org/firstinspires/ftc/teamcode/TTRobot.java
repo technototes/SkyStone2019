@@ -76,7 +76,7 @@ public class TTRobot {
   private ColorSensor sensorColorBottom = null;
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
-  public DistanceSensor sensorRangeRight = null;
+  private DistanceSensor sensorRangeRight = null;
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
@@ -187,7 +187,6 @@ public class TTRobot {
     }
   }
 
-
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
 
   public void setLinearSlideDirection(LinearSlideOperation operation, boolean override) {
@@ -265,7 +264,6 @@ public class TTRobot {
     slide.setPower(power);
   }
 
-
   public void setLinearSlideDirectionEmily(LinearSlideOperation operation, boolean override) {
     double power = 0;
     switch (operation) {
@@ -277,7 +275,6 @@ public class TTRobot {
         break;
 
     }
-
 
     // Hit a limit
     if (!override && slideSwitchSignaled()) {
@@ -376,6 +373,19 @@ public class TTRobot {
   public int getSkystonePosition(){
     //add vuforia+tristan vision processing
     return 1;
+  }
+
+  // Distance sensing
+  public double rearDistance() {
+    return sensorRangeRear.getDistance(DistanceUnit.CM);
+  }
+
+  public double leftDistance() {
+    return sensorRangeLeft.getDistance(DistanceUnit.CM);
+  }
+
+  public double rightDistance() {
+    return sensorRangeRight.getDistance(DistanceUnit.CM);
   }
 
   // Drive train:
@@ -495,14 +505,17 @@ public class TTRobot {
     lineDrive(speed, 5, direction);
   }
 
-  public void distRearDrive(double speed, double dist, double angle) {
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
+  // This will travel toward the rear until it gets to 'dist'
+  public void distRearDrive(double speed, double dist) {
+    // double distance = rearDistance();
+    driveTrain.setDriveVector(speed, -179, gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     do {
       sleep(10);
-    } while (sensorRangeRear.getDistance(DistanceUnit.CM) > dist && tm.time() < 3.0);
+    } while (rearDistance() > dist && tm.time() < 3.0);
     driveTrain.stop();
   }
+
   public void syncTurn(double angle, double time) {
 
     ElapsedTime runTime = new ElapsedTime();
@@ -578,10 +591,20 @@ public class TTRobot {
   }
 
   public void driveWallRear(double speed, double time, double angle, double distance) {
-    if (rearDistance < distance && (angle < 180 && angle > 0)) {
+    double gyroAngle = gyroHeading();
 
-      gyroHeading() = gyroHeading() + 3;
+    if (rearDistance() < distance && (angle < 180 && angle > 0)) {
+
+      gyroAngle = gyroHeading() + 3;
     }
+    else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
+      gyroAngle = gyroHeading() - 3;
+    }
+    else {
+      gyroAngle = gyroHeading();
+    }
+
+
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
 }
