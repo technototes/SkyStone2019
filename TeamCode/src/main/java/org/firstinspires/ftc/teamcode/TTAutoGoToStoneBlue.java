@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
-@Autonomous(name = "GoToStone", group = "TT")
-public class TTAutoGoToStone extends LinearOpMode {
+@Autonomous(name = "TTAutoGoToStoneBlue", group = "TT")
+public class TTAutoGoToStoneBlue extends LinearOpMode {
 
   // States
   private enum AutoState {
@@ -63,13 +63,13 @@ public class TTAutoGoToStone extends LinearOpMode {
           */
 
           switch (blockPos) {
-            case 1:
+            case 2:
               currentState = AutoState.GOTOBLOCK1;
               break;
-            case 2:
+            case 1:
               currentState = AutoState.GOTOBLOCK2;
               break;
-            case 3:
+            case 0:
               currentState = AutoState.GOTOBLOCK3;
               break;
           }
