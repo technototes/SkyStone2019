@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "Direct Drive Refactor test")
+@TeleOp(name = "Sensor Drive Testing")
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
@@ -36,7 +36,7 @@ public class a extends LinearOpMode {
       manualCtrl.Steer();
 
       if (control.buttonB().isPressed()) {
-        robot.distRearDrive(0.5, 15, 0);
+        robot.distRearDrive(0.5, 15);
       }
       telemetry.update();
     }
