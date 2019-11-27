@@ -27,18 +27,13 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
     STOP
   }
 
-  private enum SkyStonePos {
-    UNKNOWN,
-    OneAndFour,
-    TwoAndFive,
-    ThreeAndSix
-  }
+
 
   private AutoState currentState = AutoState.INITIALIZE;
-  private SkyStonePos skystonepos = SkyStonePos.UNKNOWN;
   private ElapsedTime runtime = new ElapsedTime();
   private ElapsedTime timer = new ElapsedTime();
   private TTRobot robot;
+  private ElapsedTime runTime = new ElapsedTime();
 
   @Override
   public void runOpMode() {
@@ -74,69 +69,66 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
         case INITIALIZE:
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-          /*
-          if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
-              tfod.activate();
-          }
-          */
-          currentState = AutoState.LINE_UP_STONE;
+          //robot.getSkystonePosition();
+          currentState = AutoState.GO_TO_BASE_PLATE;
           break;
         case LINE_UP_STONE:
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-          // deciding which position to go to depending on where the stone is
-          if (skystonepos.equals(SkyStonePos.OneAndFour)) {
-            robot.timeDrive(x, y, z);
-            // gyroHold(x, y, z);
-          }
-          if (skystonepos.equals(SkyStonePos.TwoAndFive)) {
-            robot.timeDrive(x, y, z);
-            // gyroHold(x, y, z);
-          }
-          if (skystonepos.equals(SkyStonePos.ThreeAndSix)) {
-            robot.timeDrive(x, y, z);
-            // gyroHold(x, y, z);
-          }
+
+          //robot.goToStone();
+
           currentState = AutoState.PICK_UP_STONE;
           break;
         case PICK_UP_STONE:
+
+
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-          // positioning the attachments to collect the stone
-          /*
-          robot.slide.setPower(x);
-          robot.liftMotor.setPower(x);
-          robot.claw.setPosition(x);
-          robot.liftMotor.setPower(x);
-          */
+//          robot.grabStone();
           break;
         case GO_TO_BASE_PLATE:
+
+
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-          // driving to the baseplate
-          robot.timeDrive(x, y, z);
-          // distDriveRear(x, y, z);
-          // gyroHold(x, y, z);
-          robot.timeDrive(x, y, z);
+
+          robot.timeDrive(1.0, 2.0, 180);
+          robot.distRearDrive(1.0, 3.0, 270);
+          robot.timeDrive(1.0, 2.0, 0);
+          robot.syncTurn(270);
+
           break;
         case PLACE_STONE:
+
+
           telemetry.addData("state", currentState.toString());
-          runtime.reset();
-          // robot.liftMotor.setPower(x);
-          // robot.claw.setPosition(x);
-          robot.timeDrive(x, y, z);
-          // robot.motorLift(x);
-          // robot.claw.setPosition(x);
-          // robot.motorLift(x);
-          robot.timeDrive(x, y, z);
-          // robot.claw.setPosition(x);
-          // robot.motorLift(x);
+          runTime.reset();
+          while (runTime.seconds() < 2) {
+            robot.liftUp();
+          }
+          runTime.reset();
+          while (runTime.seconds() < 2) {
+            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          }
+
+          runTime.reset();
+          while (runTime.seconds() < 2) {
+            robot.liftDown();
+          }
+
+          robot.claw(0);
+
           break;
 
         case GO_TO_LINE:
+
+
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-          // distToLine(x, y, z);
+          robot.driveToLine(1.0, 90);
+
+
           break;
         case STOP:
           telemetry.addData("state", currentState.toString());
