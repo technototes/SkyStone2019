@@ -420,13 +420,15 @@ public class TTRobot {
 
   // This returns a normalized angle difference (-180 to 180) from gyroHeading
   private double angleDiff(double target) {
-    return AngleUnit.normalizeDegrees(target - gyroHeading());
+    return AngleUnit.normalizeDegrees(gyroHeading() - target);
   }
+
   private Direction getDirectionTowardAngle(double to) {
     double dir = angleDiff(to);
     double rotSpeed = XDrive.getSteppedValue(TTRobot.snapSteps, dir / 180);
     return new Direction(rotSpeed, 0);
   }
+
   //for autonomous only
   public void toAngleSync(double to) {
     double dir;
@@ -447,9 +449,10 @@ public class TTRobot {
     //return snap(newangle); replaced with above scaledSnap
   }
 
-  private static double[] snapSteps = new double[] {0.0, .2, .4, .7, 1.0, 1.0};
+  private static double[] snapSteps = new double[]{0.0, .2, .4, .7, 1.0, 1.0};
+
   private double scaledSnap(double targetAngle) {
-    return XDrive.getSteppedValue(snapSteps, targetAngle/90.0);
+    return XDrive.getSteppedValue(snapSteps, targetAngle / 90.0);
   }
 
   public void stop() {
@@ -490,7 +493,7 @@ public class TTRobot {
       curDistance = rearDistance();
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
-      double dir = (dist < curDistance) ? -1 : 1;
+      double dir = (dist < curDistance) ? 1 : -1;
       double magnitude = Math.abs(dist - curDistance);
       if (magnitude < 10) {
         speedSnail();
@@ -589,11 +592,9 @@ public class TTRobot {
     if (rearDistance() < distance && (angle < 180 && angle > 0)) {
 
       gyroAngle = gyroHeading() + 3;
-    }
-    else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
+    } else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
       gyroAngle = gyroHeading() - 3;
-    }
-    else {
+    } else {
       gyroAngle = gyroHeading();
     }
 
