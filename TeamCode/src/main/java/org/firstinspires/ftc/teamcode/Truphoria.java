@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Bitmap;
 
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class Truphoria {
 
   Bitmap image;
@@ -10,81 +14,72 @@ public class Truphoria {
     image = img;
   }
 
-  // Bounding boxes for where to look for the color of the SkyStone
-
-  // rectangles go from the top left of the rectangle to the top right-1
-  // they go from the top left to the bottom-1
-  // Minimum size is 2x2
-
-  static int[] tl1 = new int[]{30, 75};
-  static int[] br1 = new int[]{32, 83};
-
-  static int[] tl2 = new int[]{60, 75};
-  static int[] br2 = new int[]{62, 83};
-
-  static int[] tl3 = new int[]{90, 75};
-  static int[] br3 = new int[]{92, 83};
-
-  int avg1, avg2, avg3;
-
-
-  public int whichPosition() {
-
-    // pixels = imageRedo();
-
-    avg1 = average(tl1, br1);
-    avg2 = average(tl2, br2);
-    avg3 = average(tl3, br3);
-
-    System.out.println("Stone 1:" + avg1 + " Stone 2: " + avg2 + " Stone 3: " + avg3);
-
-    if (avg1 < avg2 && avg1 < avg3) {
-      return 1;
-    } else if (avg2 < avg1 && avg2 < avg3) {
-      return 2;
-    } else if (avg3 < avg1 && avg3 < avg2) {
-      return 3;
-    }
-    return 0;
+  // Shameless stolen from
+  // https://www.researchgate.net/post/How_to_find_the_intensity_of_yellow_color_from_an_image
+  private static double yellowness(int r, int g, int b) {
+    double R = r / 255.0;
+    double G = g / 255.0;
+    double B = b / 255.0;
+    double u = Math.atan2((R - G) * 0.7071067812, (R + G - 2 * B) * 0.4082482905);
+    double V = Math.max(R, Math.max(G, B));
+    double v = Math.min(R, Math.min(G, B));
+    double S = 2 * (V - v) / (1 + Math.abs(V - 0.5) + Math.abs(v - 0.5));
+    return S * Math.cos(u);
   }
 
-  private int getColor(int x, int y, int k) {
-    int c = image.getPixel(x, y);
-    if (k == 0) {
-      // red
-      return (c >> 16) & 0xff;
-    } else if (k == 1) {
-      // green
-      return (c >> 8) & 0xff;
-    } else {
-      // blue
-      return c & 0xff;
-    }
+  private static boolean shouldCount(int pxl) {
+    int r = (pxl >> 16) & 0xff;
+    int g = (pxl >> 8) & 0xff;
+    int b = pxl & 0xff;
+    return yellowness(r, g, b) > .5;
   }
 
-  public int average(int[] tl, int[] br) {
-    int nowAvg = 0;
-    int nowAvg2 = 0;
-    int nowAvg3 = 0;
-    for (int i = tl[1]; i < tl[1] + br[1] - tl[1]; i++) {
-      nowAvg2 = 0;
-      for (int j = tl[0]; j < tl[0] + br[0] - tl[0]; j++) {
-        nowAvg = 0;
-        for (int k = 0; k < 2; k++) {
-          nowAvg += getColor(i, j, k);
-          // print(pixels[j][i][k] + " ");
+  // This counts which of the 3 columns of the image have the most yellow
+  // (or whatever the shouldCount function decides to count)
+  public int whichColumn(Telemetry tel) {
+    // Scale the image *way* down
+    Bitmap newImg = Bitmap.createScaledBitmap(image, 32, 18, false);
+    int w = newImg.getWidth();
+    int h = newImg.getHeight();
+    int min = 192;
+    int which = 3;
+    int wholeCount = 0;
+    for (int i = 0; i < h; i++) {
+      int count = 0;
+      String line = "";
+      for (int j = 0; j < w; j++) {
+        boolean yellow = shouldCount(newImg.getPixel(j, i));
+        if (yellow) {
+          count++;
+          line = line.concat(".");
+        } else {
+          line = line.concat(" ");
         }
-        nowAvg /= 2;
-        // println("x: " + j + " y: " + i);
-        // println();
-        // println(nowAvg);
-        nowAvg2 += nowAvg;
       }
-      nowAvg2 /= br[0] - tl[0];
-      nowAvg3 += nowAvg2;
+      if (tel != null) {
+        tel.addData(">", "%s - %d yellow", line, count);
+      }
+      wholeCount += count;
+      if (i == 5) {
+        if (wholeCount < min) {
+          min = wholeCount;
+          which = 0;
+        }
+        wholeCount = 0;
+      } else if (i == 11) {
+        if (wholeCount < min) {
+          min = wholeCount;
+          which = 1;
+        }
+        wholeCount = 0;
+      } else if (i == 17) {
+        if (wholeCount < min) {
+          min = wholeCount;
+          which = 2;
+        }
+        wholeCount = 0;
+      }
     }
-    nowAvg3 /= br[1] - tl[1];
-    return nowAvg3;
+    return which;
   }
-
 }

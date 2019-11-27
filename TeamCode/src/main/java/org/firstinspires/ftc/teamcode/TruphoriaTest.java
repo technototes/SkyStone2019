@@ -161,7 +161,7 @@ public class TruphoriaTest extends LinearOpMode {
 //    //  Instantiate the Vuforia engine
     vuforia = ClassFactory.getInstance().createVuforia(parameters);
     vuforia.enableConvertFrameToBitmap();
-    
+
     // Load the data sets for the trackable objects. These particular data
     // sets are stored in the 'assets' part of our application.
     VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
@@ -309,9 +309,9 @@ public class TruphoriaTest extends LinearOpMode {
       .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
     /**  Let all the trackable listeners know where the phone is.  */
-//    for (VuforiaTrackable trackable : allTrackables) {
-//      ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
-//    }
+    for (VuforiaTrackable trackable : allTrackables) {
+      ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+    }
 
     // WARNING:
     // In this sample, we do not wait for PLAY to be pressed.  Target Tracking is started immediately when INIT is pressed.
@@ -327,24 +327,37 @@ public class TruphoriaTest extends LinearOpMode {
 
     // Tap the preview window to receive a fresh image.
 
-    ElapsedTime tm = new ElapsedTime();
     targetsSkyStone.activate();
+    int votes = 0;
+    int for0 = 0;
+    int for1 = 0;
+    int for2 = 0;
     while (!isStopRequested()) {
       switch (curState) {
         case Empty:
-          if (tm.seconds() > 5 && bitmap == null) {
-            this.captureFrameToFile();
-          } else {
-            telemetry.addData("Countdown", "in T minus %2.3f seconds %s", 5 - tm.seconds(), error);
-          }
+          this.captureFrameToFile();
           break;
         case Complete:
-          telemetry.addLine("Finished capturing an image.");
-          telemetry.addData("Info:", "Width:  Height:  %s",error);// bitmap.getWidth(), bitmap.getHeight(), error);
+          telemetry.addData("Info:", "Width %d Height %d (%s)", bitmap.getWidth(), bitmap.getHeight(), error);
+          int vote = truphoria.whichColumn(telemetry);
+          votes++;
+          switch (vote) {
+            case 0:
+              for0++;
+              break;
+            case 1:
+              for1++;
+              break;
+            case 2:
+              for2++;
+              break;
+            default:
+              break;
+          }
+          curState = CaptureState.Empty;
           break;
         case Error:
           telemetry.addLine("Error!");
-          tm.reset();
           curState = CaptureState.Empty;
           break;
         case Requested:
@@ -357,20 +370,19 @@ public class TruphoriaTest extends LinearOpMode {
           telemetry.addData("Wut?", "Error: %s", error);
           break;
       }
-// check all the trackable targets to see which one (if any) is visible.
+      telemetry.addData("Vote:", "%d %d %d (%d)", for0, for1, for2, votes);
+      // check all the trackable targets to see which one (if any) is visible.
       targetVisible = false;
       for (VuforiaTrackable trackable : allTrackables) {
         if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
           telemetry.addData("Visible Target", trackable.getName());
-          if (trackable.getName() == "Stone Target") {
-            targetVisible = true;
+          targetVisible = true;
 
-            // getUpdatedRobotLocation() will return null if no new information is available since
-            // the last time that call was made, or if the trackable is not currently visible.
-            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
-            if (robotLocationTransform != null) {
-              lastLocation = robotLocationTransform;
-            }
+          // getUpdatedRobotLocation() will return null if no new information is available since
+          // the last time that call was made, or if the trackable is not currently visible.
+          OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+          if (robotLocationTransform != null) {
+            lastLocation = robotLocationTransform;
           }
           break;
         }
@@ -386,14 +398,6 @@ public class TruphoriaTest extends LinearOpMode {
         // express the rotation of the robot in degrees.
         Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
         telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-
-        // These units are in millimeters
-        double xPos = translation.get(0);
-        double yPos = translation.get(1);
-        double zPos = translation.get(2);
-
-        // TODO: Drive the robot to the stone and grab it
-
       } else {
         telemetry.addData("Visible Target", "none");
       }
@@ -410,6 +414,7 @@ public class TruphoriaTest extends LinearOpMode {
   volatile CaptureState curState = CaptureState.Empty;
   volatile Bitmap bitmap = null;
   volatile String error = "";
+  Truphoria truphoria = null;
 
   boolean captureFrameToFile() {
     if (curState != CaptureState.Empty) {
@@ -428,8 +433,14 @@ public class TruphoriaTest extends LinearOpMode {
           curState = CaptureState.Processing;
         }
         bitmap = vuforia.convertFrameToBitmap(frame);
-        curState = (bitmap == null) ? CaptureState.Error :  CaptureState.Complete;
-        error = bitmap == null ? "failure" : "success";
+        if (bitmap != null) {
+          truphoria = new Truphoria(bitmap);
+          curState = CaptureState.Complete;
+          error = "";
+        } else {
+          curState = CaptureState.Error;
+          error = "Failed to capture frame";
+        }
       }
     }));
     return true;
