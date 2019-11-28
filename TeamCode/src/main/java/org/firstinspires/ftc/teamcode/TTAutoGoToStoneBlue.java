@@ -46,7 +46,8 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
     waitForStart();
 
     Truphoria tf = new Truphoria(hardwareMap, telemetry);
-
+    robot.distRearDrive(0.5, 9);
+    robot.distRightDrive(0.5, 90, 60);
     runtime.reset();
     while(runtime.seconds() < 2){
       tf.takeALook();
@@ -95,7 +96,7 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
 
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
-          robot.distRearDrive(0.5, 75);
+          robot.distRearDrive(0.5, 80);
           currentState = AutoState.STOP;
           break;
         case STOP:
