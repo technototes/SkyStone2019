@@ -361,6 +361,11 @@ public class TTRobot {
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
+  public double gyroHeading2() {
+    Orientation angles1 =
+      imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
+  }
 
   void setServoDirection(Servo.Direction direction) {
     turn.setDirection(direction);
@@ -528,12 +533,22 @@ public class TTRobot {
 
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
-    while (runTime.seconds() < time) {
-      while (gyroHeading() < angle) {
-        joystickDrive(new Direction(0, 0), new Direction(1, 0), gyroHeading());
+    while(runTime.seconds() < time) {
+      if(gyroHeading2() > angle+5){
+        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
+      }else if(gyroHeading2() < angle-5){
+        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
+      }else{
+        joystickDrive(Direction.None, new Direction(0, 0), gyroHeading2());
+        time = 0;
       }
+      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro2:", gyroHeading2());
+      telemetry.update();
     }
-
+    //new code
+    //._. ._.
+    // \_(0.0)_/
 
   }
 

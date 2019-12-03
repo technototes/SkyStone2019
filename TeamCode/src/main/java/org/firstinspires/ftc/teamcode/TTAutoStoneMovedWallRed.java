@@ -76,11 +76,11 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           currentState = AutoState.PICK_UP_STONE;
           break;
         case PICK_UP_STONE:
-
-
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-//          robot.grabStone();
+
+//          robot.grabBlock();
+
           break;
         case GO_TO_BASE_PLATE:
 
@@ -88,21 +88,23 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           telemetry.addData("state", currentState.toString());
           runtime.reset();
 
-          robot.timeDrive(0.10, 2.0, 180);
+//          robot.timeDrive(1.0, 3.0, 180);
 
-          robot.syncTurn(0, 2);
-          robot.timeDrive(0.5, 1.0, 270);
-          robot.syncTurn(0, 2);
-          robot.timeDrive(0.5, 1.0, 270);
-          robot.syncTurn(0, 2);
-          robot.timeDrive(0.5, 1.0, 270);
-//          robot.driveWallRear(0.3, 5.0, 270, 20);
+//          robot.syncTurn(0, 2);
+          robot.distRearDrive(0.5, 65);
+          robot.timeDrive(0.5, 2.5, -90);
+          robot.timeDrive(0.3, 0.7, -90);
+          robot.timeDrive(0.5, 0.2, 90);
+
+          runtime.reset();
+          while (runtime.seconds() < 3) {
+            robot.syncTurn(-90, 3);
+
+          }
+
+          robot.timeDrive(0.5, 0.3, -90);
+
           stop();
-          robot.timeDrive(0.25, 2.0, 0);
-          robot.syncTurn(270, 3);
-
-
-
           break;
 
 
