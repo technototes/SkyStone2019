@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -409,7 +407,7 @@ public class TTRobot {
 
   // set nearestSnap to true to snap to nearest 90 dgree angle, or set nearestSnap to false and
   // input angle to snap to.
-  public double snapToAngle(double gyroAngle) {
+  private double toNearestAngle(double gyroAngle) {
     double test = 0.0;
     if (gyroAngle > 50 && gyroAngle < 130) {
       test = 90 - gyroAngle;
@@ -425,62 +423,41 @@ public class TTRobot {
     return test;
   }
 
+  // This returns a normalized angle difference (-180 to 180) from gyroHeading
+  private double angleDiff(double target) {
+    return AngleUnit.normalizeDegrees(gyroHeading() - target);
+  }
+
+  private Direction getDirectionTowardAngle(double to) {
+    double dir = angleDiff(to);
+    double rotSpeed = XDrive.getSteppedValue(TTRobot.snapSteps, dir / 180);
+    return new Direction(rotSpeed, 0);
+  }
+
   //for autonomous only
-  public void toAngle(double to) {
-    if (to > 0) {
-      while (to > gyroHeading()) {
-        Direction dir = new Direction(1, 0);
-        joystickDrive(Direction.None, dir, 0);
-      }
-    } else {
-      while (to < gyroHeading()) {
-        Direction dir = new Direction(-1, 0);
-        joystickDrive(Direction.None, dir, 0);
-      }
-    }
+  public void toAngleSync(double to) {
+    double dir;
+    do {
+      Direction turn = getDirectionTowardAngle(to);
+      dir = turn.X;
+      joystickDrive(Direction.None, turn, gyroHeading());
+      sleep(10);
+    } while (Math.abs(dir) > 3);
   }
 
   // Snap the robot to the closest 90 degree angle
   public double snap(Telemetry tel) {
     double curr = gyroHeading();
-    double newangle = snapToAngle(curr);
+    double newangle = toNearestAngle(curr);
     tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
 
-  // Turn the robot to a specific angle
-  private double snap(double targetAngle) {
-    if (targetAngle < -25) {
-      return -1.0;
-    } else if (targetAngle > 25) {
-      return 1.0;
-    } else if (targetAngle < -5) {
-      return -.1;
-    } else if (targetAngle > 5) {
-      return .1;
-    }
-    return 0;
-  }
+  private static double[] snapSteps = new double[]{0.0, .2, .4, .7, 1.0, 1.0};
 
   private double scaledSnap(double targetAngle) {
-    double angleMag = Math.abs(targetAngle);
-    double motorMag = 0.0;
-    if (angleMag > 35.0) {
-      motorMag = 1.0;
-    } else if (angleMag > 25.0) {
-      motorMag = .7;
-    } else if (angleMag > 15.0) {
-      motorMag = .4;
-    } else if (angleMag > 5.0) {
-      motorMag = .2;
-    } else if (angleMag > 0.0) {
-      motorMag = 0.0;
-    }
-    if (targetAngle < 0.0) {
-      motorMag = -motorMag;
-    }
-    return motorMag;
+    return XDrive.getSteppedValue(snapSteps, targetAngle / 90.0);
   }
 
   public void stop() {
@@ -522,11 +499,20 @@ public class TTRobot {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
       double dir = (dist < curDistance) ? 1 : -1;
-      double speedMult = (Math.abs(dist - curDistance) > 10) ? 1.0 : 0.5;
-      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < 10) {
+        speedSnail();
+      } else if (magnitude > 50) {
+        speedTurbo();
+      } else {
+        speedNormal();
+      }
+      Direction turn = getDirectionTowardAngle(0);
+      joystickDrive(new Direction(0, dir), turn, gyroHeading());
       sleep(10);
     } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0);
     driveTrain.stop();
+    speedNormal();
   }
 
   public void syncTurn(double angle, double time) {
@@ -621,11 +607,9 @@ public class TTRobot {
     if (rearDistance() < distance && (angle < 180 && angle > 0)) {
 
       gyroAngle = gyroHeading() + 3;
-    }
-    else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
+    } else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
       gyroAngle = gyroHeading() - 3;
-    }
-    else {
+    } else {
       gyroAngle = gyroHeading();
     }
 
