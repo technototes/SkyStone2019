@@ -359,6 +359,7 @@ public class TTRoboTest {
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
+
   public double gyroHeading2() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -492,6 +493,8 @@ public class TTRoboTest {
 
   // This will travel toward the rear until it gets to 'dist'
   public void distRearDrive(double speed, double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = 0;
     do {
@@ -519,12 +522,12 @@ public class TTRoboTest {
 
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
-    while(runTime.seconds() < time) {
-      if(gyroHeading2() > angle+5){
+    while (runTime.seconds() < time) {
+      if (gyroHeading2() > angle + 5) {
         joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      }else if(gyroHeading2() < angle-5){
+      } else if (gyroHeading2() < angle - 5) {
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
-      }else{
+      } else {
         joystickDrive(Direction.None, new Direction(0, 0), gyroHeading2());
         time = 0;
       }
