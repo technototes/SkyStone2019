@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-public class TTRobot {
+public class TTRoboTest {
   // Scaling values
 
   // The amount we divide speed by when dropping the lift
@@ -95,7 +95,7 @@ public class TTRobot {
     }
   }
 
-  public TTRobot(HardwareMap hardwareMap, Telemetry tel) {
+  public TTRoboTest(HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "lslideServo");
@@ -430,7 +430,7 @@ public class TTRobot {
 
   private Direction getDirectionTowardAngle(double to) {
     double dir = angleDiff(to);
-    double rotSpeed = XDrive.getSteppedValue(TTRobot.snapSteps, dir / 180);
+    double rotSpeed = XDrive.getSteppedValue(TTRoboTest.snapSteps, dir / 180);
     return new Direction(rotSpeed, 0);
   }
 

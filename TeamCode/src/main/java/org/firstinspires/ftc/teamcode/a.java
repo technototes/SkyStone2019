@@ -9,8 +9,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp(name = "Sensor Drive Testing")
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
-  private TTRobot robot;
-  private XDriveManualControl manualCtrl;
+  private TTRoboTest robot;
+  private XDriveManualControlTest manualCtrl;
   private Controller control;
   private Controller driver;
 
@@ -20,8 +20,8 @@ public class a extends LinearOpMode {
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
-    robot = new TTRobot(hardwareMap, telemetry);
-    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
+    robot = new TTRoboTest(hardwareMap, telemetry);
+    manualCtrl = new XDriveManualControlTest(robot, driver, control, telemetry);
 
     telemetry.addLine("Hello!");
     telemetry.update();

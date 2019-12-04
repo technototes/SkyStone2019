@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "Direct Control")
-public class DirectControl extends LinearOpMode {
+@TeleOp(name = "DCTest")
+public class DirectControlTest extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
   private Controller control;
