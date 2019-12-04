@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+@Disabled
 
 @Autonomous(name = "TTAutoGrabBaseplateRed", group = "TT")
 public class TTAutoGrabBaseplateRed extends LinearOpMode {

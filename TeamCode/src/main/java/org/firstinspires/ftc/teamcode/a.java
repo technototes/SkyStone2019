@@ -36,7 +36,7 @@ public class a extends LinearOpMode {
       manualCtrl.Steer();
 
       if (driver.buttonB().isPressed()) {
-        robot.distRearDrive(15);
+        robot.distRearDrive(0.5, 15);
       }
       if (control.buttonA().isPressed()) {
         robot.stop();
