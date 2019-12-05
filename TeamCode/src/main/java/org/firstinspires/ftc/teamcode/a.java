@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "Sensor Drive Testing")
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
-  private ZRobot robot;
-  private ZXDriveManualControl manualCtrl;
+  private TTRobot robot;
+  private XDriveManualControl manualCtrl;
   private Controller control;
   private Controller driver;
 
@@ -17,8 +17,8 @@ public class a extends LinearOpMode {
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
-    robot = new ZRobot(this, hardwareMap, telemetry);
-    manualCtrl = new ZXDriveManualControl(robot, driver, control, telemetry);
+    robot = new TTRobot(this, hardwareMap, telemetry);
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     telemetry.addLine("Hello!");
     telemetry.update();
@@ -32,21 +32,8 @@ public class a extends LinearOpMode {
       // Allow the robot to move around
       manualCtrl.Steer();
 
-      if (driver.buttonB().isPressed()) {
+      if (control.buttonB().isPressed()) {
         robot.distRearDrive(0.5, 15);
-      }
-      if (control.buttonA().isPressed()) {
-        robot.stop();
-        robot.toAngleSync(180);
-      } else if (control.buttonB().isPressed()) {
-        robot.stop();
-        robot.toAngleSync(90);
-      } else if (control.buttonY().isPressed()) {
-        robot.stop();
-        robot.toAngleSync(0);
-      } else if (control.buttonX().isPressed()) {
-        robot.stop();
-        robot.toAngleSync(-90);
       }
       telemetry.update();
     }
