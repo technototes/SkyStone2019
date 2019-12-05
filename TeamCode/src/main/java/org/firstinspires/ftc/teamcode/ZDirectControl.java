@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "DCTest")
+@TeleOp(name = "Z-DCTest")
 public class ZDirectControl extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private ZRobot robot;
