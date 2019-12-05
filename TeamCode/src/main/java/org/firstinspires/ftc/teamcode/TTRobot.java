@@ -537,7 +537,7 @@ public class TTRobot {
       double speedMult = (Math.abs(dist - curDistance) > 10) ? 1.0 : 0.5;
       driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
       sleep(10);
-    } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0);
+    } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -545,7 +545,7 @@ public class TTRobot {
 
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
-    while (runTime.seconds() < time) {
+    while (runTime.seconds() < time && opMode.opModeIsActive()) {
       if (gyroHeading2() > angle + 5) {
         joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
       } else if (gyroHeading2() < angle - 5) {
