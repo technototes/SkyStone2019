@@ -19,7 +19,7 @@ public class DirectControl extends LinearOpMode {
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, "controller");
-    robot = new TTRobot(hardwareMap, telemetry);
+    robot = new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();

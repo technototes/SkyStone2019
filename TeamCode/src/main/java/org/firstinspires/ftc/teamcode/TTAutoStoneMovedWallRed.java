@@ -43,10 +43,13 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
      * Initialize the standard drive system variables.
      * The init() method of the hardware class does most of the work here
      */
-    robot = new TTRobot(hardwareMap, telemetry);
+    robot = new TTRobot(this, hardwareMap, telemetry);
 
     telemetry.addData(">", "Robot Heading = %f", robot.gyroHeading());
     telemetry.update();
+    robot.claw(1.0);
+    sleep(5000);
+    robot.claw(0.0);
 
     // Put truphoria Here
 
@@ -86,25 +89,37 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
 
           telemetry.addData("state", currentState.toString());
-          runtime.reset();
 
-//          robot.timeDrive(1.0, 3.0, 180);
+          runTime.reset();
 
-//          robot.syncTurn(0, 2);
+          while (runTime.seconds() < 3) {
+            robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, false);
+          }
+          runTime.reset();
+          while (runTime.seconds() <  0.9) {
+            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          }
+          robot.rotateClaw(0);
+
+          runTime.reset();
+          while (runTime.seconds() < 1.1) {
+            robot.liftDown();
+          }
+          robot.liftStop();
           robot.distRearDrive(0.5, 65);
           robot.timeDrive(0.5, 2.5, -90);
           robot.timeDrive(0.3, 0.7, -90);
           robot.timeDrive(0.5, 0.2, 90);
 
           runtime.reset();
-          while (runtime.seconds() < 3) {
-            robot.syncTurn(-90, 3);
 
-          }
+            robot.syncTurn(-90  , 3);
+
+
 
           robot.timeDrive(0.5, 0.3, -90);
 
-          stop();
+
           break;
 
 
@@ -114,7 +129,8 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
           telemetry.addData("state", currentState.toString());
           runTime.reset();
-          while (runTime.seconds() < 2) {
+
+          while (runTime.seconds() < 1.5) {
             robot.liftUp();
           }
           runTime.reset();
@@ -123,11 +139,12 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           }
 
           runTime.reset();
-          while (runTime.seconds() < 2) {
+          while (runTime.seconds() < 1) {
             robot.liftDown();
           }
 
-          robot.claw(0);
+          robot.claw(0.0);
+          stop();
 
           break;
 

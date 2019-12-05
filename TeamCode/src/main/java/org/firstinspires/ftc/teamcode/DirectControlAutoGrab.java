@@ -14,7 +14,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    robot = new TTRobot(hardwareMap, telemetry);
+    robot = new TTRobot(this, hardwareMap, telemetry);
     // If you want telemetry, include a name as a string
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");

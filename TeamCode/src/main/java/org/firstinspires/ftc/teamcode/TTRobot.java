@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -26,6 +27,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 
 public class TTRobot {
   // Scaling values
@@ -82,6 +88,7 @@ public class TTRobot {
 
   private XDrive driveTrain = null;
   private Telemetry telemetry = null;
+  private LinearOpMode opMode = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
   private BNO055IMU imu;
@@ -97,8 +104,9 @@ public class TTRobot {
     }
   }
 
-  public TTRobot(HardwareMap hardwareMap, Telemetry tel) {
+  public TTRobot(LinearOpMode op, HardwareMap hardwareMap, Telemetry tel) {
     telemetry = tel;
+    opMode = op;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "lslideServo");
     turn = hardwareMap.get(Servo.class, "grabTurn");
@@ -361,6 +369,7 @@ public class TTRobot {
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
+
   public double gyroHeading2() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -462,7 +471,6 @@ public class TTRobot {
     }
     return 0;
   }
-
   private double scaledSnap(double targetAngle) {
     double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
@@ -494,7 +502,11 @@ public class TTRobot {
   }
 
   public void timeDrive(double speed, double time, double angle) {
-    driveTrain.timeDrive(speed, time, angle, gyroHeading());
+
+    ElapsedTime runTime = new ElapsedTime();
+    while (runTime.seconds() < time && opMode.opModeIsActive()) {
+      driveTrain.timeDrive(speed, time, angle, gyroHeading());
+    }
   }
 
   public void lineDrive(double speed, double time, double angle) {
@@ -533,12 +545,12 @@ public class TTRobot {
 
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
-    while(runTime.seconds() < time) {
-      if(gyroHeading2() > angle+5){
+    while (runTime.seconds() < time) {
+      if (gyroHeading2() > angle + 5) {
         joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      }else if(gyroHeading2() < angle-5){
+      } else if (gyroHeading2() < angle - 5) {
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
-      }else{
+      } else {
         joystickDrive(Direction.None, new Direction(0, 0), gyroHeading2());
         time = 0;
       }
@@ -621,15 +633,14 @@ public class TTRobot {
     if (rearDistance() < distance && (angle < 180 && angle > 0)) {
 
       gyroAngle = gyroHeading() + 3;
-    }
-    else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
+    } else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
       gyroAngle = gyroHeading() - 3;
-    }
-    else {
+    } else {
       gyroAngle = gyroHeading();
     }
 
 
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
+
 }
