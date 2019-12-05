@@ -26,69 +26,16 @@ public class ZDirectControl extends LinearOpMode {
     robot.rotateClaw(1);
     while (opModeIsActive()) {
 
-      // Handle Grabber rotation
-      /*if (control.buttonA() == Button.Pressed) {
-        if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
-          robot.snapGrabberPosition(GrabberPosition.Horizontal);
-        } else { // It'sHORIZONTAL!
-          robot.snapGrabberPosition(GrabberPosition.Vertical);
-        }
-      }*/
-      // Handle Grabber clutch
-      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.setClawPosition(ClawPosition.Close); // CLosed
-      }
-      // Grabber rotation
-
-      if (control.lbump() == Button.Pressed) {
-        robot.rotateClaw(0);
-        telemetry.addLine("Open 0.4");
-      } else if (control.rbump() == Button.Pressed) {
-        robot.rotateClaw(1);
-        telemetry.addLine("Close 0.6");
+      telemetry.addData("rear distance", "%3.3f", robot.rearDistance());
+      telemetry.addData("gyroHeading:", "%3.3f", robot.gyroHeading());
+      telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
+      Direction clst = control.lstick();
+      if (clst.isDown()) {
+        robot.distRearDrive(0, 20);
       }
 
-      // Override the linear slide limit switches
-      boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
-      Direction slide = control.dpad();
-      if (slide.isLeft()) {
-        robot.setLinearSlideDirectionRyan(LinearSlideOperation.Extend, !slideOverride);
-      } else if (slide.isRight()) {
-        robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, !slideOverride);
-      } else {
-        robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
-      }
-      Direction dcontrols = driver.dpad();
-      if (dcontrols.isUp()) {
-        robot.blockFlipper(0.15);
-      } else {
-        robot.blockFlipper(0.8);
-      }
-      if (dcontrols.isDown()) {
-        robot.bpGrabber(0);
-      } else {
-        robot.bpGrabber(1);
-      }
-      if (dcontrols.isLeft()) {
-        robot.capstone(-1);
-      } else if (dcontrols.isRight()) {
-        robot.capstone(1);
-      } else {
-        robot.capstone(0);
-      }
-      // Lift control:
-      Direction dir = control.dpad();
-      if (dir.isUp()) {
-        robot.liftUp();
-      } else if (dir.isDown()) {
-        robot.liftDown();
-      } else {
-        robot.liftStop();
-      }
       // This is just steering
-      manualCtrl.Steer();
+      //manualCtrl.Steer();
       telemetry.update();
     }
   }

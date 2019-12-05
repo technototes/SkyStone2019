@@ -364,12 +364,17 @@ public class TTRobot {
     return !liftSwitch.getState();
   }
 
+  // 0 = facing toward the driver (6 O'Clock)
+  // 90 = 9 O'clock
+  // -90 = 3:00
   public double gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
-
+  // 0 = facing away from driver (12 O'Clock)
+  // 90 degrees: 3:00
+  // -90 degrees: 9:00
   public double gyroHeading2() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);

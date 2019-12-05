@@ -357,12 +357,18 @@ public class ZRobot {
     return !liftSwitch.getState();
   }
 
+  // 0 = facing toward the driver (6 O'Clock)
+  // 90 = 9 O'clock
+  // -90 = 3:00
   public double gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
 
+  // 0 = facing away from driver (12 O'Clock)
+  // 90 degrees: 3:00
+  // -90 degrees: 9:00
   public double gyroHeading2() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -415,9 +421,9 @@ public class ZRobot {
     double test = 0.0;
     if (gyroAngle > 50 && gyroAngle < 130) {
       test = 90 - gyroAngle;
-    } else if (gyroAngle > 140 && gyroAngle < 180) {
+    } else if (gyroAngle > 140 && gyroAngle <= 180) {
       test = 180 - gyroAngle;
-    } else if (gyroAngle > -180 && gyroAngle < -140) {
+    } else if (gyroAngle >= -180 && gyroAngle < -140) {
       test = -180 - gyroAngle;
     } else if (gyroAngle > -130 && gyroAngle < -50) {
       test = -90 - gyroAngle;
@@ -499,24 +505,26 @@ public class ZRobot {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
-    double curDistance = 0;
-    do {
-      curDistance = rearDistance();
+    double curDistance = rearDistance();
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
       double dir = (dist < curDistance) ? 1 : -1;
       double magnitude = Math.abs(dist - curDistance);
-      if (magnitude < 10) {
+      if (magnitude < 15) {
         speedSnail();
-      } else if (magnitude > 50) {
-        speedTurbo();
-      } else {
+      } else if (magnitude < 50) {
         speedNormal();
+      } else {
+        speedTurbo();
       }
-      Direction turn = getDirectionTowardAngle(0);
-      joystickDrive(new Direction(0, dir), turn, gyroHeading());
+      double heading = gyroHeading();
+      double turn = (heading < 0) ? .5 : -.5;
+      Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(0, dir), rotation, heading);
+      curDistance = rearDistance();
       sleep(10);
-    } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0);
+    }
     driveTrain.stop();
     speedNormal();
   }
