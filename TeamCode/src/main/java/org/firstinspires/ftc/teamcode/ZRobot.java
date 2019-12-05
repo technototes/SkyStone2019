@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,7 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-public class TTRoboTest {
+public class ZRobot {
   // Scaling values
 
   // The amount we divide speed by when dropping the lift
@@ -80,6 +81,7 @@ public class TTRoboTest {
 
   private XDrive driveTrain = null;
   private Telemetry telemetry = null;
+  private LinearOpMode opMode = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
   // The IMU sensor object
   private BNO055IMU imu;
@@ -95,7 +97,8 @@ public class TTRoboTest {
     }
   }
 
-  public TTRoboTest(HardwareMap hardwareMap, Telemetry tel) {
+  public ZRobot(LinearOpMode op, HardwareMap hardwareMap, Telemetry tel) {
+    opMode = op;
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "lslideServo");
@@ -431,7 +434,7 @@ public class TTRoboTest {
 
   private Direction getDirectionTowardAngle(double to) {
     double dir = angleDiff(to);
-    double rotSpeed = XDrive.getSteppedValue(TTRoboTest.snapSteps, dir / 180);
+    double rotSpeed = XDrive.getSteppedValue(ZRobot.snapSteps, dir / 180);
     return new Direction(rotSpeed, 0);
   }
 

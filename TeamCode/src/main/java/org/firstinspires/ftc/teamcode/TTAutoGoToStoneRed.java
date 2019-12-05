@@ -38,7 +38,7 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
      * Initialize the standard drive system variables.
      * The init() method of the hardware class does most of the work here
      */
-    robot = new TTRobot(hardwareMap, telemetry);
+    robot = new TTRobot(this, hardwareMap, telemetry);
 
 
 

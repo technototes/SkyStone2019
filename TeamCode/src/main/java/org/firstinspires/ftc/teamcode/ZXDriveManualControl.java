@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 // For use by opModes for driving the robot manually
-public class XDriveManualControlTest {
-  TTRoboTest robot;
+public class ZXDriveManualControl {
+  ZRobot robot;
   Controller driver;
   Controller control;
   Telemetry telemetry;
@@ -16,7 +16,7 @@ public class XDriveManualControlTest {
    * @param ctrl  The controller side controller
    * @param tel   The Telemetry thing (not currently used)
    */
-  public XDriveManualControlTest(TTRoboTest r, Controller drv, Controller ctrl, Telemetry tel) {
+  public ZXDriveManualControl(ZRobot r, Controller drv, Controller ctrl, Telemetry tel) {
     robot = r;
     driver = drv;
     control = ctrl;

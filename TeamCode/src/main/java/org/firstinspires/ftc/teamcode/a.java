@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Sensor Drive Testing")
 public class a extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
-  private TTRoboTest robot;
-  private XDriveManualControlTest manualCtrl;
+  private ZRobot robot;
+  private ZXDriveManualControl manualCtrl;
   private Controller control;
   private Controller driver;
 
@@ -20,8 +17,8 @@ public class a extends LinearOpMode {
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, null);
-    robot = new TTRoboTest(hardwareMap, telemetry);
-    manualCtrl = new XDriveManualControlTest(robot, driver, control, telemetry);
+    robot = new ZRobot(this, hardwareMap, telemetry);
+    manualCtrl = new ZXDriveManualControl(robot, driver, control, telemetry);
 
     telemetry.addLine("Hello!");
     telemetry.update();

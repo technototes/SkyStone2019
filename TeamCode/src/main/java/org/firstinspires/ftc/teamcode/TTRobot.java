@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -80,6 +81,7 @@ public class TTRobot {
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
+  private LinearOpMode opMode = null;
   private XDrive driveTrain = null;
   private Telemetry telemetry = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
@@ -97,7 +99,8 @@ public class TTRobot {
     }
   }
 
-  public TTRobot(HardwareMap hardwareMap, Telemetry tel) {
+  public TTRobot(LinearOpMode op, HardwareMap hardwareMap, Telemetry tel) {
+    opMode = op;
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "lslideServo");
