@@ -54,8 +54,9 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
     waitForStart();
 
     Truphoria tf = new Truphoria(hardwareMap, telemetry);
-    robot.distRearDrive(1, 10);
-    robot.distRightDrive(0.5, 90, 55);
+    robot.distRearDrive(1, 8);
+    robot.distRightDrive(0.5, 90, 45);
+    robot.distRightDrive(0.3, -90, 45);
     runtime.reset();
     while(runtime.seconds() < 2){
       tf.takeALook();
@@ -98,27 +99,27 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, -90, 85);
-          robot.distRightDrive(0.3, 90, 85);
+          robot.distRightDrive(0.5, -90, 90);
+          robot.distRightDrive(0.3, 90, 90);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK2:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, -90, 65);
-          robot.distRightDrive(0.3, 90, 65);
+          robot.distRightDrive(0.5, -90, 70);
+          robot.distRightDrive(0.3, 90, 70);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK3:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, 90, 45);
-          robot.distRightDrive(0.3, -90, 45);
+          robot.distRightDrive(0.5, 90, 50);
+          robot.distRightDrive(0.3, -90, 55);
           currentState = AutoState.GOFORWARD;
           break;
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
-          robot.distRearDrive(0.5, 80);
+          robot.distRearDrive(0.75, 110);
           driveTime.reset();
-          while(driveTime.seconds() < 1) {
+          while(driveTime.seconds() < 1.5) {
             robot.liftUp();
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
           }
@@ -131,19 +132,19 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
 
           telemetry.addData("state", currentState.toString());
           driveTime.reset();
-          while (driveTime.seconds() < 2) {
+          while (driveTime.seconds() < 1) {
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
           }
-          while (driveTime.seconds() < 4 && !robot.slideSwitchSignaled()) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
-          }
+          //while (driveTime.seconds() < 4 && !robot.slideSwitchSignaled()) {
+          //robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          //}
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
           driveTime.reset();
           robot.rotateClaw(1);
           robot.claw(1.0);
-          while(driveTime.seconds() < 0.9) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
-          }
+          //while(driveTime.seconds() < 0.9) {
+          //robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
+          //}
           robot.setLinearSlideDirection(LinearSlideOperation.None, true);
           driveTime.reset();
           while(driveTime.seconds() < 2 && !robot.liftSwitchSignaled()){
@@ -178,8 +179,13 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
           sleep(1000);
           currentState = AutoState.GO_TO_BASE_PLATE;
           // distToLine(x, y, z);
-          robot.distRearDrive(0.5, 60);
+          robot.distRearDrive(0.5, 55);
           robot.syncTurn(-90, 3);
+          driveTime.reset();
+          while(driveTime.seconds() < 0.1){
+            robot.liftUp();
+          }
+          stop();
           break;
         case GO_TO_BASE_PLATE:
 
@@ -191,7 +197,7 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
 
 //          robot.syncTurn(0, 2);
           //robot.distRearDrive(0.5, 65);
-          robot.timeDrive(1, 1, -90);
+          robot.timeDrive(1, 1.3, -90);
           robot.timeDrive(0.3, 1, -90);
           robot.timeDrive(0.5, 0.2, 90);
 
@@ -210,7 +216,7 @@ public class TTAutoGoToStoneBlue extends LinearOpMode {
 
           telemetry.addData("state", currentState.toString());
           runTime.reset();
-          while (runTime.seconds() < 2) {
+          while (runTime.seconds() < 1) {
             robot.liftUp();
           }
           runTime.reset();
