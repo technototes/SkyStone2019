@@ -31,7 +31,12 @@ public class ZDirectControl extends LinearOpMode {
       telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
       Direction clst = control.lstick();
       if (clst.isDown()) {
-        robot.distRearDrive(0, 20);
+        robot.distRearDrive(30);
+      }
+      else if (clst.isLeft()) {
+        robot.distLeftDrive(100);
+      } else if (clst.isRight()) {
+        robot.distRightDrive(30);
       }
 
       // This is just steering
