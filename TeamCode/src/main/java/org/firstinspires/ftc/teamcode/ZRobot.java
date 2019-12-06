@@ -504,13 +504,46 @@ public class ZRobot {
     lineDrive(speed, 5, direction);
   }
 
+  public void setTurningSpeed(double angleDelta) {
+    if (Math.abs(angleDelta) < 25) {
+      speedSnail();
+    } else if (Math.abs(angleDelta) < 75) {
+      speedNormal();
+    } else {
+      speedTurbo();
+    }
+  }
+
+  // Turn to the angle specified
+  // FYI: 0 is facing 'away' from the driver
+  // 90 == 3:00, -90 == 9:00, 0 == 6:00
+  public void fastSyncTurn(double angle, double time) {
+    ElapsedTime runTime = new ElapsedTime();
+    runTime.reset();
+    while (opMode.opModeIsActive() &&
+      runTime.seconds() < time &&
+      Math.abs(gyroHeading2() - angle) > 4) {
+      if (gyroHeading2() > angle + 4) {
+        setTurningSpeed(gyroHeading2() - angle);
+        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
+      } else if (gyroHeading2() < angle - 4) {
+        setTurningSpeed(angle - gyroHeading2());
+        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
+      }
+      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro2:", gyroHeading2());
+      telemetry.update();
+    }
+    stop();
+  }
+
   // This will travel toward the rear until it gets to 'dist'
-  public void distRearDrive(double dist) {
+  public void fastRearDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rearDistance();
-    syncTurn(0, 2);
+    fastSyncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
@@ -534,45 +567,12 @@ public class ZRobot {
     speedNormal();
   }
 
-  public void setTurningSpeed(double angleDelta) {
-    if (Math.abs(angleDelta) < 25) {
-      speedSnail();
-    } else if (Math.abs(angleDelta) < 75) {
-      speedNormal();
-    } else {
-      speedTurbo();
-    }
-  }
-
-  // Turn to the angle specified
-  // FYI: 0 is facing 'away' from the driver
-  // 90 == 3:00, -90 == 9:00, 0 == 6:00
-  public void syncTurn(double angle, double time) {
-    ElapsedTime runTime = new ElapsedTime();
-    runTime.reset();
-    while (opMode.opModeIsActive() &&
-      runTime.seconds() < time &&
-      Math.abs(gyroHeading2() - angle) > 4) {
-      if (gyroHeading2() > angle + 4) {
-        setTurningSpeed(gyroHeading2() - angle);
-        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      } else if (gyroHeading2() < angle - 4) {
-        setTurningSpeed(angle - gyroHeading2());
-        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
-      }
-      telemetry.addData("gyro:", gyroHeading());
-      telemetry.addData("gyro2:", gyroHeading2());
-      telemetry.update();
-    }
-    stop();
-  }
-
-  public void distLeftDrive(double dist) {
+  public void fastLeftDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = leftDistance();
-    syncTurn(0, 2);
+    fastSyncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
@@ -596,12 +596,12 @@ public class ZRobot {
     speedNormal();
   }
 
-  public void distRightDrive(double dist) {
+  public void fastRightDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rightDistance();
-    syncTurn(0, 2);
+    fastSyncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
