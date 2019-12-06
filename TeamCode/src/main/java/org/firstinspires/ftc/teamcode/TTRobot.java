@@ -193,7 +193,7 @@ public class TTRobot {
         break;
     }
     slide.setPower(power);
-    while (!override && power != 0 && slideSwitchSignaled()) {
+    while (!override && power != 0 && slideSwitchSignaled() && opMode.opModeIsActive()) {
       slide.setPower(-power);
       sleep(1);
     }
@@ -291,7 +291,7 @@ public class TTRobot {
     // Hit a limit
     if (!override && slideSwitchSignaled()) {
       // Stop the slide
-      while (slideSwitchSignaled() == true) {
+      while (slideSwitchSignaled() == true && opMode.opModeIsActive()) {
         slide.setPower(-power);
         sleep(1);
       }
@@ -446,12 +446,12 @@ public class TTRobot {
   //for autonomous only
   public void toAngle(double to) {
     if (to > 0) {
-      while (to > gyroHeading()) {
+      while (to > gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
     } else {
-      while (to < gyroHeading()) {
+      while (to < gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(-1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
@@ -526,7 +526,7 @@ public class TTRobot {
       sleep(10);
       red = sensorColorBottom.red();
       blue = sensorColorBottom.blue();
-    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50));
+    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50) && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -579,7 +579,7 @@ public class TTRobot {
     ElapsedTime tm = new ElapsedTime();
     do {
       sleep(10);
-    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0);
+    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -591,7 +591,7 @@ public class TTRobot {
     tm.reset();
     do {
       sleep(10);
-    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0);
+    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -735,7 +735,7 @@ public class TTRobot {
       angle = AngleUnit.DEGREES.fromRadians(angle);
       driveTrain.setDriveVector(speed, angle, gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0);
+    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -753,7 +753,7 @@ public class TTRobot {
       angle = AngleUnit.DEGREES.fromRadians(angle);
       driveTrain.setDriveVector(speed, angle, gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0);
+    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
