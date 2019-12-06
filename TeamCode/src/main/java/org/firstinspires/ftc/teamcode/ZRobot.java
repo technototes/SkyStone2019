@@ -510,7 +510,7 @@ public class ZRobot {
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rearDistance();
-    syncTurn(180, 2);
+    syncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
@@ -535,9 +535,9 @@ public class ZRobot {
   }
 
   public void setTurningSpeed(double angleDelta) {
-    if (Math.abs(angleDelta) < 5) {
+    if (Math.abs(angleDelta) < 20) {
       speedSnail();
-    } else if (Math.abs(angleDelta) < 25) {
+    } else if (Math.abs(angleDelta) < 75) {
       speedNormal();
     } else {
       speedTurbo();
@@ -545,7 +545,7 @@ public class ZRobot {
   }
 
   // Turn to the angle specified
-  // FYI: 180/-180 is facing 'away' from the driver
+  // FYI: 0 is facing 'away' from the driver
   // 90 == 3:00, -90 == 9:00, 0 == 6:00
   public void syncTurn(double angle, double time) {
     ElapsedTime runTime = new ElapsedTime();
@@ -572,7 +572,7 @@ public class ZRobot {
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = leftDistance();
-    syncTurn(180, 2);
+    syncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
@@ -601,7 +601,7 @@ public class ZRobot {
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rightDistance();
-    syncTurn(180, 2);
+    syncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
