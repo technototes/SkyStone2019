@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @TeleOp(name = "Z-DCTest")
 public class ZDirectControl extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
@@ -29,9 +27,14 @@ public class ZDirectControl extends LinearOpMode {
       telemetry.addData("rear distance", "%3.3f", robot.rearDistance());
       telemetry.addData("gyroHeading:", "%3.3f", robot.gyroHeading());
       telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
-      Direction clst = control.lstick();
-      if (clst.isDown()) {
-        robot.distRearDrive(0, 20);
+      if (control.buttonA().isPressed()) {
+        robot.fastRearDrive(30);
+      } else if (control.buttonB().isPressed()) {
+        robot.fastRightDrive(30);
+      } else if (control.buttonX().isPressed()) {
+        robot.fastLeftDrive(100);
+      } else if (control.buttonY().isPressed()) {
+        robot.fastSyncTurn(90, 2);
       }
 
       // This is just steering

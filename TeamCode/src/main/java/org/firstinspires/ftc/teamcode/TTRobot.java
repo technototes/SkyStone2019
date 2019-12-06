@@ -52,6 +52,10 @@ public class TTRobot {
   public static final double CLAWOPENPOSITION = 0.4;
   public static final double CLAWCLOSEPOSITION = 0.6;
 
+  // Distance speeds in cm for fast auto drive functions
+  public static final double TURBODISTANCE = 65;
+  public static final double SNAILDISTANCE = 15;
+
   // Unused stuff
   // the grab rotation position for snapping to horizontal or vertical
   private static final double GRABBERPOSITIONCUTOFF = 0.25;
@@ -189,7 +193,7 @@ public class TTRobot {
         break;
     }
     slide.setPower(power);
-    while (!override && power != 0 && slideSwitchSignaled()) {
+    while (!override && power != 0 && slideSwitchSignaled() && opMode.opModeIsActive()) {
       slide.setPower(-power);
       sleep(1);
     }
@@ -287,7 +291,7 @@ public class TTRobot {
     // Hit a limit
     if (!override && slideSwitchSignaled()) {
       // Stop the slide
-      while (slideSwitchSignaled() == true) {
+      while (slideSwitchSignaled() == true && opMode.opModeIsActive()) {
         slide.setPower(-power);
         sleep(1);
       }
@@ -442,12 +446,12 @@ public class TTRobot {
   //for autonomous only
   public void toAngle(double to) {
     if (to > 0) {
-      while (to > gyroHeading()) {
+      while (to > gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
     } else {
-      while (to < gyroHeading()) {
+      while (to < gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(-1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
@@ -522,7 +526,7 @@ public class TTRobot {
       sleep(10);
       red = sensorColorBottom.red();
       blue = sensorColorBottom.blue();
-    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50));
+    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50) && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -575,7 +579,7 @@ public class TTRobot {
     ElapsedTime tm = new ElapsedTime();
     do {
       sleep(10);
-    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0);
+    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -587,9 +591,135 @@ public class TTRobot {
     tm.reset();
     do {
       sleep(10);
-    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0);
+    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
+
+  // Adaptive autonomous driving stuff:
+
+
+  public void setTurningSpeed(double angleDelta) {
+    if (Math.abs(angleDelta) < 25) {
+      speedSnail();
+    } else if (Math.abs(angleDelta) < 75) {
+      speedNormal();
+    } else {
+      speedTurbo();
+    }
+  }
+
+  // Turn to the angle specified
+  // FYI: 0 is facing 'away' from the driver
+  // 90 == 3:00, -90 == 9:00, 0 == 6:00
+  public void fastSyncTurn(double angle, double time) {
+    ElapsedTime runTime = new ElapsedTime();
+    runTime.reset();
+    while (opMode.opModeIsActive() &&
+      runTime.seconds() < time &&
+      Math.abs(gyroHeading2() - angle) > 4) {
+      if (gyroHeading2() > angle + 4) {
+        setTurningSpeed(gyroHeading2() - angle);
+        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
+      } else if (gyroHeading2() < angle - 4) {
+        setTurningSpeed(angle - gyroHeading2());
+        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
+      }
+      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro2:", gyroHeading2());
+      telemetry.update();
+    }
+    stop();
+  }
+
+  // This will travel toward the rear until it gets to 'dist'
+  public void fastRearDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = rearDistance();
+    fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? 1 : -1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      double heading = gyroHeading();
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(0, dir), Direction.None, heading);
+      curDistance = rearDistance();
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+
+  public void fastLeftDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = leftDistance();
+    fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? -1 : 1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      double heading = gyroHeading();
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(dir, 0), Direction.None, heading);
+      curDistance = leftDistance();
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+
+  public void fastRightDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = rightDistance();
+    fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? -1 : 1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      // This should be "close" to 0 degrees
+      double heading = gyroHeading2();
+      Direction rotation = new Direction(-heading / 100, 0);
+      joystickDrive(new Direction(dir, 0), rotation, heading);
+      curDistance = rightDistance();
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+
+
 
   // This attempts to drive in a straight(ish) line toward a corner
   public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
@@ -605,7 +735,7 @@ public class TTRobot {
       angle = AngleUnit.DEGREES.fromRadians(angle);
       driveTrain.setDriveVector(speed, angle, gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0);
+    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -623,7 +753,7 @@ public class TTRobot {
       angle = AngleUnit.DEGREES.fromRadians(angle);
       driveTrain.setDriveVector(speed, angle, gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0);
+    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 

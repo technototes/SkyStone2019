@@ -177,6 +177,8 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           currentState = AutoState.GO_TO_BASE_PLATE;
           // distToLine(x, y, z);
           robot.distRearDrive(0.75, 40);
+          robot.syncTurn(-90, 3);
+          robot.distRearDrive(0.75, 40);
           robot.syncTurn(90, 3);
           driveTime.reset();
 
@@ -196,6 +198,8 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           }
           robot.liftStop();
 
+
+          runTime.reset();
 
           runTime.reset();
 
@@ -256,7 +260,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           }
 
           robot.claw(0.0);
-
+          telemetry.addData("should stop", "");
+          telemetry.update();
+          sleep(2000);
           stop();
           currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
           break;
