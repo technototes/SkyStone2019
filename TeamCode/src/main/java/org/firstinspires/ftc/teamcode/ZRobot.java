@@ -46,8 +46,8 @@ public class ZRobot {
   public static final double CLAWCLOSEPOSITION = 0.6;
 
   // Distance speeds in cm
-  public static final double TURBODISTANCE=65;
-  public static final double SNAILDISTANCE=15;
+  public static final double TURBODISTANCE = 65;
+  public static final double SNAILDISTANCE = 15;
 
   // Unused stuff
   // the grab rotation position for snapping to horizontal or vertical
@@ -524,9 +524,9 @@ public class ZRobot {
         speedTurbo();
       }
       double heading = gyroHeading();
-      double turn = (heading < 0) ? .5 : -.5;
-      Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-      joystickDrive(new Direction(0, dir), rotation, heading);
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(0, dir), Direction.None, heading);
       curDistance = rearDistance();
       sleep(10);
     }
@@ -535,7 +535,7 @@ public class ZRobot {
   }
 
   public void setTurningSpeed(double angleDelta) {
-    if (Math.abs(angleDelta) < 20) {
+    if (Math.abs(angleDelta) < 25) {
       speedSnail();
     } else if (Math.abs(angleDelta) < 75) {
       speedNormal();
@@ -552,11 +552,11 @@ public class ZRobot {
     runTime.reset();
     while (opMode.opModeIsActive() &&
       runTime.seconds() < time &&
-      Math.abs(gyroHeading2() - angle) > 2) {
-      if (gyroHeading2() > angle + 2) {
+      Math.abs(gyroHeading2() - angle) > 4) {
+      if (gyroHeading2() > angle + 4) {
         setTurningSpeed(gyroHeading2() - angle);
         joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      } else if (gyroHeading2() < angle - 2) {
+      } else if (gyroHeading2() < angle - 4) {
         setTurningSpeed(angle - gyroHeading2());
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
       }
@@ -576,7 +576,7 @@ public class ZRobot {
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
-      double dir = (dist < curDistance) ? 1 : -1;
+      double dir = (dist < curDistance) ? -1 : 1;
       double magnitude = Math.abs(dist - curDistance);
       if (magnitude < SNAILDISTANCE) {
         speedSnail();
@@ -586,9 +586,9 @@ public class ZRobot {
         speedTurbo();
       }
       double heading = gyroHeading();
-      double turn = (heading < 0) ? .5 : -.5;
-      Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-      joystickDrive(new Direction(0, dir), rotation, heading);
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(dir, 0), Direction.None, heading);
       curDistance = leftDistance();
       sleep(10);
     }
@@ -605,7 +605,7 @@ public class ZRobot {
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
-      double dir = (dist < curDistance) ? 1 : -1;
+      double dir = (dist < curDistance) ? -1 : 1;
       double magnitude = Math.abs(dist - curDistance);
       if (magnitude < SNAILDISTANCE) {
         speedSnail();
@@ -614,10 +614,10 @@ public class ZRobot {
       } else {
         speedTurbo();
       }
-      double heading = gyroHeading();
-      double turn = (heading < 0) ? .5 : -.5;
-      Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-      joystickDrive(new Direction(0, dir), rotation, heading);
+      // This should be "close" to 0 degrees
+      double heading = gyroHeading2();
+      Direction rotation = new Direction(-heading / 100, 0);
+      joystickDrive(new Direction(dir, 0), rotation, heading);
       curDistance = rightDistance();
       sleep(10);
     }

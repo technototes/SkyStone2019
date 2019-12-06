@@ -29,14 +29,14 @@ public class ZDirectControl extends LinearOpMode {
       telemetry.addData("rear distance", "%3.3f", robot.rearDistance());
       telemetry.addData("gyroHeading:", "%3.3f", robot.gyroHeading());
       telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
-      Direction clst = control.lstick();
-      if (clst.isDown()) {
+      if (control.buttonA().isPressed()) {
         robot.distRearDrive(30);
-      }
-      else if (clst.isLeft()) {
-        robot.distLeftDrive(100);
-      } else if (clst.isRight()) {
+      } else if (control.buttonB().isPressed()) {
         robot.distRightDrive(30);
+      } else if (control.buttonX().isPressed()) {
+        robot.distLeftDrive(100);
+      } else if (control.buttonY().isPressed()) {
+        robot.syncTurn(90, 2);
       }
 
       // This is just steering
