@@ -64,7 +64,7 @@ public class HelperGrabber {
 
 
         robot.claw(0.0);
-        TTRobot.sleep(1000);
+        robot.sleep(1000);
         currentState = AutoState.STOP;
         // distToLine(x, y, z);
         break;
