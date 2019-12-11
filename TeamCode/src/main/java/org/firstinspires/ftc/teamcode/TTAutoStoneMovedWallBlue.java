@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-
-@Autonomous(name = "TTAutoGoToStoneBlue", group = "TT")
+//Test
+@Autonomous(name = "TTAutoStoneMovedWallBlue", group = "TT")
 public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
   // States
@@ -54,8 +54,8 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
     Truphoria tf = new Truphoria(hardwareMap, telemetry);
     robot.distRearDrive(1, 8);
-    robot.distRightDrive(0.5, 90, 45);
-    robot.distRightDrive(0.3, -90, 45);
+    robot.distRightDrive(0.5, 90, 40);
+    robot.distRightDrive(0.3, -90, 47);
     runtime.reset();
     while (runtime.seconds() < 2) {
       tf.takeALook();
@@ -98,8 +98,8 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, -90, 90);
-          robot.distRightDrive(0.3, 90, 90);
+          robot.distRightDrive(0.5, -90, 87);
+          robot.distRightDrive(0.3, 90, 87);
           currentState = AutoState.GOFORWARD;
           break;
         case GOTOBLOCK2:
@@ -110,16 +110,19 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           break;
         case GOTOBLOCK3:
           telemetry.addData("state", currentState.toString());
-          robot.distRightDrive(0.5, 90, 50);
-          robot.distRightDrive(0.3, -90, 55);
+          //robot.distRightDrive(0.5, 90, 50);
+          //robot.distRightDrive(0.3, -90, 55);
+//          robot.timeDrive(0.25, 0.25, 90);
           currentState = AutoState.GOFORWARD;
           break;
         case GOFORWARD:
           telemetry.addData("state", currentState.toString());
           robot.distRearDrive(0.75, 110);
           driveTime.reset();
-          while (driveTime.seconds() < 1.5) {
-            robot.liftUp();
+          while (driveTime.seconds() < 1.2) {
+            if (driveTime.seconds() < 0.75){
+              robot.liftUp();
+            }
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
           }
           robot.liftStop();
@@ -178,14 +181,17 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           sleep(1000);
           currentState = AutoState.GO_TO_BASE_PLATE;
           // distToLine(x, y, z);
-          robot.distRearDrive(0.5, 55);
+          robot.distRearDrive(0.5, 45);
           robot.syncTurn(-90, 3);
           driveTime.reset();
-          while (driveTime.seconds() < 0.1) {
+          while (driveTime.seconds() < 0.25) {
             robot.liftUp();
           }
-          stop();
+          robot.liftStop();
+
           break;
+
+
 
 
 
@@ -196,81 +202,119 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
           runTime.reset();
 
-          while (runTime.seconds() < 3) {
-            robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, false);
-          }
+
           runTime.reset();
           while (runTime.seconds() < 0.3) {
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
           }
-          robot.rotateClaw(0);
+          
 
           runTime.reset();
-          while (runTime.seconds() < 1.1) {
+          while (runTime.seconds() < 0.5) {
             robot.liftDown();
           }
 
           robot.liftStop();
-          telemetry.addData("Preparing to move from wall", "");
-          telemetry.update();
-          sleep(5000);
-
-          robot.distRearDrive(0.5, 60);
+          
+          
           robot.syncTurn(-90, 3);
-          robot.timeDrive(0.5, 2.5, -90);
+          
+          
+          if (tf.whichColumn() == 0) {
+          robot.timeDrive(0.5, 3, -90);
           runtime.reset();
-          while (runtime.seconds() < 0.4) {
+          while (runtime.seconds() < 1.25) {
             robot.liftUp();
           }
-          telemetry.addData("Lift should have moved up", "");
-          telemetry.update();
-          sleep(5000);
           robot.liftStop();
-          robot.timeDrive(0.7, 0.7, -90);
-          robot.timeDrive(0.3, 0.2, 90);
+          robot.rotateClaw(0.0);
+          
+          robot.timeDrive(0.3, 1.5, -90);
+          }
 
+          else if (tf.whichColumn() == 1) {
+          robot.timeDrive(0.5, 2.7, -90);
           runtime.reset();
+          while (runtime.seconds() < 1.25) {
+            robot.liftUp();
+          }
+          robot.liftStop();
+          robot.rotateClaw(0.0);
+          
+          robot.timeDrive(0.4, 1.6, -90);
+          }
+          
+          else if (tf.whichColumn() == 2) {
+          robot.timeDrive(0.5, 2.5, -90);
+          runtime.reset();
+          while (runtime.seconds() < 1.25) {
+            robot.liftUp();
+          }
+          robot.liftStop();
+          robot.rotateClaw(0.0);
+          
+          robot.timeDrive(0.3, 1.5, -90);
+          }
+          currentState = AutoState.PLACE_STONE;
 
-          robot.timeDrive(0.5, 0.3, -90);
-          telemetry.addData("about to start placing stone", "");
-          telemetry.update();
-          sleep(5000);
+          
+
+
 
           break;
 
-
         case PLACE_STONE:
+          
+          robot.rotateClaw(0.0);
 
 
           telemetry.addData("state", currentState.toString());
           telemetry.update();
-          sleep(2000);
+          
           runTime.reset();
 
 
-          telemetry.addData("starting to place stone", "");
-          telemetry.update();
-          sleep(2000);
+
           runTime.reset();
-          while (runTime.seconds() < 0.4) {
-            robot.liftUp();
-          }
+          
+          
           runTime.reset();
           while (runTime.seconds() < 1.5) {
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
           }
+          robot.rotateClaw(1.0);
 
           runTime.reset();
-          while (runTime.seconds() < 0.3) {
+          while (runTime.seconds() < 1.25) {
             robot.liftDown();
           }
-
-          robot.claw(0.0);
-          telemetry.addData("should stop", "");
-          telemetry.update();
-          sleep(2000);
-          stop();
-          currentState = AutoState.STOP;
+          robot.liftStop();
+          
+          robot.claw(1.0);
+          
+          runtime.reset();
+          while (runtime.seconds() < 0.5) {
+            robot.liftUp();
+          }
+          
+          robot.liftStop();
+          
+          
+          runtime.reset();
+          while (runtime.seconds() < 1) {
+          robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
+          }
+          robot.timeDrive(0.2, 0.25, 90);
+          runtime.reset();
+          while (runtime.seconds() < 1.3) {
+            robot.liftDown();
+          }
+          robot.liftStop();
+          robot.syncTurn(-90, 2);
+          robot.distLeftDrive(0.4, 0, 50);
+          
+          currentState = AutoState.GO_TO_LINE;
+          
           break;
 
         case GO_TO_LINE:
@@ -278,9 +322,10 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
           telemetry.addData("state", currentState.toString());
           runtime.reset();
-//          robot.driveToLine(1.0, 90);
+          robot.driveToLine(0.5, 90);
 
-
+          robot.stop();
+          currentState = AutoState.STOP;
           break;
         case STOP:
           telemetry.addData("state", currentState.toString());
