@@ -42,8 +42,4 @@ public class Direction {
     return (Y < -.5);
   }
 
-  public void turbo(double value) {
-    X = X * value;
-    Y = Y * value;
-  }
 }
