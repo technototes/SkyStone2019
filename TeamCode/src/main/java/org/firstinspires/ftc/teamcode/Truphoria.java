@@ -70,6 +70,12 @@ public class Truphoria {
       case Complete:
         telemetry.addData("Info:", "Width %d Height %d (%s)", image.getWidth(), image.getHeight(), error);
         votes++;
+        if(votes > 50){
+          votes = 0;
+          for0 = 0;
+          for1 = 0;
+          for2 = 0;
+        }
         switch (tallyYellows()) {
           case 0:
             for0++;
@@ -101,7 +107,6 @@ public class Truphoria {
     }
     telemetry.addData("Vote:", "%d %d %d (%d)", for0, for1, for2, votes);
   }
-
   /**
    * This tells you which column we believe has the Skystone in it currently
    * @return 0, 1, or 2 (assuming normal orientation!)

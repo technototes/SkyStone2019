@@ -165,7 +165,7 @@ public class TTRobot {
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
-    sleep(2000);
+    //sleep(2000);
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
   }
