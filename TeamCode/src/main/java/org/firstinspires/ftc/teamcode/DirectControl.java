@@ -87,9 +87,10 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.liftStop();
       }
-      if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8) {
+      if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
         robot.initGyro();
       }
+
       telemetry.addData("Left trigger pos: ", driver.ltrigger());
       telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering
