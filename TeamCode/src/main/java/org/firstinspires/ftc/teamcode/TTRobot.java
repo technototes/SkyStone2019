@@ -33,7 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-public class TTRobot {
+public class TTRobot implements IRobot {
   // Scaling values
 
   // The amount we divide speed by when dropping the lift
@@ -100,9 +100,19 @@ public class TTRobot {
   private Orientation angles;
   private Acceleration gravity;
 
-  public static final void sleep(long milliseconds) {
+  private static boolean UNTESTED = false;
+
+  // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
+  public final void sleep(long milliseconds) {
     try {
-      Thread.sleep(milliseconds);
+      if (UNTESTED) {
+        ElapsedTime tm = new ElapsedTime();
+        while (tm.milliseconds() < milliseconds && opMode.opModeIsActive()) {
+          Thread.sleep(Math.min(milliseconds - (long) tm.milliseconds(), 50));
+        }
+      } else {
+        Thread.sleep(milliseconds);
+      }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
@@ -460,10 +470,10 @@ public class TTRobot {
   }
 
   // Snap the robot to the closest 90 degree angle
-  public double snap(Telemetry tel) {
+  public double snap() {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
-    tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }

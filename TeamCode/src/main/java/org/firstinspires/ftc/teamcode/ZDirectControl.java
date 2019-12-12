@@ -9,7 +9,7 @@ public class ZDirectControl extends LinearOpMode {
   private ZRobot robot;
   private Controller control;
   private Controller driver;
-  private ZXDriveManualControl manualCtrl;
+  private XDriveManualControl manualCtrl;
 
   @Override
   public void runOpMode() {
@@ -18,7 +18,7 @@ public class ZDirectControl extends LinearOpMode {
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, "controller");
     robot = new ZRobot(this, hardwareMap, telemetry);
-    manualCtrl = new ZXDriveManualControl(robot, driver, control, telemetry);
+    manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
     robot.rotateClaw(1);

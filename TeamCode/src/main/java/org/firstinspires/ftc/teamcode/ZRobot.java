@@ -26,7 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-public class ZRobot {
+public class ZRobot implements IRobot {
   // Scaling values
 
   // The amount we divide speed by when dropping the lift
@@ -93,9 +93,18 @@ public class ZRobot {
   private Orientation angles;
   private Acceleration gravity;
 
-  public static final void sleep(long milliseconds) {
+  private static boolean UNTESTED = false;
+  // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
+  public final void sleep(long milliseconds) {
     try {
-      Thread.sleep(milliseconds);
+      if (UNTESTED) {
+        ElapsedTime tm = new ElapsedTime();
+        while (tm.milliseconds() < milliseconds && opMode.opModeIsActive()) {
+          Thread.sleep(Math.min(milliseconds - (long) tm.milliseconds(), 50));
+        }
+      } else {
+        Thread.sleep(milliseconds);
+      }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
@@ -449,7 +458,7 @@ public class ZRobot {
   }
 
   //for autonomous only
-  public void toAngleSync(double to) {
+  private void toAngleSync(double to) {
     double dir;
     do {
       Direction turn = getDirectionTowardAngle(to);
@@ -460,10 +469,10 @@ public class ZRobot {
   }
 
   // Snap the robot to the closest 90 degree angle
-  public double snap(Telemetry tel) {
+  public double snap() {
     double curr = gyroHeading();
     double newangle = toNearestAngle(curr);
-    tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
