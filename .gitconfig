@@ -1,0 +1,5 @@
+[alias]
+  st = status
+  sl = log --graph --oneline --decorate --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative -n 20 --all
+  branches = branch --list --all
+  tags = tag --list
