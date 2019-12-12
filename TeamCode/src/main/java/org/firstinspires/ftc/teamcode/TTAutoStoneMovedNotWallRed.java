@@ -111,6 +111,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
 
 
         case GO_TO_LINE:
+
           telemetry.addData("state", currentState.toString());
           runtime.reset();
           // distToLine(x, y, z);

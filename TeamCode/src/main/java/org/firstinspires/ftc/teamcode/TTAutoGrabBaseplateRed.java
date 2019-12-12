@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
 @Disabled
 
 @Autonomous(name = "TTAutoGrabBaseplateRed", group = "TT")
@@ -51,67 +52,91 @@ public class TTAutoGrabBaseplateRed extends LinearOpMode {
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-      switch (currentState) {
-        case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+      while (opModeIsActive()) {
+
+        switch (currentState) {
+
+          case INITIALIZE:
+            if (opModeIsActive()) {
+
+              telemetry.addData("state", currentState.toString());
+              runtime.reset();
           /*
           if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
               tfod.activate();
           }
+
           */
-          currentState = AutoState.GO_TO_PLATE;
-          robot.timeDrive(0.5, 1, 270);
-          robot.timeDrive(0.5, 0.2, 90);
-          break;
-        case GO_TO_PLATE:
-          telemetry.addData("state", currentState.toString()); // make sure
 
-          robot.timeDrive(0.5, 2.4, 180);
-          currentState = AutoState.GRAB_PLATE;
-          break;
-        case GRAB_PLATE:
-          telemetry.addData("state", currentState.toString());
+              currentState = AutoState.GO_TO_PLATE;
+              robot.timeDrive(0.5, 1, 270);
+              robot.timeDrive(0.5, 0.2, 90);
+            }
+            break;
+          case GO_TO_PLATE:
+            if (opModeIsActive()) {
 
-          robot.bpGrabber(1);
-          robot.timeDrive(0, 1, 0);
-          currentState = AutoState.BRING_PLATE;
-          break;
-        case BRING_PLATE:
-          telemetry.addData("state", currentState.toString());
-          robot.bpGrabber(1);
-          robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
-          currentState = AutoState.LET_GO;
-          break;
-        case LET_GO:
-          telemetry.addData("state", currentState.toString());
-          robot.bpGrabber(0);
+              telemetry.addData("state", currentState.toString()); // make sure
 
-          currentState = AutoState.GO_TO_LINE;
-          robot.timeDrive(0.5, 2, 90);
-          break;
-        case GO_TO_LINE:
-          telemetry.addData("state", currentState.toString());
-          // if(
-          robot.driveToLine(0.5, 90); // ){
-          currentState = AutoState.STOP;
-          // }
+              robot.timeDrive(0.5, 2.4, 180);
+              currentState = AutoState.GRAB_PLATE;
+            }
+            break;
+          case GRAB_PLATE:
+            if (opModeIsActive()) {
+              telemetry.addData("state", currentState.toString());
 
-          // distToLine(x, y, z);
-          break;
-        case STOP:
-          telemetry.addData("state", currentState.toString());
+              robot.bpGrabber(1);
+              robot.timeDrive(0, 1, 0);
+              currentState = AutoState.BRING_PLATE;
+            }
+            break;
+          case BRING_PLATE:
+            if (opModeIsActive()) {
+              telemetry.addData("state", currentState.toString());
+              robot.bpGrabber(1);
+              robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
+              currentState = AutoState.LET_GO;
+            }
+            break;
+          case LET_GO:
+            if (opModeIsActive()) {
+              telemetry.addData("state", currentState.toString());
+              robot.bpGrabber(0);
 
-          stop();
-          break;
+              currentState = AutoState.GO_TO_LINE;
+              robot.timeDrive(0.5, 2, 90);
+            }
+            break;
+          case GO_TO_LINE:
+            if (opModeIsActive()) {
+              telemetry.addData("state", currentState.toString());
+              // if(
+              robot.driveToLine(0.5, 90); // ){
+              currentState = AutoState.STOP;
+              // }
 
-        default:
-          telemetry.addData("state", currentState.toString());
+              // distToLine(x, y, z);
+            }
+            break;
+          case STOP:
+            if (opModeIsActive()) {
+              telemetry.addData("state", currentState.toString());
 
-          stop();
-          break;
+              stop();
+            }
+            break;
+
+          default:
+            telemetry.addData("state", currentState.toString());
+
+            stop();
+            break;
+        }
+        telemetry.update();
       }
-      telemetry.update();
     }
   }
+
+
 }

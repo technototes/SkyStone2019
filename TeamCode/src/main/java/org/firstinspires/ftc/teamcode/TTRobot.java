@@ -376,6 +376,7 @@ public class TTRobot {
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
+
   // 0 = facing away from driver (12 O'Clock)
   // 90 degrees: 3:00
   // -90 degrees: 9:00
@@ -480,6 +481,7 @@ public class TTRobot {
     }
     return 0;
   }
+
   private double scaledSnap(double targetAngle) {
     double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
@@ -720,7 +722,6 @@ public class TTRobot {
   }
 
 
-
   // This attempts to drive in a straight(ish) line toward a corner
   public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
     double rDist, ltDist;
@@ -778,4 +779,9 @@ public class TTRobot {
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
 
+  public void initGyro() {
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    imu.initialize(parameters);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+  }
 }

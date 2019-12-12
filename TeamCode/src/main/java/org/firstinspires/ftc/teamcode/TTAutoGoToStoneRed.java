@@ -41,7 +41,6 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
     robot = new TTRobot(this, hardwareMap, telemetry);
 
 
-
     // Put vuforia Here
 
     waitForStart();
@@ -50,7 +49,7 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
     robot.distRearDrive(0.5, 9);
     robot.distLeftDrive(0.5, -90, 60);
     runtime.reset();
-    while(runtime.seconds() < 2){
+    while (runtime.seconds() < 2) {
       tf.takeALook();
       telemetry.addData("tfdata ", tf.whichColumn());
       telemetry.addData("tfconf ", tf.confidence());
@@ -69,50 +68,62 @@ public class TTAutoGoToStoneRed extends LinearOpMode {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
       switch (currentState) {
         case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            runtime.reset();
           /*
           if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
               tfod.activate();
           }
           */
-          switch (blockPos) {
-            case 0:
-              currentState = AutoState.GOTOBLOCK1;
-              break;
-            case 1:
-              currentState = AutoState.GOTOBLOCK2;
-              break;
-            case 2:
-              currentState = AutoState.GOTOBLOCK3;
-              break;
+            switch (blockPos) {
+              case 0:
+                currentState = AutoState.GOTOBLOCK1;
+                break;
+              case 1:
+                currentState = AutoState.GOTOBLOCK2;
+                break;
+              case 2:
+                currentState = AutoState.GOTOBLOCK3;
+                break;
+            }
           }
           break;
 
         case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90, 74);
-          currentState = AutoState.GOFORWARD;
-          break;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distLeftDrive(0.5, 90, 74);
+            currentState = AutoState.GOFORWARD;
+            break;
+          }
         case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90, 60);
-          currentState = AutoState.GOFORWARD;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distLeftDrive(0.5, 90, 60);
+            currentState = AutoState.GOFORWARD;
+          }
           break;
         case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, -90, 47);
-          currentState = AutoState.GOFORWARD;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distLeftDrive(0.5, -90, 47);
+            currentState = AutoState.GOFORWARD;
+          }
           break;
         case GOFORWARD:
-          telemetry.addData("state", currentState.toString());
-          robot.distRearDrive(0.5, 80);
-          currentState = AutoState.STOP;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distRearDrive(0.5, 80);
+            currentState = AutoState.STOP;
+          }
           break;
         case STOP:
-          telemetry.addData("state", currentState.toString());
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
 
-          stop();
+            stop();
+          }
           break;
 
         default:
