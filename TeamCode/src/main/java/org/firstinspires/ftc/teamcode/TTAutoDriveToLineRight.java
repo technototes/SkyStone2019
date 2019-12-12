@@ -49,29 +49,36 @@ public class TTAutoDriveToLineRight extends LinearOpMode {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
 
       switch (currentState) {
-        case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+          case INITIALIZE:
+            if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            runtime.reset();
           /*
           if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
               tfod.activate();
           }
           */
+        }
           currentState = AutoState.GO_TO_LINE;
+
           break;
 
 
         case GO_TO_LINE:
-          telemetry.addData("state", currentState.toString());
-          robot.driveToLine(0.5, 90);
-          robot.driveToLine(0.2, 270);
-          currentState = AutoState.STOP;
-          // distToLine(x, y, z);
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.driveToLine(0.5, 90);
+            robot.driveToLine(0.2, 270);
+            currentState = AutoState.STOP;
+            // distToLine(x, y, z);
+          }
           break;
         case STOP:
-          telemetry.addData("state", currentState.toString());
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
 
-          stop();
+            stop();
+          }
           break;
 
         default:

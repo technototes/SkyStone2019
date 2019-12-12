@@ -55,51 +55,63 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
 
       switch (currentState) {
         case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            runtime.reset();
           /*
           if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
               tfod.activate();
           }
           */
-          currentState = AutoState.GO_TO_PLATE;
-          robot.timeDrive(0.5, 1, 90);
-          robot.timeDrive(0.5, 0.2, 270);
+            currentState = AutoState.GO_TO_PLATE;
+            robot.timeDrive(0.5, 1, 90);
+            robot.timeDrive(0.5, 0.2, 270);
+          }
           break;
         case GO_TO_PLATE:
-          telemetry.addData("state", currentState.toString()); // make sure
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString()); // make sure
 
-          robot.timeDrive(0.5, 2.4, 180);
-          currentState = AutoState.GRAB_PLATE;
+            robot.timeDrive(0.5, 2.4, 180);
+            currentState = AutoState.GRAB_PLATE;
+          }
           break;
         case GRAB_PLATE:
-          telemetry.addData("state", currentState.toString());
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
 
-          robot.bpGrabber(1);
-          robot.timeDrive(0, 1, 0);
-          currentState = AutoState.BRING_PLATE;
+            robot.bpGrabber(1);
+            robot.timeDrive(0, 1, 0);
+            currentState = AutoState.BRING_PLATE;
+          }
           break;
         case BRING_PLATE:
-          telemetry.addData("state", currentState.toString());
-          robot.bpGrabber(1);
-          robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
-          currentState = AutoState.LET_GO;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.bpGrabber(1);
+            robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
+            currentState = AutoState.LET_GO;
+          }
           break;
         case LET_GO:
-          telemetry.addData("state", currentState.toString());
-          robot.bpGrabber(0);
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.bpGrabber(0);
 
-          currentState = AutoState.GO_TO_LINE;
-          robot.timeDrive(0.5, 2, 270);
+            currentState = AutoState.GO_TO_LINE;
+            robot.timeDrive(0.5, 2, 270);
+          }
           break;
         case GO_TO_LINE:
-          telemetry.addData("state", currentState.toString());
-          // if(
-          robot.driveToLine(0.5, 270); // ){
-          currentState = AutoState.STOP;
-          // }
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            // if(
+            robot.driveToLine(0.5, 270); // ){
+            currentState = AutoState.STOP;
+            // }
 
-          // distToLine(x, y, z);
+            // distToLine(x, y, z);
+          }
           break;
         case STOP:
           telemetry.addData("state", currentState.toString());

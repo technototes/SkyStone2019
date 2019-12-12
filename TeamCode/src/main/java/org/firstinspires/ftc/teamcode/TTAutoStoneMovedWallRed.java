@@ -76,204 +76,213 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
       switch (currentState) {
         case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            runtime.reset();
           /*
           if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
               tfod.activate();
           }
           */
-          switch (blockPos) {
-            case 0:
-              currentState = AutoState.GOTOBLOCK1;
-              break;
-            case 1:
-              currentState = AutoState.GOTOBLOCK2;
-              break;
-            case 2:
-              currentState = AutoState.GOTOBLOCK3;
-              break;
+            switch (blockPos) {
+              case 0:
+                currentState = AutoState.GOTOBLOCK1;
+                break;
+              case 1:
+                currentState = AutoState.GOTOBLOCK2;
+                break;
+              case 2:
+                currentState = AutoState.GOTOBLOCK3;
+                break;
+            }
           }
           break;
 
         case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90, 90);
-          robot.distLeftDrive(0.3, -90, 90);
-          currentState = AutoState.GOFORWARD;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distLeftDrive(0.5, 90, 90);
+            robot.distLeftDrive(0.3, -90, 90);
+            currentState = AutoState.GOFORWARD;
+          }
           break;
         case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
-          //robot.distLeftDrive(0.5, 90, 70);
-          //robot.distLeftDrive(0.3, -90, 70);
-          currentState = AutoState.GOFORWARD;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            //robot.distLeftDrive(0.5, 90, 70);
+            //robot.distLeftDrive(0.3, -90, 70);
+            currentState = AutoState.GOFORWARD;
+          }
           break;
         case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, -90, 50);
-          robot.distLeftDrive(0.3, 90, 50);
-          currentState = AutoState.GOFORWARD;
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distLeftDrive(0.5, -90, 50);
+            robot.distLeftDrive(0.3, 90, 50);
+            currentState = AutoState.GOFORWARD;
+          }
           break;
         case GOFORWARD:
-          telemetry.addData("state", currentState.toString());
-          robot.distRearDrive(0.75, 100);
-          driveTime.reset();
-          while(driveTime.seconds() < 1) {
-            robot.liftUp();
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
-          }
-          robot.liftStop();
-          while(driveTime.seconds() < 0.75){
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
-          }
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            robot.distRearDrive(0.75, 100);
+            driveTime.reset();
+            while (driveTime.seconds() < 1) {
+              robot.liftUp();
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+            }
+            robot.liftStop();
+            while (driveTime.seconds() < 0.75) {
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+            }
 
-          robot.setLinearSlideDirection(LinearSlideOperation.None, true);
+            robot.setLinearSlideDirection(LinearSlideOperation.None, true);
 
-          currentState = AutoState.EXTENDSLIDE;
+            currentState = AutoState.EXTENDSLIDE;
+          }
           break;
         case EXTENDSLIDE:
+          if (opModeIsActive()) {
 
-          telemetry.addData("state", currentState.toString());
-          driveTime.reset();
-          while (driveTime.seconds() < 1.3) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+            telemetry.addData("state", currentState.toString());
+            driveTime.reset();
+            while (driveTime.seconds() < 1.3) {
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+            }
+            //while (driveTime.seconds() < 4 && !robot.slideSwitchSignaled()) {
+            //robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+            //}
+            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+            driveTime.reset();
+            robot.rotateClaw(1);
+            robot.claw(1.0);
+            //while(driveTime.seconds() < 0.9) {
+            //robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
+            //}
+            robot.setLinearSlideDirection(LinearSlideOperation.None, true);
+            driveTime.reset();
+            while (driveTime.seconds() < 1.5 && !robot.liftSwitchSignaled()) {
+              robot.liftDown();
+
+            }
+            robot.liftStop();
+
+            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+
+            currentState = AutoState.GRABBLOCK;
+
+            // distToLine(x, y, z);
           }
-          //while (driveTime.seconds() < 4 && !robot.slideSwitchSignaled()) {
-          //robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
-          //}
-          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-          driveTime.reset();
-          robot.rotateClaw(1);
-          robot.claw(1.0);
-          //while(driveTime.seconds() < 0.9) {
-          //robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
-          //}
-          robot.setLinearSlideDirection(LinearSlideOperation.None, true);
-          driveTime.reset();
-          while(driveTime.seconds() < 1.5 && !robot.liftSwitchSignaled()){
-            robot.liftDown();
-
-          }
-          robot.liftStop();
-
-          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-
-          currentState = AutoState.GRABBLOCK;
-
-          // distToLine(x, y, z);
           break;
         case GRABBLOCK:
+          if (opModeIsActive()) {
 
-          telemetry.addData("state", currentState.toString());
+            telemetry.addData("state", currentState.toString());
 
-          robot.claw(0.0);
-          sleep(500);
-          driveTime.reset();
-          while(driveTime.seconds() < 0.25){
+            robot.claw(0.0);
+            sleep(500);
+            driveTime.reset();
+            while (driveTime.seconds() < 0.25) {
 
-            robot.liftUp();
+              robot.liftUp();
+            }
+            robot.liftStop();
+            currentState = AutoState.GO_TO_BASE_PLATE;
+            // distToLine(x, y, z);
+            robot.distRearDrive(0.75, 40);
+            robot.syncTurn(-90, 3);
+            robot.distRearDrive(0.75, 40);
+            robot.syncTurn(90, 3);
+            driveTime.reset();
           }
-          robot.liftStop();
-          currentState = AutoState.GO_TO_BASE_PLATE;
-          // distToLine(x, y, z);
-          robot.distRearDrive(0.75, 40);
-          robot.syncTurn(-90, 3);
-          robot.distRearDrive(0.75, 40);
-          robot.syncTurn(90, 3);
-          driveTime.reset();
-
 
           break;
-
 
 
         case GO_TO_BASE_PLATE:
 
+          if (opModeIsActive()) {
 
-          telemetry.addData("state", currentState.toString());
+            telemetry.addData("state", currentState.toString());
 
-          runTime.reset();
-          while (runtime.seconds() < 2) {
-            robot.liftUp();
+            runTime.reset();
+            while (runtime.seconds() < 2) {
+              robot.liftUp();
+            }
+            robot.liftStop();
+
+
+            runTime.reset();
+
+            runTime.reset();
+
+            while (runTime.seconds() < 0.4) {
+              robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, false);
+            }
+            runTime.reset();
+            while (runTime.seconds() < 0.3) {
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+            }
+            robot.rotateClaw(0);
+
+
+            robot.distLeftDrive(0.5, 0, 60);
+            robot.syncTurn(-90, 3);
+            robot.timeDrive(0.45, 3, -90);
+            runtime.reset();
+            while (runtime.seconds() < 1.5) {
+              robot.liftUp();
+            }
+            robot.liftStop();
+
+            robot.timeDrive(0.3, 0.7, -90);
+
+
+            runtime.reset();
+
           }
-          robot.liftStop();
-
-
-          runTime.reset();
-
-          runTime.reset();
-
-          while (runTime.seconds() < 0.4) {
-            robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, false);
-          }
-          runTime.reset();
-          while (runTime.seconds() < 0.3) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
-          }
-          robot.rotateClaw(0);
-
-
-
-
-          robot.distLeftDrive(0.5, 0, 60);
-          robot.syncTurn(-90, 3);
-          robot.timeDrive(0.45, 3, -90);
-          runtime.reset();
-          while (runtime.seconds() < 1.5) {
-            robot.liftUp();
-          }
-          robot.liftStop();
-
-          robot.timeDrive(0.3, 0.7, -90);
-
-
-          runtime.reset();
-
-
-
           break;
 
 
         case PLACE_STONE:
 
+          if (opModeIsActive()) {
+            runTime.reset();
 
 
-          runTime.reset();
+            runTime.reset();
+            while (runTime.seconds() < 0.25) {
+              robot.liftUp();
+            }
+            robot.liftStop();
+            runTime.reset();
+            stop();
+            currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
+            while (runTime.seconds() < 1.5) {
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+            }
 
+            runTime.reset();
+            while (runTime.seconds() < 0.3) {
+              robot.liftDown();
+            }
 
-
-          runTime.reset();
-          while (runTime.seconds() < 0.25) {
-            robot.liftUp();
+            robot.claw(0.0);
+            telemetry.addData("should stop", "");
+            telemetry.update();
+            sleep(2000);
+            stop();
+            currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
           }
-          robot.liftStop();
-          runTime.reset();
-          stop();
-          currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
-          while (runTime.seconds() < 1.5) {
-            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
-          }
-
-          runTime.reset();
-          while (runTime.seconds() < 0.3) {
-            robot.liftDown();
-          }
-
-          robot.claw(0.0);
-          telemetry.addData("should stop", "");
-          telemetry.update();
-          sleep(2000);
-          stop();
-          currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
           break;
 
         case GO_TO_LINE:
 
-
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
+          if (opModeIsActive()) {
+            telemetry.addData("state", currentState.toString());
+            runtime.reset();
 //          robot.driveToLine(1.0, 90);
-
+          }
 
           break;
         case STOP:
