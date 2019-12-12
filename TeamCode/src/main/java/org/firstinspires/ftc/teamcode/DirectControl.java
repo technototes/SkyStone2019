@@ -91,5 +91,8 @@ public class DirectControl extends LinearOpMode {
       manualCtrl.Steer();
       telemetry.update();
     }
+    if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8) {
+      robot.initGyro();
+    }
   }
 }
