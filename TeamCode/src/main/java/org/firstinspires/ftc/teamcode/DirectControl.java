@@ -97,6 +97,5 @@ public class DirectControl extends LinearOpMode {
       manualCtrl.Steer();
       telemetry.update();
     }
-
   }
 }
