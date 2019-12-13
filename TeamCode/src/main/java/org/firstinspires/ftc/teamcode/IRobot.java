@@ -6,6 +6,7 @@ public interface IRobot {
   // robot moves
   public static final double STICK_DEAD_ZONE = 0.05;
 
+  // This is an opModeActive aware sleep
   public void sleep(long milliseconds);
 
   // 0 = facing toward the driver (6 O'Clock)
@@ -29,6 +30,7 @@ public interface IRobot {
   // Snap the robot to the closest 90 degree angle
   public double snap();
 
+  // Stop the phone
   public void stop();
 
   // leave gyroAngle at zero to set relative angle
