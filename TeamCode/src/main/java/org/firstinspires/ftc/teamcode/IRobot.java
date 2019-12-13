@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 public interface IRobot {
   // This is the 'center' space on the controllers, used by the XDrive code, to not move the bot
   // Feel free to change it: The bigger it is, the more you have to push the sticks before the
@@ -46,4 +51,7 @@ public interface IRobot {
   // FYI: 0 is facing 'away' from the driver
   // 90 == 3:00, -90 == 9:00, 0 == 6:00
   public void fastSyncTurn(double angle, double time);
+
+  public void initGyro();
+
 }

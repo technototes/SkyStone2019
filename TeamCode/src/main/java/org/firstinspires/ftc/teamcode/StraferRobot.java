@@ -348,4 +348,9 @@ public class StraferRobot implements IRobot {
     double res = sens.getDistance(DistanceUnit.CM);
     return Range.clip(res, 0.01, cap);
   }
+  public void initGyro() {
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    imu.initialize(parameters);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+  }
 }

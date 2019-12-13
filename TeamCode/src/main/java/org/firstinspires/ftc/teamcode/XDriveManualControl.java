@@ -65,7 +65,7 @@ public class XDriveManualControl {
     }
 
     if (driver.ltrigger() > 0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed() ) {
-
+      robot.initGyro();
     }
   }
 }
