@@ -75,6 +75,7 @@ public class StraferRobot implements IRobot {
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
   private DistanceSensor sensorRangeRight = null;
+  private DistanceSensor sensorRangeFront = null;
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
@@ -118,9 +119,11 @@ public class StraferRobot implements IRobot {
     // cap = hardwareMap.get(CRServo.class, "cap");
     // lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     // liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
-    // sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
-    // sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
-    // sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
+    sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sRear");
+    sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sLeft");
+    sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sRight");
+    sensorRangeFront = hardwareMap.get(DistanceSensor.class, "sFront");
+
 
     // lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     // rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
