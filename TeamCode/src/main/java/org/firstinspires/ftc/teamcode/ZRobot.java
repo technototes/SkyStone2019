@@ -690,5 +690,11 @@ public class ZRobot implements IRobot {
 
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
+  public void initGyro() {
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    imu.initialize(parameters);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+  }
+
 
 }
