@@ -161,7 +161,7 @@ public class StraferRobot implements IRobot {
   public double gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
+    return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
   // 0 = facing away from driver (12 O'Clock)
