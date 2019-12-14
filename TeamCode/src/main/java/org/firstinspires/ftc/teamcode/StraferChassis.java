@@ -24,7 +24,11 @@ public class StraferChassis extends LinearOpMode {
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
-    robot.distRearLeftDrive(0.5, 50, 50);
+    robot.fastRearDrive(90);
+    sleep(4000);
+    robot.fastRearDrive(60);
+    robot.fastSyncTurn(-90, 2);
+    robot.fastFrontDrive(100);
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
