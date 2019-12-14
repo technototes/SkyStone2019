@@ -283,21 +283,22 @@ public class StraferRobot implements IRobot {
   // Turn to the angle specified
   // FYI: 0 is facing 'away' from the driver
   // 90 == 3:00, -90 == 9:00, 0 == 6:00
+  //better now
   public void fastSyncTurn(double angle, double time) {
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
     while (opMode.opModeIsActive() &&
       runTime.seconds() < time &&
-      Math.abs(gyroHeading() - angle) > 4) {
-      if (gyroHeading() > angle + 4) {
+      Math.abs(gyroHeading() - angle) > 10) {
+      if (angle > gyroHeading() - 2) {
         setTurningSpeed(gyroHeading() - angle);
         joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading());
-      } else if (gyroHeading() < angle - 4) {
+      } else if (angle < gyroHeading() + 2) {
         setTurningSpeed(angle - gyroHeading());
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading());
       }
       telemetry.addData("gyro:", gyroHeading());
-      telemetry.addData("gyro2:", gyroHeading());
+      //telemetry.addData("gyro2:", gyroHeading());
       telemetry.update();
     }
     stop();
