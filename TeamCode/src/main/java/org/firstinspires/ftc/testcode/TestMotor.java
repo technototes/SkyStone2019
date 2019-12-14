@@ -36,10 +36,9 @@ public class TestMotor extends LinearOpMode {
     // to 'get' must correspond to the names assigned during the robot configuration
     // step (using the FTC Robot Controller app on the phone).
 
-    motor = hardwareMap.get(DcMotor.class, "motor");
-
-    // Most robots need the motor on one side to be reversed to drive forward
-    // Reverse the motor that runs backwards when connected directly to the battery
+    motor = hardwareMap.get(DcMotor.class, "Mother");
+    encoder = "Mother";
+    motor.setMode(DcMotor.RunMode.RUN_WITH_ENCODEER);
 
     motor.setDirection(DcMotor.Direction.FORWARD);
     // Wait for the game to start (driver presses PLAY)
@@ -61,6 +60,8 @@ public class TestMotor extends LinearOpMode {
           inc = -.05;
         }
       }
+      int encPosition = motor.getCurrentPosition();
+      telemetry.addData("EncPos:", "%d", encPosition);
       // Show the elapsed game time and wheel power.
       telemetry.addData("Power", "%.2f", power);
       telemetry.update();
