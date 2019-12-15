@@ -37,7 +37,7 @@ public class TTAutoDriveToLineLeft extends LinearOpMode {
 
     sleep(2000);
     // start calibrating the gyro.
-    //telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    //telemetry.addData(">", "Robot Heading = %d", robot.dep_gyroHeading());
 
     // Put vuforia Here
 

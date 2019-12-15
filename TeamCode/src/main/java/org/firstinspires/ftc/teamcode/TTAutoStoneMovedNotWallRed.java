@@ -3,11 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 @Autonomous(name = "TTAutoStoneMovedNotWallRed", group = "TT")
 @Disabled
@@ -50,7 +46,7 @@ public class TTAutoStoneMovedNotWallRed extends LinearOpMode {
      */
     robot = new TTRobot(this, hardwareMap, telemetry);
 
-    telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    telemetry.addData(">", "Robot Heading = %d", robot.dep_gyroHeading());
     telemetry.update();
 
     // Put vuforia Here

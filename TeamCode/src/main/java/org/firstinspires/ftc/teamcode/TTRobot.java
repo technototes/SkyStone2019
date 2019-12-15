@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -28,8 +25,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
@@ -381,7 +376,8 @@ public class TTRobot implements IRobot {
   // 0 = facing toward the driver (6 O'Clock)
   // 90 = 9 O'clock
   // -90 = 3:00
-  public double gyroHeading() {
+  @Deprecated
+  public double dep_gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
@@ -457,12 +453,12 @@ public class TTRobot implements IRobot {
   //for autonomous only
   public void toAngle(double to) {
     if (to > 0) {
-      while (to > gyroHeading() && opMode.opModeIsActive()) {
+      while (to > dep_gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
     } else {
-      while (to < gyroHeading() && opMode.opModeIsActive()) {
+      while (to < dep_gyroHeading() && opMode.opModeIsActive()) {
         Direction dir = new Direction(-1, 0);
         joystickDrive(Direction.None, dir, 0);
       }
@@ -471,7 +467,7 @@ public class TTRobot implements IRobot {
 
   // Snap the robot to the closest 90 degree angle
   public double snap() {
-    double curr = gyroHeading();
+    double curr = dep_gyroHeading();
     double newangle = snapToAngle(curr);
     telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
@@ -526,12 +522,12 @@ public class TTRobot implements IRobot {
 
     ElapsedTime runTime = new ElapsedTime();
     while (runTime.seconds() < time && opMode.opModeIsActive()) {
-      driveTrain.timeDrive(speed, time, angle, gyroHeading());
+      driveTrain.timeDrive(speed, time, angle, dep_gyroHeading());
     }
   }
 
   public void lineDrive(double speed, double time, double angle) {
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     int red, blue;
     do {
@@ -556,7 +552,7 @@ public class TTRobot implements IRobot {
       telemetry.update();
       double dir = (dist < curDistance) ? 1 : -1;
       double speedMult = (Math.abs(dist - curDistance) > 10) ? 1.0 : 0.5;
-      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
+      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, dep_gyroHeading());
       sleep(10);
     } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0 && opMode.opModeIsActive());
     driveTrain.stop();
@@ -575,7 +571,7 @@ public class TTRobot implements IRobot {
         joystickDrive(Direction.None, new Direction(0, 0), gyroHeading2());
         time = 0;
       }
-      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro:", dep_gyroHeading());
       telemetry.addData("gyro2:", gyroHeading2());
       telemetry.update();
     }
@@ -587,7 +583,7 @@ public class TTRobot implements IRobot {
 
   public void distLeftDrive(double speed, double angle, double leftDist) {
     // TODO: Check this angle
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     do {
       sleep(10);
@@ -597,7 +593,7 @@ public class TTRobot implements IRobot {
 
   public void distRightDrive(double speed, double angle, double rightDist) {
     // TODO: Check this angle
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
 
     ElapsedTime tm = new ElapsedTime();
     tm.reset();
@@ -636,7 +632,7 @@ public class TTRobot implements IRobot {
         setTurningSpeed(angle - gyroHeading2());
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
       }
-      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro:", dep_gyroHeading());
       telemetry.addData("gyro2:", gyroHeading2());
       telemetry.update();
     }
@@ -662,7 +658,7 @@ public class TTRobot implements IRobot {
       } else {
         speedTurbo();
       }
-      double heading = gyroHeading();
+      double heading = dep_gyroHeading();
       //double turn = (heading < 0) ? .5 : -.5;
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
       joystickDrive(new Direction(0, dir), Direction.None, heading);
@@ -691,7 +687,7 @@ public class TTRobot implements IRobot {
       } else {
         speedTurbo();
       }
-      double heading = gyroHeading();
+      double heading = dep_gyroHeading();
       //double turn = (heading < 0) ? .5 : -.5;
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
       joystickDrive(new Direction(dir, 0), Direction.None, heading);
@@ -744,7 +740,7 @@ public class TTRobot implements IRobot {
       // TODO: Might need to do something like 90 - angle
       double angle = Math.atan2(rDist, -ltDist);
       angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
       sleep(10);
     } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
@@ -762,7 +758,7 @@ public class TTRobot implements IRobot {
       // TODO: Might need to do something like 90 - angle
       double angle = Math.atan2(rDist, rtDist);
       angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
       sleep(10);
     } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
@@ -774,19 +770,19 @@ public class TTRobot implements IRobot {
   }
 
   public void driveWallRear(double speed, double time, double angle, double distance) {
-    double gyroAngle = gyroHeading();
+    double gyroAngle = dep_gyroHeading();
 
     if (rearDistance() < distance && (angle < 180 && angle > 0)) {
 
-      gyroAngle = gyroHeading() + 3;
+      gyroAngle = dep_gyroHeading() + 3;
     } else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
-      gyroAngle = gyroHeading() - 3;
+      gyroAngle = dep_gyroHeading() - 3;
     } else {
-      gyroAngle = gyroHeading();
+      gyroAngle = dep_gyroHeading();
     }
 
 
-    driveTrain.timeDrive(speed, time, angle, gyroHeading());
+    driveTrain.timeDrive(speed, time, angle, dep_gyroHeading());
   }
 
   public void initGyro() {

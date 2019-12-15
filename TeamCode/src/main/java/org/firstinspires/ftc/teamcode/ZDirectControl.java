@@ -30,7 +30,7 @@ public class ZDirectControl extends LinearOpMode {
       telemetry.addData("right distance", "%3.3f", robot.sensorRangeRight.getDistance(DistanceUnit.CM));
       telemetry.addData("front distance", "%3.3f", robot.sensorRangeFront.getDistance(DistanceUnit.CM));
 
-      telemetry.addData("gyroHeading:", "%3.3f", robot.gyroHeading());
+      telemetry.addData("dep_gyroHeading:", "%3.3f", robot.dep_gyroHeading());
       telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
 
       // This is just steering

@@ -61,7 +61,7 @@ public class XDriveManualControl {
     if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
       robot.joystickDrive(L2, D, 0);
     } else {
-      robot.joystickDrive(L2, D, robot.gyroHeading());
+      robot.joystickDrive(L2, D, robot.dep_gyroHeading());
     }
 
     if (driver.ltrigger() > 0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed() ) {

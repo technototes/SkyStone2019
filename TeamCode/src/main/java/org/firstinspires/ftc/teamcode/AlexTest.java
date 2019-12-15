@@ -45,7 +45,7 @@ public class AlexTest extends LinearOpMode {
     // start calibrating the gyro.
     telemetry.addData(">", "Gyro Calibrating. Do Not move!");
     //robot.calibrate();
-    //telemetry.addData(">", "Robot Heading = %d", robot.gyroHeading());
+    //telemetry.addData(">", "Robot Heading = %d", robot.dep_gyroHeading());
 
     // Put vuforia Here
 

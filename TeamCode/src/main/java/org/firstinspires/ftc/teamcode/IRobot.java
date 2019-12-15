@@ -17,7 +17,7 @@ public interface IRobot {
   // 0 = facing toward the driver (6 O'Clock)
   // 90 = 9 O'clock
   // -90 = 3:00
-  public double gyroHeading();
+  public double dep_gyroHeading();
 
   // 0 = facing away from driver (12 O'Clock)
   // 90 degrees: 3:00

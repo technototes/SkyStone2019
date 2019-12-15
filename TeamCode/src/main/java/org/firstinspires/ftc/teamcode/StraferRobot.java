@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.content.res.Resources;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
@@ -11,8 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -156,7 +151,7 @@ public class StraferRobot implements IRobot {
   // 0 = facing toward the driver (6 O'Clock)
   // 90 = 9 O'clock
   // -90 = 3:00
-  public double gyroHeading() {
+  public double dep_gyroHeading() {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
@@ -203,9 +198,9 @@ public class StraferRobot implements IRobot {
     return test;
   }
 
-  // This returns a normalized angle difference (-180 to 180) from gyroHeading
+  // This returns a normalized angle difference (-180 to 180) from dep_gyroHeading
   private double angleDiff(double target) {
-    return AngleUnit.normalizeDegrees(gyroHeading() - target);
+    return AngleUnit.normalizeDegrees(dep_gyroHeading() - target);
   }
 
   private Direction getDirectionTowardAngle(double to) {
@@ -220,14 +215,14 @@ public class StraferRobot implements IRobot {
     do {
       Direction turn = getDirectionTowardAngle(to);
       dir = turn.X;
-      joystickDrive(Direction.None, turn, gyroHeading());
+      joystickDrive(Direction.None, turn, dep_gyroHeading());
       sleep(10);
     } while (Math.abs(dir) > 3);
   }
 
   // Snap the robot to the closest 90 degree angle
   public double snap() {
-    double curr = gyroHeading();
+    double curr = dep_gyroHeading();
     double newangle = toNearestAngle(curr);
     telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
@@ -251,11 +246,11 @@ public class StraferRobot implements IRobot {
   }
 
   public void timeDrive(double speed, double time, double angle) {
-    driveTrain.timeDrive(speed, time, angle, gyroHeading());
+    driveTrain.timeDrive(speed, time, angle, dep_gyroHeading());
   }
 
   public void lineDrive(double speed, double time, double angle) {
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
+    driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
     ElapsedTime tm = new ElapsedTime();
     int red, blue;
     do {
@@ -296,7 +291,7 @@ public class StraferRobot implements IRobot {
         setTurningSpeed(angle - gyroHeading2());
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
       }
-      telemetry.addData("gyro:", gyroHeading());
+      telemetry.addData("gyro:", dep_gyroHeading());
       telemetry.addData("gyro2:", gyroHeading2());
       telemetry.update();
     }
@@ -318,7 +313,7 @@ public class StraferRobot implements IRobot {
       // TODO: Might need to do something like 90 - angle
       double angle = Math.atan2(rDist, -ltDist);
       angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
       sleep(10);
     } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0);
     driveTrain.stop();
@@ -336,7 +331,7 @@ public class StraferRobot implements IRobot {
       // TODO: Might need to do something like 90 - angle
       double angle = Math.atan2(rDist, rtDist);
       angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      driveTrain.setDriveVector(speed, angle, dep_gyroHeading());
       sleep(10);
     } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0);
     driveTrain.stop();

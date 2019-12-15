@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Direct Control Auto Grab")
 public class DirectControlAutoGrab extends LinearOpMode {
@@ -149,7 +147,7 @@ public class DirectControlAutoGrab extends LinearOpMode {
       }
 
 
-      robot.joystickDrive(L2, D, robot.gyroHeading());
+      robot.joystickDrive(L2, D, robot.dep_gyroHeading());
       /*if (control.buttonY() == Button.Pressed) {
         robot.lslide(LinearSlideOperation.Extend);
       } else if (control.buttonA() == Button.Pressed) {
@@ -160,22 +158,22 @@ public class DirectControlAutoGrab extends LinearOpMode {
 
 
       /*if(control.dpad().isDown()){
-        robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(-0,-FINEDRIVESPEED), new Direction(0,0), robot.dep_gyroHeading());
       }
       if(control.dpad().isUp()){
-        robot.joystickDrive(new Direction(0,FINEDRIVESPEED), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(0,FINEDRIVESPEED), new Direction(0,0), robot.dep_gyroHeading());
       }
       if(control.dpad().isLeft()){
-        robot.joystickDrive(new Direction(-FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(-FINEDRIVESPEED,0), new Direction(0,0), robot.dep_gyroHeading());
       }
       if(control.dpad().isRight()){
-        robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.gyroHeading());
+        robot.joystickDrive(new Direction(FINEDRIVESPEED,0), new Direction(0,0), robot.dep_gyroHeading());
       }*/
       if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
         robot.joystickDrive(L2, D, 0);
       }
       else {
-        robot.joystickDrive(L2, D, robot.gyroHeading());
+        robot.joystickDrive(L2, D, robot.dep_gyroHeading());
       }
       telemetry.update();
 
