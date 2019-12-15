@@ -14,34 +14,32 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TTRobotTest {
   private TTRobot ttRobot;
   private @Mock LinearOpMode opMode;
-  private @Mock HardwareMap hardwareMap;
-  private @Mock Telemetry telemetry;
-  private @Mock CRServo lslideServo;
+  private HardwareMap hardwareMap = mock(HardwareMap.class);
+  private Telemetry telemetry = mock(Telemetry.class);
+  private CRServo lslideServo = mock(CRServo.class);
+  private BNO055IMU mockImu = mock(BNO055IMU.class);
 
-  private @Mock DcMotor lLiftMotor;
-  private @Mock DcMotor rLiftMotor;
+  private DcMotor lLiftMotor = mock(DcMotor.class);
+  private DcMotor rLiftMotor = mock(DcMotor.class);
 
-  private @Mock DigitalChannel lslideSwitch;
-  private @Mock DigitalChannel liftSwitch;
+  private DigitalChannel lslideSwitch = mock(DigitalChannel.class);
+  private DigitalChannel liftSwitch = mock(DigitalChannel.class);
 
-  private @Mock Servo lClaw;
-  private @Mock Servo rClaw;
-  private @Mock Servo lGrabber;
-  private @Mock Servo rGrabber;
+  private Servo lClaw = mock(Servo.class);
+  private Servo rClaw = mock(Servo.class);
+  private Servo lGrabber = mock(Servo.class);
+  private Servo rGrabber = mock(Servo.class);
+  private Servo grabTurn = mock(Servo.class);
 
   @org.junit.jupiter.api.Test
   void setLinearSlideDirection() {
@@ -70,7 +68,11 @@ class TTRobotTest {
   }
 
   @BeforeEach
-  void setUp(@Mock BNO055IMU mockImu) {
+  void setUp() {
+    ttRobot = buildMockRobot();
+  }
+
+  TTRobot buildMockRobot() {
     Mockito.lenient().when(hardwareMap.get(CRServo.class, "lslideServo")).thenReturn(lslideServo);
     Mockito.lenient().when(hardwareMap.get(BNO055IMU.class, "imu1")).thenReturn(mockImu);
 
@@ -86,6 +88,8 @@ class TTRobotTest {
     Mockito.lenient().when(hardwareMap.get(Servo.class, "lGrabber")).thenReturn(lGrabber);
     Mockito.lenient().when(hardwareMap.get(Servo.class, "rGrabber")).thenReturn(rGrabber);
 
-    ttRobot = new TTRobot(opMode, hardwareMap, telemetry);
+    Mockito.lenient().when(hardwareMap.get(Servo.class, "grabTurn")).thenReturn(grabTurn);
+
+    return new TTRobot(opMode, hardwareMap, telemetry);
   }
 }
