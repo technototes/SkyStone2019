@@ -25,8 +25,11 @@ public class DirectControl extends LinearOpMode {
 
     waitForStart();
     ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
-    while (opModeIsActive()) {
+    ElapsedTime timeSinceStart = new ElapsedTime();
+    ElapsedTime loopTime = new ElapsedTime();
 
+    while (opModeIsActive()) {
+      loopTime.reset();
       // Handle Grabber rotation
       /*if (control.buttonA() == Button.Pressed) {
         if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
@@ -102,6 +105,8 @@ public class DirectControl extends LinearOpMode {
       telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering
       manualCtrl.Steer();
+
+      telemetry.addLine(String.format("Timing: %.1f, %.1f", timeSinceStart.seconds(), loopTime.seconds()));
       telemetry.update();
     }
   }
