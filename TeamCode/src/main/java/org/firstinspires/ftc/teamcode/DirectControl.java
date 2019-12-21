@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -23,7 +24,7 @@ public class DirectControl extends LinearOpMode {
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
-    robot.rotateClaw(1);
+    ElapsedTime sinceLastUsed = new ElapsedTime();
     while (opModeIsActive()) {
 
       // Handle Grabber rotation
@@ -41,14 +42,16 @@ public class DirectControl extends LinearOpMode {
         robot.setClawPosition(ClawPosition.Close); // CLosed
       }
       // Grabber rotation
-
-      if (control.lbump() == Button.Pressed) {
-        robot.rotateClaw(0);
+      if (control.lbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
+        robot.rotateClaw(false);
         telemetry.addLine("Open 0.4");
-      } else if (control.rbump() == Button.Pressed) {
-        robot.rotateClaw(1);
+        sinceLastUsed.reset();
+      } else if (control.rbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
+        robot.rotateClaw(true);
         telemetry.addLine("Close 0.6");
+        sinceLastUsed.reset();
       }
+
 
       // Override the linear slide limit switches
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
