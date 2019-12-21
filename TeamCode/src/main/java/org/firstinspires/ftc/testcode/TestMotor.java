@@ -37,8 +37,8 @@ public class TestMotor extends LinearOpMode {
     // step (using the FTC Robot Controller app on the phone).
 
     motor = hardwareMap.get(DcMotor.class, "Mother");
-    encoder = "Mother";
-    motor.setMode(DcMotor.RunMode.RUN_WITH_ENCODEER);
+    //encoder = "Mother";
+    //motor.setMode(DcMotor.RunMode.RUN_WITH_ENCODEER);
 
     motor.setDirection(DcMotor.Direction.FORWARD);
     // Wait for the game to start (driver presses PLAY)
