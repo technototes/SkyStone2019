@@ -119,10 +119,10 @@ public class StraferRobot implements IRobot {
     // cap = hardwareMap.get(CRServo.class, "cap");
     // lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     // liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
-    sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sRear");
-    sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sLeft");
-    sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sRight");
-    sensorRangeFront = hardwareMap.get(DistanceSensor.class, "sFront");
+    //sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sRear");
+    //sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sLeft");
+    //sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sRight");
+    //sensorRangeFront = hardwareMap.get(DistanceSensor.class, "sFront");
     // lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
     // rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
     // sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
@@ -160,6 +160,13 @@ public class StraferRobot implements IRobot {
     Orientation angles1 =
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
+  }
+
+  public double getXAccel(){
+    return imu.getAcceleration().xAccel;
+  }
+  public double getYAccel(){
+    return imu.getAcceleration().yAccel;
   }
 
   // 0 = facing away from driver (12 O'Clock)
@@ -247,7 +254,7 @@ public class StraferRobot implements IRobot {
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
     driveTrain.setStickVector(j1.X, j1.Y, j2.X, gyroAngle);
-    telemetry.addData("control rstick X: ", j2.X);
+    //telemetry.addData("control rstick X: ", j2.X);
   }
 
   public void timeDrive(double speed, double time, double angle) {
@@ -283,21 +290,22 @@ public class StraferRobot implements IRobot {
   // Turn to the angle specified
   // FYI: 0 is facing 'away' from the driver
   // 90 == 3:00, -90 == 9:00, 0 == 6:00
+  //better now
   public void fastSyncTurn(double angle, double time) {
     ElapsedTime runTime = new ElapsedTime();
     runTime.reset();
     while (opMode.opModeIsActive() &&
       runTime.seconds() < time &&
-      Math.abs(gyroHeading2() - angle) > 4) {
-      if (gyroHeading2() > angle + 4) {
-        setTurningSpeed(gyroHeading2() - angle);
-        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      } else if (gyroHeading2() < angle - 4) {
-        setTurningSpeed(angle - gyroHeading2());
-        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
+      Math.abs(gyroHeading() - angle) > 10) {
+      if (angle > gyroHeading() - 2) {
+        setTurningSpeed(gyroHeading() - angle);
+        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading());
+      } else if (angle < gyroHeading() + 2) {
+        setTurningSpeed(angle - gyroHeading());
+        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading());
       }
       telemetry.addData("gyro:", gyroHeading());
-      telemetry.addData("gyro2:", gyroHeading2());
+      //telemetry.addData("gyro2:", gyroHeading());
       telemetry.update();
     }
     stop();
@@ -308,19 +316,34 @@ public class StraferRobot implements IRobot {
 
   // This attempts to drive in a straight(ish) line toward a corner
   public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
-    double rDist, ltDist;
+    double rDist, lDist;
     ElapsedTime tm = new ElapsedTime();
+    fastSyncTurn(0, 2);
     do {
-      rDist = getCappedRange(sensorRangeRear, 1500);
-      ltDist = getCappedRange(sensorRangeLeft, 1500);
+
       // Let's figure out what angle to drive toward to make a straightish line
       // TODO: I have no idea if this is the proper angle or not
       // TODO: Might need to do something like 90 - angle
-      double angle = Math.atan2(rDist, -ltDist);
-      angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      lDist = getCappedRange(sensorRangeLeft, 1500);
+      //double dir = (rearDist < rDist) ? -1 : 1;
+      double magnitude = Math.abs(rearDist - rDist);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      //double angle = Math.atan2(rDist, rtDist);
+      //angle = AngleUnit.DEGREES.fromRadians(angle);
+      joystickDrive(new Direction((leftDist-lDist)/(rDist-rearDist), (rDist-rearDist)/(lDist-leftDist)), new Direction(0, 0), gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0);
+      telemetry.addData("rdist ", rDist);
+      telemetry.addData("ldist ", lDist);
+      telemetry.update();
+
+    } while ((rDist > rearDist|| lDist > leftDist) && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -328,18 +351,146 @@ public class StraferRobot implements IRobot {
   public void distRearRightDrive(double speed, double rearDist, double rightDist) {
     double rDist, rtDist;
     ElapsedTime tm = new ElapsedTime();
+    //fastSyncTurn(0, 2);
     do {
-      rDist = getCappedRange(sensorRangeRear, 1500);
-      rtDist = getCappedRange(sensorRangeLeft, 1500);
       // Let's figure out what angle to drive toward to make a straightish line
       // TODO: I have no idea if this is the proper angle or not
       // TODO: Might need to do something like 90 - angle
-      double angle = Math.atan2(rDist, rtDist);
-      angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      rtDist = getCappedRange(sensorRangeRight, 1500);
+      //double dir = (rearDist < rDist) ? -1 : 1;
+      double magnitude = Math.abs(rearDist - rDist);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      //double angle = Math.atan2(rDist, rtDist);
+      //angle = AngleUnit.DEGREES.fromRadians(angle);
+      joystickDrive(new Direction((rtDist-rightDist)/(rDist-rearDist), (rDist-rearDist)/(rtDist-rightDist)), new Direction(0, 0), gyroHeading());
       sleep(10);
-    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0);
+      telemetry.addData("rdist ", rDist);
+      telemetry.addData("rtdist ", rtDist);
+      telemetry.update();
+
+    } while ((rDist > rearDist || rtDist > rightDist) && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
+  }
+  public void fastRearDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = sensorRangeRear.getDistance(DistanceUnit.CM);
+    fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? 1 : -1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      double heading = gyroHeading();
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(0, dir), Direction.None, heading);
+      curDistance = sensorRangeRear.getDistance(DistanceUnit.CM);
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+  public void fastFrontDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = sensorRangeFront.getDistance(DistanceUnit.CM);
+    fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? 1 : -1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      double heading = gyroHeading();
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(0, -dir), Direction.None, heading);
+      curDistance = sensorRangeFront.getDistance(DistanceUnit.CM);
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+
+  public void fastLeftDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = sensorRangeLeft.getDistance(DistanceUnit.CM);
+    //fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? -1 : 1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      double heading = gyroHeading();
+      //double turn = (heading < 0) ? .5 : -.5;
+      //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+      joystickDrive(new Direction(dir, 0), Direction.None, heading);
+      curDistance = sensorRangeLeft.getDistance(DistanceUnit.CM);
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
+  }
+
+  public void fastRightDrive(double dist) {
+    // Update: No attention should be paid to 'speed'
+    // Just drive and slow down when we get slow to the target
+    ElapsedTime tm = new ElapsedTime();
+    double curDistance = sensorRangeRight.getDistance(DistanceUnit.CM);
+    //fastSyncTurn(0, 2);
+    while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.update();
+      double dir = (dist < curDistance) ? -1 : 1;
+      double magnitude = Math.abs(dist - curDistance);
+      if (magnitude < SNAILDISTANCE) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      // This should be "close" to 0 degrees
+      double heading = gyroHeading();
+      Direction rotation = new Direction(-heading / 100, 0);
+      joystickDrive(new Direction(dir, 0), rotation, heading);
+      curDistance = sensorRangeRight.getDistance(DistanceUnit.CM);
+      sleep(10);
+    }
+    driveTrain.stop();
+    speedNormal();
   }
 
   private double getCappedRange(DistanceSensor sens, double cap) {
@@ -350,5 +501,13 @@ public class StraferRobot implements IRobot {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     imu.initialize(parameters);
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+  }
+  public void rearDist(){
+    while(opMode.opModeIsActive()) {
+      telemetry.addData("sensorVal: ", sensorRangeRear.getDistance(DistanceUnit.CM));
+      telemetry.addData("val: ", Math.cos(Math.toRadians(gyroHeading()))*sensorRangeRear.getDistance(DistanceUnit.CM));
+      telemetry.addData("gyro: ", gyroHeading());
+      telemetry.update();
+    }
   }
 }

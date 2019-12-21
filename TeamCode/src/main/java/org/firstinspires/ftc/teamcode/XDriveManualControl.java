@@ -33,9 +33,9 @@ public class XDriveManualControl {
     Direction D = new Direction(0, 0);
     Direction L2 = new Direction(0, 0);
     if (Math.abs(R2.X) > robot.STICK_DEAD_ZONE) {
-      D.X = -R2.X;
+      D.X = R2.X;
     } else if (Math.abs(R1.X) > robot.STICK_DEAD_ZONE) {
-      D.X = -R1.X;
+      D.X = R1.X;
     }
     if (Math.abs(L.X) > robot.STICK_DEAD_ZONE) {
       L2.X = L.X;
