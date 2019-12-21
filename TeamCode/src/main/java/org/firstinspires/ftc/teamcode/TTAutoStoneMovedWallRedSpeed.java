@@ -166,6 +166,12 @@
             robot.timeDrive(0.5, 2, 0);
             robot.fastSyncTurn(0, 2);
 
+            driveTime.reset();
+            while (driveTime.seconds() < 1.3) {
+              robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+            }
+            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+
             //choice for secondary skystone
             switch (blockPos) {
               case 0:
@@ -212,11 +218,12 @@
             currentState = AutoState.GOTOMOVEDBASEPLATE;
             break;
           case GOTOMOVEDBASEPLATE:
-            currentState = AutoState.PLACEBLOCK2;
+            robot.fastRearDrive(60);
             robot.fastSyncTurn(-90, 1);
 
             //TODO make this distfront to a dist of 80 maybe
             robot.timeDrive(0.75, 3, 90);
+            currentState = AutoState.PLACEBLOCK2;
             break;
           case PLACEBLOCK2:
             robot.setClawPosition(ClawPosition.Open);

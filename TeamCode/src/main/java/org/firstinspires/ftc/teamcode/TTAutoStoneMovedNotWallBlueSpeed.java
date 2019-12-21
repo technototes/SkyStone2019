@@ -1,16 +1,12 @@
   package org.firstinspires.ftc.teamcode;
 
   import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-  import com.qualcomm.robotcore.eventloop.opmode.Disabled;
   import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-  import com.qualcomm.robotcore.hardware.DcMotor;
   import com.qualcomm.robotcore.util.ElapsedTime;
 
-  import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-  import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
   //Test
-  @Autonomous(name = "TTAutoStoneMovedWallBlueSpeed", group = "TT")
-  public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
+  @Autonomous(name = "TTAutoStoneMovedNotWallBlueSpeed", group = "TT")
+  public class TTAutoStoneMovedNotWallBlueSpeed extends LinearOpMode {
 
     // States
     private enum AutoState {
@@ -20,15 +16,19 @@
       GOTOBLOCK2,
       GOTOBLOCK3,
       GRABBLOCK,          //1
-      GOTOBASEPLATE,      //3
+      GOTOMOVEDBASEPLATE, //2
       PLACEBLOCK,         //1
-      MOVEBASEPLATE,      //4
-      GOTOBLOCK4,         //5
+      GOTOBLOCK4,         //3
       GOTOBLOCK5,
       GOTOBLOCK6,
       GRABBLOCK2,         //1
-      GOTOMOVEDBASEPLATE, //3
-      PLACEBLOCK2,        //1
+      GOTOMOVEDBASEPLATE2,//2
+      PLACEBLOCK2,        //2
+      GOTOBLOCK12,        //2
+      GOTOBLOCK22,
+      GRABBLOCK3,         //1
+      GOTOMOVEDBASEPLATE3,//2
+      PLACEBLOCK3,        //1
       GOTOLINE,           //2
       STOP
 
@@ -139,42 +139,18 @@
               robot.liftUp();
             }
             robot.liftStop();
-            currentState = AutoState.GOTOBASEPLATE;
+            currentState = AutoState.GOTOMOVEDBASEPLATE;
             break;
-          case GOTOBASEPLATE:
+          case GOTOMOVEDBASEPLATE:
             robot.fastRearDrive(60);
-            robot.distRearLeftDrive(1, 90, 40);
+            robot.fastSyncTurn(-90, 2);
+
+            //TODO add distFrontLeftDrive
+            //robot.distRearLeftDrive(1, 90, 40);
             currentState = AutoState.PLACEBLOCK;
             break;
           case PLACEBLOCK:
             robot.setClawPosition(ClawPosition.Open);
-            while (driveTime.seconds() < 1.3) {
-              robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-            }
-            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-            currentState = AutoState.MOVEBASEPLATE;
-            break;
-          case MOVEBASEPLATE:
-            robot.fastRearDrive(70);
-            robot.fastSyncTurn(180, 2);
-            robot.timeDrive(0.5, 1, 0);
-            robot.bpGrabber(0);
-
-            //TODO make this dist front drive to a distance of 10
-            robot.timeDrive(0.75, 2, 180);
-            robot.bpGrabber(1);
-            robot.fastRightDrive(100);
-
-            //TODO also this one but to a distance of 60
-            robot.timeDrive(0.5, 2, 0);
-            robot.fastSyncTurn(0, 2);
-
-            driveTime.reset();
-            while (driveTime.seconds() < 1.3) {
-              robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
-            }
-            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-            //choice for secondary skystone
             switch (blockPos) {
               case 0:
                 currentState = AutoState.GOTOBLOCK6;
@@ -186,6 +162,8 @@
                 currentState = AutoState.GOTOBLOCK4;
                 break;
             }
+            robot.timeDrive(0.5, 0.5, 90);
+            robot.fastSyncTurn(0, 2);
             //lower lift
             driveTime.reset();
             while (driveTime.seconds() < 0.2) {
@@ -219,15 +197,65 @@
             robot.liftStop();
             currentState = AutoState.GOTOMOVEDBASEPLATE;
             break;
-          case GOTOMOVEDBASEPLATE:
+          case GOTOMOVEDBASEPLATE2:
             robot.fastRearDrive(60);
-            robot.fastSyncTurn(-90, 1);
+            robot.fastSyncTurn(-90, 2);
 
             //TODO make this distfront to a dist of 80 maybe
             robot.timeDrive(0.75, 3, -90);
             currentState = AutoState.PLACEBLOCK2;
             break;
           case PLACEBLOCK2:
+            robot.setClawPosition(ClawPosition.Open);
+            switch (blockPos){
+              case 0:
+                currentState = AutoState.GOTOBLOCK12;
+                break;
+              case 1:
+                currentState = AutoState.GOTOBLOCK12;
+                break;
+              case 2:
+                currentState = AutoState.GOTOBLOCK22;
+                break;
+            }
+            robot.timeDrive(0.5, 0.5, 90);
+            robot.fastSyncTurn(0, 2);
+            //lower lift
+            driveTime.reset();
+            while (driveTime.seconds() < 0.2) {
+              robot.liftDown();
+            }
+            robot.liftStop();
+
+            break;
+          case GOTOBLOCK12:
+            robot.distRearRightDrive(1, 80, 90);
+            currentState = AutoState.GRABBLOCK3;
+            break;
+          case GOTOBLOCK22:
+            robot.distRearRightDrive(1, 80, 70);
+            currentState = AutoState.GRABBLOCK3;
+            break;
+          case GRABBLOCK3:
+            robot.setClawPosition(ClawPosition.Close);
+            sleep(500);
+            driveTime.reset();
+            while (driveTime.seconds() < 0.2) {
+              robot.liftUp();
+            }
+            robot.liftStop();
+            currentState = AutoState.GOTOMOVEDBASEPLATE3;
+            break;
+          case GOTOMOVEDBASEPLATE3:
+
+            robot.fastRearDrive(60);
+            robot.fastSyncTurn(-90, 2);
+
+            //TODO make this distfront to a dist of 80 maybe
+            robot.timeDrive(0.75, 3, -90);
+            currentState = AutoState.PLACEBLOCK3;
+            break;
+          case PLACEBLOCK3:
             robot.setClawPosition(ClawPosition.Open);
             currentState = AutoState.GOTOLINE;
             break;
