@@ -870,7 +870,7 @@ public class TTRobot implements IRobot {
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
       double magnitude = Math.abs(rearDist - rDist);
-      if (magnitude < 30) {
+      if (magnitude < 20) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
         speedNormal();
