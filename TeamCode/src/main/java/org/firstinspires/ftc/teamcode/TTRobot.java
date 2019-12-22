@@ -103,6 +103,8 @@ public class TTRobot implements IRobot {
 
   // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
   public final void sleep(long milliseconds) {
+    telemetry.addData("Sleeping!", milliseconds);
+
     try {
       if (UNTESTED) {
         ElapsedTime tm = new ElapsedTime();

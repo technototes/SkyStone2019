@@ -28,14 +28,11 @@ public class XDriveManualControl {
     // Driver control:
     Direction Dpad = driver.dpad();
     Direction L = driver.lstick();
-    Direction R1 = driver.rstick();
-    Direction R2 = control.rstick();
+    Direction R = driver.rstick();
     Direction D = new Direction(0, 0);
     Direction L2 = new Direction(0, 0);
-    if (Math.abs(R2.X) > robot.STICK_DEAD_ZONE) {
-      D.X = R2.X;
-    } else if (Math.abs(R1.X) > robot.STICK_DEAD_ZONE) {
-      D.X = R1.X;
+    if (Math.abs(R.X) > robot.STICK_DEAD_ZONE) {
+      D.X = R.X;
     }
     if (Math.abs(L.X) > robot.STICK_DEAD_ZONE) {
       L2.X = L.X;
@@ -45,9 +42,7 @@ public class XDriveManualControl {
     }
 
     // Turbo Mode (insert Tristan happy face)
-    if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0)) {
-      robot.speedSnail();
-    } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
+    if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
       robot.speedTurbo();
     } else {
       robot.speedNormal();
