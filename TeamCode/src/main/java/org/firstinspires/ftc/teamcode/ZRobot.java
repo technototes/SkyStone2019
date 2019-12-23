@@ -64,19 +64,11 @@ public class ZRobot implements IRobot {
   private boolean isGrabberOpened = true;
   private LinearSlidePosition slidePosition = LinearSlidePosition.In;
 
-  private DigitalChannel lslideSwitch = null;
   private CRServo slide = null;
-  private Servo turn = null;
-  private Servo lClaw = null;
-  private Servo rClaw = null;
-  private Servo blockFlipper = null;
-  private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
   private DistanceSensor sensorRangeRight = null;
-  private Servo lGrabber = null;
-  private Servo rGrabber = null;
 
   public LiftControl lift = null;
   private XDrive driveTrain = null;
@@ -111,13 +103,13 @@ public class ZRobot implements IRobot {
     opMode = op;
     telemetry = tel;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "lslideServo");
-    turn = hardwareMap.get(Servo.class, "grabTurn");
-    lClaw = hardwareMap.get(Servo.class, "lClaw");
-    rClaw = hardwareMap.get(Servo.class, "rClaw");
-    blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
-    cap = hardwareMap.get(CRServo.class, "cap");
-    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
+    slide = hardwareMap.get(CRServo.class, "slide");
+//    turn = hardwareMap.get(Servo.class, "grabTurn");
+//    lClaw = hardwareMap.get(Servo.class, "lClaw");
+//    rClaw = hardwareMap.get(Servo.class, "rClaw");
+//    blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
+//    cap = hardwareMap.get(CRServo.class, "cap");
+//    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
     sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
     sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
@@ -127,8 +119,8 @@ public class ZRobot implements IRobot {
     lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
-    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
-    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
+//    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
+//    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
 
     DcMotor flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     DcMotor frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -150,13 +142,13 @@ public class ZRobot implements IRobot {
     // Calibrate
     // Set the digital channel mode to
     // Output mode can be used to blink LED's
-    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
+//    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-    lGrabber.setDirection(Servo.Direction.FORWARD);
-    rGrabber.setDirection(Servo.Direction.REVERSE);
+    //lGrabber.setDirection(Servo.Direction.FORWARD);
+    //rGrabber.setDirection(Servo.Direction.REVERSE);
 
-    lClaw.setDirection(Servo.Direction.FORWARD);
-    rClaw.setDirection(Servo.Direction.REVERSE);
+    //lClaw.setDirection(Servo.Direction.FORWARD);
+    //rClaw.setDirection(Servo.Direction.REVERSE);
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
@@ -166,7 +158,7 @@ public class ZRobot implements IRobot {
   }
 
   // Linear slide stuff:
-  public boolean slideSwitchSignaled() {
+/*  public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
   }
 
@@ -327,7 +319,7 @@ public class ZRobot implements IRobot {
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
-
+*/
   // 0 = facing toward the driver (6 O'Clock)
   // 90 = 9 O'clock
   // -90 = 3:00
@@ -346,14 +338,14 @@ public class ZRobot implements IRobot {
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
-  void setServoDirection(Servo.Direction direction) {
+/*  void setServoDirection(Servo.Direction direction) {
     turn.setDirection(direction);
   }
 
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
-
+*/
   public int getSkystonePosition() {
     //add vuforia+tristan vision processing
     return 1;

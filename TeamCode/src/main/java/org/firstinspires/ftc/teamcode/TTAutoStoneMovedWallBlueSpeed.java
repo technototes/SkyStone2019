@@ -126,9 +126,9 @@
             sleep(1000);
             driveTime.reset();
             while(driveTime.seconds() < 0.15){
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             robot.fastRearDrive(50);
             robot.distRearLeftDrive(1, 80, 50);
   //          robot.timeDrive(0.25, 0.25, 90);
@@ -141,10 +141,10 @@
             driveTime.reset();
             while (driveTime.seconds() < 2) {
               if (driveTime.seconds() < 0.75) {
-                robot.liftUp();
+                robot.lift.up();
               }
               robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
-              robot.liftStop();
+              robot.lift.stop();
             }/*
 
             robot.setLinearSlideDirection(LinearSlideOperation.None, true);

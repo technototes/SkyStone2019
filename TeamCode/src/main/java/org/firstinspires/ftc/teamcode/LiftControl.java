@@ -10,8 +10,11 @@ public class LiftControl {
   // This is how many 'ticks' a brick is
   private static int BRICK_HEIGHT = 1100;
 
-  // This is how high the base plate is
+  // This is how high the base plate is (to get *over* it while holding a brick)
   private static int BASE_PLATE_HEIGHT = 400;
+
+  // This is the height offset for placing a brick
+  private static int PLACE_HEIGHT_OFFSET = 100;
 
   // How many ticks should we be within for 'zero'
   private static int ZERO_TICK_RANGE = 150;
@@ -103,7 +106,7 @@ public class LiftControl {
     }
   }
 
-  private boolean GoToPosition(int target) {
+  public boolean GoToPosition(int target) {
     if (AverageInRange(target, POSITION_TICK_RANGE)) {
       stop();
       return true;
@@ -134,7 +137,9 @@ public class LiftControl {
   // This height should be the right height to release a brick on the stack
   public boolean SetBrick() {
     int cur = AveragePos();
-    if (Math.abs((cur - BASE_PLATE_HEIGHT) % BRICK_HEIGHT) < POSITION_TICK_RANGE) {
+    int targetLevel = cur / BRICK_HEIGHT;
+    int target = targetLevel * BRICK_HEIGHT + PLACE_HEIGHT_OFFSET;
+    if (Math.abs(cur - target) < POSITION_TICK_RANGE) {
       stop();
       return true;
     }
