@@ -632,6 +632,7 @@ public class TTRobot implements IRobot {
       telemetry.update();
 
       curDistance = rearDistance();
+      distFromGoal = Math.abs(curDistance - targetDist);
     }
 
     driveTrain.stop();
