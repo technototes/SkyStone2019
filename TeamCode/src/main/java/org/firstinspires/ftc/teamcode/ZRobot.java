@@ -69,8 +69,12 @@ public class ZRobot implements IRobot {
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
+
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
+  private int lLiftStart = 0;
+  private int rLiftStart = 0;
+
   private Servo turn = null;
   private Servo lClaw = null;
   private Servo rClaw = null;
@@ -114,10 +118,10 @@ public class ZRobot implements IRobot {
     opMode = op;
     telemetry = tel;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "lslideServo");
+    slide = hardwareMap.get(CRServo.class, "slide");
     turn = hardwareMap.get(Servo.class, "grabTurn");
-    lClaw = hardwareMap.get(Servo.class, "lClaw");
-    rClaw = hardwareMap.get(Servo.class, "rClaw");
+    //lClaw = hardwareMap.get(Servo.class, "lClaw");
+    //rClaw = hardwareMap.get(Servo.class, "rClaw");
     blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
     cap = hardwareMap.get(CRServo.class, "cap");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
@@ -154,6 +158,12 @@ public class ZRobot implements IRobot {
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    // Encoder setup
+    lLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    rLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    lLiftStart = lLiftMotor.getCurrentPosition();
+    rLiftStart = rLiftMotor.getCurrentPosition();
+
     // Set the digital channel mode to
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -162,8 +172,8 @@ public class ZRobot implements IRobot {
     lGrabber.setDirection(Servo.Direction.FORWARD);
     rGrabber.setDirection(Servo.Direction.REVERSE);
 
-    lClaw.setDirection(Servo.Direction.FORWARD);
-    rClaw.setDirection(Servo.Direction.REVERSE);
+    //lClaw.setDirection(Servo.Direction.FORWARD);
+    //rClaw.setDirection(Servo.Direction.REVERSE);
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
@@ -212,7 +222,6 @@ public class ZRobot implements IRobot {
       case Retract:
         power = -LINEARSLIDEPOWER;
         break;
-
     }
 
     switch (slidePosition) {
@@ -307,8 +316,8 @@ public class ZRobot implements IRobot {
 
   // Grabber stuff:
   public void claw(double val) {
-    lClaw.setPosition(val);
-    rClaw.setPosition(val);
+    //lClaw.setPosition(val);
+    //rClaw.setPosition(val);
   }
 
   public void rotateClaw(double val) {
@@ -343,6 +352,8 @@ public class ZRobot implements IRobot {
       val = val / DOWNWARDLIFTSCALE;
     lLiftMotor.setPower(val);
     rLiftMotor.setPower(val);
+    telemetry.addData("left lift:", lLiftMotor.getCurrentPosition());
+    telemetry.addData("right lift:", rLiftMotor.getCurrentPosition());
   }
 
   public void liftUp() {
@@ -472,7 +483,7 @@ public class ZRobot implements IRobot {
   public double snap() {
     double curr = gyroHeading();
     double newangle = toNearestAngle(curr);
-    telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    //telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
@@ -490,7 +501,7 @@ public class ZRobot implements IRobot {
   // leave gyroAngle at zero to set relative angle
   public void joystickDrive(Direction j1, Direction j2, double gyroAngle) {
     driveTrain.setStickVector(j1.X, j1.Y, j2.X, gyroAngle);
-    telemetry.addData("control rstick X: ", j2.X);
+    //telemetry.addData("control rstick X: ", j2.X);
   }
 
   public void timeDrive(double speed, double time, double angle) {
@@ -539,9 +550,9 @@ public class ZRobot implements IRobot {
         setTurningSpeed(angle - gyroHeading2());
         joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
       }
-      telemetry.addData("gyro:", gyroHeading());
-      telemetry.addData("gyro2:", gyroHeading2());
-      telemetry.update();
+      //telemetry.addData("gyro:", gyroHeading());
+      //telemetry.addData("gyro2:", gyroHeading2());
+      //telemetry.update();
     }
     stop();
   }
@@ -554,8 +565,8 @@ public class ZRobot implements IRobot {
     double curDistance = rearDistance();
     fastSyncTurn(0, 2);
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
-      telemetry.addData("Current Distance", curDistance);
-      telemetry.update();
+      //telemetry.addData("Current Distance", curDistance);
+      //telemetry.update();
       double dir = (dist < curDistance) ? 1 : -1;
       double magnitude = Math.abs(dist - curDistance);
       if (magnitude < SNAILDISTANCE) {

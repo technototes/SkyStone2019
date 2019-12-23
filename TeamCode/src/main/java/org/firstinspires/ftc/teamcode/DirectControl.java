@@ -24,9 +24,12 @@ public class DirectControl extends LinearOpMode {
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
-    ElapsedTime sinceLastUsed = new ElapsedTime();
-    while (opModeIsActive()) {
+    ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
+    ElapsedTime timeSinceStart = new ElapsedTime();
+    ElapsedTime loopTime = new ElapsedTime();
 
+    while (opModeIsActive()) {
+      loopTime.reset();
       // Handle Grabber rotation
       /*if (control.buttonA() == Button.Pressed) {
         if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
@@ -39,18 +42,22 @@ public class DirectControl extends LinearOpMode {
       if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
       } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.setClawPosition(ClawPosition.Close); // CLosed
+        robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
-      if (control.lbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
-        robot.rotateClaw(false);
-        telemetry.addLine("Open 0.4");
-        sinceLastUsed.reset();
-      } else if (control.rbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
-        robot.rotateClaw(true);
-        telemetry.addLine("Close 0.6");
-        sinceLastUsed.reset();
+      final double grabRotationDebounceSecs = 0.25;
+      if (sinceLastUsedGrabRotate.seconds() > grabRotationDebounceSecs) {
+        if (control.lbump() == Button.Pressed) {
+          robot.rotateClaw(true);
+          telemetry.addLine("rotateClaw true");
+          sinceLastUsedGrabRotate.reset();
+        } else if (control.rbump() == Button.Pressed) {
+          robot.rotateClaw(false);
+          telemetry.addLine("rotateClaw false");
+          sinceLastUsedGrabRotate.reset();
+        }
       }
+
 
 
       // Override the linear slide limit switches
@@ -98,6 +105,8 @@ public class DirectControl extends LinearOpMode {
       telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering
       manualCtrl.Steer();
+
+      telemetry.addLine(String.format("Timing: %.1f, %.1f", timeSinceStart.seconds(), loopTime.seconds()));
       telemetry.update();
     }
   }
