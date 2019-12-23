@@ -176,7 +176,8 @@ public class TTRobot implements IRobot {
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
     //set grabber rotation to be centered
-    turn.setPosition(0.5);
+    //turn.setPosition(0.5);
+    centerClaw();
   }
 
   // Linear slide stuff:
@@ -869,7 +870,7 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = Math.abs(rearDist - rDist);
+      double magnitude = Math.abs(leftDist - lDist);
       if (magnitude < 20) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
