@@ -24,28 +24,35 @@ public class ZDirectControl extends LinearOpMode {
 
     waitForStart();
     boolean liftMoving = false;
+    int curBrickHeight = -1;
     while (opModeIsActive()) {
 
-      //telemetry.addData("rear distance", "%3.3f", robot.sensorRangeRear.getDistance(DistanceUnit.CM));
-      //telemetry.addData("left distance", "%3.3f", robot.sensorRangeLeft.getDistance(DistanceUnit.CM));
-      //telemetry.addData("right distance", "%3.3f", robot.sensorRangeRight.getDistance(DistanceUnit.CM));
-      //telemetry.addData("front distance", "%3.3f", robot.sensorRangeFront.getDistance(DistanceUnit.CM));
-
-      //telemetry.addData("gyroHeading:", "%3.3f", robot.gyroHeading());
-      //telemetry.addData("gyroHeading2", "%3.3f", robot.gyroHeading2());
-
-      // Lift stuff
-      double ltr = control.ltrigger();
-      double rtr = control.rtrigger();
-      if (Math.abs(ltr) > ZRobot.STICKDEADZONE) {
-        robot.liftUp();
+      // Manual control of the lift from the control dpad
+      Direction dir = control.dpad();
+      if (dir.isUp()) {
+        robot.lift.up();
         liftMoving = true;
-      } else if (Math.abs(rtr) > ZRobot.STICKDEADZONE) {
-        robot.liftDown();
+      } else if (dir.isDown()) {
+        robot.lift.down();
         liftMoving = true;
       } else if (liftMoving) {
-        robot.liftStop();
         liftMoving = false;
+        robot.lift.stop();
+      }
+      // More automated control of the lift:
+      // Y for 'up a brick'
+      // X for 'down a brick'
+      // A for 'position current brick to place'
+      // B for 'grab a brick'
+      if (control.buttonA().isPressed()) {
+        robot.lift.SetBrickWait();
+      } else if (control.buttonY().isPressed()) {
+        robot.lift.LiftBrickWait(++curBrickHeight);
+      } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
+        robot.lift.LiftBrickWait(--curBrickHeight);
+      } else if (control.buttonB().isPressed()) {
+        robot.lift.AcquireBrickWait();
+        curBrickHeight = -1;
       }
 
       // This is just steering

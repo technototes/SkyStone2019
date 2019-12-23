@@ -29,8 +29,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 public class ZRobot implements IRobot {
   // Scaling values
 
-  // The amount we divide speed by when dropping the lift
-  private static final double DOWNWARDLIFTSCALE = 2.0;
   // the power of the linear slide
   private static final double LINEARSLIDEPOWER = 1.0;
 
@@ -66,27 +64,13 @@ public class ZRobot implements IRobot {
   private boolean isGrabberOpened = true;
   private LinearSlidePosition slidePosition = LinearSlidePosition.In;
 
-  private DigitalChannel lslideSwitch = null;
-  private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
-
-  private DcMotor lLiftMotor = null;
-  private DcMotor rLiftMotor = null;
-  private int lLiftStart = 0;
-  private int rLiftStart = 0;
-
-  private Servo turn = null;
-  private Servo lClaw = null;
-  private Servo rClaw = null;
-  private Servo blockFlipper = null;
-  private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
   private DistanceSensor sensorRangeRight = null;
-  private Servo lGrabber = null;
-  private Servo rGrabber = null;
 
+  public LiftControl lift = null;
   private XDrive driveTrain = null;
   private Telemetry telemetry = null;
   private LinearOpMode opMode = null;
@@ -98,6 +82,7 @@ public class ZRobot implements IRobot {
   private Acceleration gravity;
 
   private static boolean UNTESTED = false;
+
   // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
   public final void sleep(long milliseconds) {
     try {
@@ -119,23 +104,23 @@ public class ZRobot implements IRobot {
     telemetry = tel;
     // Get handles to all the hardware
     slide = hardwareMap.get(CRServo.class, "slide");
-    turn = hardwareMap.get(Servo.class, "grabTurn");
-    //lClaw = hardwareMap.get(Servo.class, "lClaw");
-    //rClaw = hardwareMap.get(Servo.class, "rClaw");
-    blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
-    cap = hardwareMap.get(CRServo.class, "cap");
-    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
-    liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
+//    turn = hardwareMap.get(Servo.class, "grabTurn");
+//    lClaw = hardwareMap.get(Servo.class, "lClaw");
+//    rClaw = hardwareMap.get(Servo.class, "rClaw");
+//    blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
+//    cap = hardwareMap.get(CRServo.class, "cap");
+//    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
     sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
     sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
     sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
 
-    lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
-    rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    DcMotor lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
+    DcMotor rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
-    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
-    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
+//    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
+//    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
 
     DcMotor flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     DcMotor frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -155,22 +140,12 @@ public class ZRobot implements IRobot {
     imu.initialize(parameters);
 
     // Calibrate
-    // make lift motors work together: they're facing opposite directions
-    lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-    rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    // Encoder setup
-    lLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    rLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    lLiftStart = lLiftMotor.getCurrentPosition();
-    rLiftStart = rLiftMotor.getCurrentPosition();
-
     // Set the digital channel mode to
     // Output mode can be used to blink LED's
-    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
-    liftSwitch.setMode(DigitalChannel.Mode.INPUT);
+//    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-    lGrabber.setDirection(Servo.Direction.FORWARD);
-    rGrabber.setDirection(Servo.Direction.REVERSE);
+    //lGrabber.setDirection(Servo.Direction.FORWARD);
+    //rGrabber.setDirection(Servo.Direction.REVERSE);
 
     //lClaw.setDirection(Servo.Direction.FORWARD);
     //rClaw.setDirection(Servo.Direction.REVERSE);
@@ -183,12 +158,8 @@ public class ZRobot implements IRobot {
   }
 
   // Linear slide stuff:
-  public boolean slideSwitchSignaled() {
+/*  public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
-  }
-
-  public boolean liftSwitchSignaled() {
-    return !liftSwitch.getState();
   }
 
   public void setLinearSlideDirectionRyan(LinearSlideOperation operation, boolean override) {
@@ -335,38 +306,9 @@ public class ZRobot implements IRobot {
     }
   }
 
-  // Lift stuff:
-  enum LiftState {
-    Above,
-    At,
-    Below
-  }
-
   public void bpGrabber(double pos) {
     lGrabber.setPosition(pos);
     rGrabber.setPosition(pos);
-  }
-
-  private void setLiftPower(double val) {
-    if (val > 0)
-      val = val / DOWNWARDLIFTSCALE;
-    lLiftMotor.setPower(val);
-    rLiftMotor.setPower(val);
-    telemetry.addData("left lift:", lLiftMotor.getCurrentPosition());
-    telemetry.addData("right lift:", rLiftMotor.getCurrentPosition());
-  }
-
-  public void liftUp() {
-    setLiftPower(-1.0);
-  }
-
-  public void liftDown() {
-    if (!isLiftAtLowerLimit())
-      setLiftPower(1.0);
-  }
-
-  public void liftStop() {
-    setLiftPower(0);
   }
 
   public void blockFlipper(double pos) {
@@ -376,11 +318,7 @@ public class ZRobot implements IRobot {
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
-
-  public boolean isLiftAtLowerLimit() {
-    return !liftSwitch.getState();
-  }
-
+*/
   // 0 = facing toward the driver (6 O'Clock)
   // 90 = 9 O'clock
   // -90 = 3:00
@@ -399,14 +337,14 @@ public class ZRobot implements IRobot {
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
-  void setServoDirection(Servo.Direction direction) {
+/*  void setServoDirection(Servo.Direction direction) {
     turn.setDirection(direction);
   }
 
   void setServoPosition(double position) {
     turn.setPosition(position);
   }
-
+*/
   public int getSkystonePosition() {
     //add vuforia+tristan vision processing
     return 1;
@@ -701,6 +639,7 @@ public class ZRobot implements IRobot {
 
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
+
   public void initGyro() {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     imu.initialize(parameters);
