@@ -3,12 +3,18 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,8 +32,9 @@ class TTRobotTest {
   private @Mock LinearOpMode opMode;
   private HardwareMap hardwareMap = mock(HardwareMap.class);
   private Telemetry telemetry = mock(Telemetry.class);
-  private CRServo lslideServo = mock(CRServo.class);
+
   private BNO055IMU mockImu = mock(BNO055IMU.class);
+  private Orientation gyroOrientation = new Orientation();
 
   private DcMotor lLiftMotor = mock(DcMotor.class);
   private DcMotor rLiftMotor = mock(DcMotor.class);
@@ -35,11 +42,24 @@ class TTRobotTest {
   private DigitalChannel lslideSwitch = mock(DigitalChannel.class);
   private DigitalChannel liftSwitch = mock(DigitalChannel.class);
 
-  private Servo lClaw = mock(Servo.class);
-  private Servo rClaw = mock(Servo.class);
+  private Servo claw = mock(Servo.class);
   private Servo lGrabber = mock(Servo.class);
   private Servo rGrabber = mock(Servo.class);
   private Servo grabTurn = mock(Servo.class);
+  private Servo blockFlipper = mock(Servo.class);
+
+  private CRServo lslideServo = mock(CRServo.class);
+  private CRServo capServo = mock(CRServo.class);
+
+  private DistanceSensor sensorRangeRear = mock(DistanceSensor.class);
+  private DistanceSensor sensorRangeLeft = mock(DistanceSensor.class);
+  private DistanceSensor sensorRangeRight = mock(DistanceSensor.class);
+  private ColorSensor sensorColorBottom = mock(ColorSensor.class);
+
+  private DcMotor flMotor = mock(DcMotor.class);
+  private DcMotor frMotor = mock(DcMotor.class);
+  private DcMotor rlMotor = mock(DcMotor.class);
+  private DcMotor rrMotor = mock(DcMotor.class);
 
   @org.junit.jupiter.api.Test
   void setLinearSlideDirection() {
@@ -51,7 +71,7 @@ class TTRobotTest {
     verify(lslideServo, times(2)).setPower(0.0);
 
     ttRobot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
-    verify(lslideServo).setPower(-1.0);
+    verify(lslideServo).setPower(-0.5);
     verify(lslideSwitch, never()).getState();
   }
 
@@ -73,8 +93,8 @@ class TTRobotTest {
   }
 
   TTRobot buildMockRobot() {
-    Mockito.lenient().when(hardwareMap.get(CRServo.class, "lslideServo")).thenReturn(lslideServo);
     Mockito.lenient().when(hardwareMap.get(BNO055IMU.class, "imu1")).thenReturn(mockImu);
+    Mockito.lenient().when(mockImu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES)).thenReturn(gyroOrientation);
 
     Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorLiftLeft")).thenReturn(lLiftMotor);
     Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorLiftRight")).thenReturn(rLiftMotor);
@@ -82,13 +102,27 @@ class TTRobotTest {
     Mockito.lenient().when(hardwareMap.get(DigitalChannel.class, "slideLimit")).thenReturn(lslideSwitch);
     Mockito.lenient().when(hardwareMap.get(DigitalChannel.class, "liftLimit")).thenReturn(liftSwitch);
 
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "lClaw")).thenReturn(lClaw);
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "rClaw")).thenReturn(rClaw);
+    Mockito.lenient().when(hardwareMap.get(CRServo.class, "slide")).thenReturn(lslideServo);
+    Mockito.lenient().when(hardwareMap.get(Servo.class, "claw")).thenReturn(claw);
 
     Mockito.lenient().when(hardwareMap.get(Servo.class, "lGrabber")).thenReturn(lGrabber);
     Mockito.lenient().when(hardwareMap.get(Servo.class, "rGrabber")).thenReturn(rGrabber);
 
     Mockito.lenient().when(hardwareMap.get(Servo.class, "grabTurn")).thenReturn(grabTurn);
+    Mockito.lenient().when(hardwareMap.get(Servo.class, "blockFlipper")).thenReturn(blockFlipper);
+
+    Mockito.lenient().when(hardwareMap.get(CRServo.class, "cap")).thenReturn(capServo);
+
+    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRear")).thenReturn(sensorRangeRear);
+    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeLeft")).thenReturn(sensorRangeLeft);
+    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRight")).thenReturn(sensorRangeRight);
+
+    Mockito.lenient().when(hardwareMap.get(ColorSensor.class, "sensorColorBottom")).thenReturn(sensorColorBottom);
+
+    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorFrontLeft")).thenReturn(flMotor);
+    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorFrontRight")).thenReturn(frMotor);
+    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorRearLeft")).thenReturn(rlMotor);
+    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorRearRight")).thenReturn(rrMotor);
 
     return new TTRobot(opMode, hardwareMap, telemetry);
   }
