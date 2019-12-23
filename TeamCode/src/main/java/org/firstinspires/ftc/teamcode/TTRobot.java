@@ -33,13 +33,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-public class TTRobot {
+public class TTRobot implements IRobot {
   // Scaling values
 
   // The amount we divide speed by when dropping the lift
   private static final double DOWNWARDLIFTSCALE = 2.0;
   // the power of the linear slide
-  private static final double LINEARSLIDEPOWER = 1.0;
+  private static final double LINEARSLIDEPOWER = 0.5;
 
   // Dead zones
 
@@ -49,8 +49,8 @@ public class TTRobot {
   public static final double TRIGGERTHRESHOLD = 0.25;
 
   // Claw grab positions
-  public static final double CLAWOPENPOSITION = 0.4;
-  public static final double CLAWCLOSEPOSITION = 0.6;
+  public static final double CLAWOPENPOSITION = 0;
+  public static final double CLAWCLOSEPOSITION = 1;
 
   // Distance speeds in cm for fast auto drive functions
   public static final double TURBODISTANCE = 65;
@@ -79,8 +79,7 @@ public class TTRobot {
   private DcMotor lLiftMotor = null;
   private DcMotor rLiftMotor = null;
   private Servo turn = null;
-  private Servo lClaw = null;
-  private Servo rClaw = null;
+  private Servo claw = null;
   private Servo blockFlipper = null;
   private CRServo cap = null;
   private ColorSensor sensorColorBottom = null;
@@ -100,9 +99,21 @@ public class TTRobot {
   private Orientation angles;
   private Acceleration gravity;
 
-  public static final void sleep(long milliseconds) {
+  private static boolean UNTESTED = false;
+
+  // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
+  public final void sleep(long milliseconds) {
+    telemetry.addData("Sleeping!", milliseconds);
+
     try {
-      Thread.sleep(milliseconds);
+      if (UNTESTED) {
+        ElapsedTime tm = new ElapsedTime();
+        while (tm.milliseconds() < milliseconds && opMode.opModeIsActive()) {
+          Thread.sleep(Math.min(milliseconds - (long) tm.milliseconds(), 50));
+        }
+      } else {
+        Thread.sleep(milliseconds);
+      }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
@@ -112,10 +123,9 @@ public class TTRobot {
     telemetry = tel;
     opMode = op;
     // Get handles to all the hardware
-    slide = hardwareMap.get(CRServo.class, "lslideServo");
+    slide = hardwareMap.get(CRServo.class, "slide");
     turn = hardwareMap.get(Servo.class, "grabTurn");
-    lClaw = hardwareMap.get(Servo.class, "lClaw");
-    rClaw = hardwareMap.get(Servo.class, "rClaw");
+    claw = hardwareMap.get(Servo.class, "claw");
     blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
     cap = hardwareMap.get(CRServo.class, "cap");
     lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
@@ -160,14 +170,15 @@ public class TTRobot {
     lGrabber.setDirection(Servo.Direction.FORWARD);
     rGrabber.setDirection(Servo.Direction.REVERSE);
 
-    lClaw.setDirection(Servo.Direction.FORWARD);
-    rClaw.setDirection(Servo.Direction.REVERSE);
     // TODO: Add initialization / calibration for the slide and lift?
 
     // Shamelessly copied from example code...
-    sleep(2000);
+    //sleep(2000);
     // Start the logging of measured acceleration
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
+    //set grabber rotation to be centered
+    turn.setPosition(0.5);
   }
 
   // Linear slide stuff:
@@ -304,22 +315,59 @@ public class TTRobot {
 
 
   // Grabber stuff:
-  public void claw(double val) {
-    lClaw.setPosition(val);
-    rClaw.setPosition(val);
+  public void claw(boolean openOrClose) {
+    if(openOrClose){
+      claw.setPosition(CLAWOPENPOSITION);
+    } else{
+      claw.setPosition(CLAWCLOSEPOSITION);
+    }
   }
 
-  public void rotateClaw(double val) {
-    turn.setPosition(val);
+  //sorry
+  private final int CLAW_LEFT_VAL = 0;
+  private final int CLAW_RIGHT_VAL = 0;
+  private final int CLAW_CENTER_VAL = 0;
+
+  public enum CurrentClawPosition {
+    LEFT, CENTER, RIGHT;
+  }
+
+  public void centerClaw(){
+    turn.setPosition(0.3);
+  }
+  private CurrentClawPosition curPos = CurrentClawPosition.CENTER;
+
+  public void rotateClaw(boolean increment) {
+    if(curPos == CurrentClawPosition.CENTER){
+      if(increment){
+        turn.setPosition(1);
+        curPos = CurrentClawPosition.RIGHT;
+      } else{
+        turn.setPosition(0);
+        curPos = CurrentClawPosition.LEFT;
+      }
+    } else if(curPos == CurrentClawPosition.LEFT){
+      if(increment){
+        turn.setPosition(0.3);
+        curPos = CurrentClawPosition.CENTER;
+      }
+    } else{
+      if(!increment){
+        turn.setPosition(0.3);
+        curPos = CurrentClawPosition.CENTER;
+      }
+    }
+    //telemetry.addData("val", turn.getPosition());
+    //telemetry.update();
   }
 
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
-        claw(0); // Open
+        claw(false); // Open
         break;
       case Close:
-        claw(1); // Closed
+        claw(true); // Closed
         break;
     }
   }
@@ -376,6 +424,7 @@ public class TTRobot {
       imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle + 180);
   }
+
   // 0 = facing away from driver (12 O'Clock)
   // 90 degrees: 3:00
   // -90 degrees: 9:00
@@ -459,10 +508,10 @@ public class TTRobot {
   }
 
   // Snap the robot to the closest 90 degree angle
-  public double snap(Telemetry tel) {
+  public double snap() {
     double curr = gyroHeading();
     double newangle = snapToAngle(curr);
-    tel.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
+    telemetry.addData("Snap:", String.format("curr: %3.3f new: %3.3f", curr, newangle));
     return scaledSnap(newangle);
     //return snap(newangle); replaced with above scaledSnap
   }
@@ -480,6 +529,7 @@ public class TTRobot {
     }
     return 0;
   }
+
   private double scaledSnap(double targetAngle) {
     double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
@@ -633,109 +683,221 @@ public class TTRobot {
 
   // This will travel toward the rear until it gets to 'dist'
   public void fastRearDrive(double dist) {
+
     // Update: No attention should be paid to 'speed'
+
     // Just drive and slow down when we get slow to the target
+
     ElapsedTime tm = new ElapsedTime();
+
     double curDistance = rearDistance();
+
     fastSyncTurn(0, 2);
+
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+
       telemetry.addData("Current Distance", curDistance);
+
       telemetry.update();
+
       double dir = (dist < curDistance) ? 1 : -1;
+
       double magnitude = Math.abs(dist - curDistance);
-      if (magnitude < SNAILDISTANCE) {
+
+      if (magnitude < 30) {
+
         speedSnail();
+
       } else if (magnitude < TURBODISTANCE) {
+
         speedNormal();
+
       } else {
+
         speedTurbo();
+
       }
+
       double heading = gyroHeading();
+
       //double turn = (heading < 0) ? .5 : -.5;
+
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+
       joystickDrive(new Direction(0, dir), Direction.None, heading);
+
       curDistance = rearDistance();
+
       sleep(10);
+
     }
+
     driveTrain.stop();
+
     speedNormal();
+
   }
+
+
 
   public void fastLeftDrive(double dist) {
+
     // Update: No attention should be paid to 'speed'
+
     // Just drive and slow down when we get slow to the target
+
     ElapsedTime tm = new ElapsedTime();
+
     double curDistance = leftDistance();
+
     fastSyncTurn(0, 2);
+
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+
       telemetry.addData("Current Distance", curDistance);
+
       telemetry.update();
+
       double dir = (dist < curDistance) ? -1 : 1;
+
       double magnitude = Math.abs(dist - curDistance);
+
       if (magnitude < SNAILDISTANCE) {
+
         speedSnail();
+
       } else if (magnitude < TURBODISTANCE) {
+
         speedNormal();
+
       } else {
+
         speedTurbo();
+
       }
+
       double heading = gyroHeading();
+
       //double turn = (heading < 0) ? .5 : -.5;
+
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
+
       joystickDrive(new Direction(dir, 0), Direction.None, heading);
+
       curDistance = leftDistance();
+
       sleep(10);
+
     }
+
     driveTrain.stop();
+
     speedNormal();
+
   }
+
+
 
   public void fastRightDrive(double dist) {
+
     // Update: No attention should be paid to 'speed'
+
     // Just drive and slow down when we get slow to the target
+
     ElapsedTime tm = new ElapsedTime();
+
     double curDistance = rightDistance();
+
     fastSyncTurn(0, 2);
+
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
+
       telemetry.addData("Current Distance", curDistance);
+
       telemetry.update();
+
       double dir = (dist < curDistance) ? -1 : 1;
+
       double magnitude = Math.abs(dist - curDistance);
+
       if (magnitude < SNAILDISTANCE) {
+
         speedSnail();
+
       } else if (magnitude < TURBODISTANCE) {
+
         speedNormal();
+
       } else {
+
         speedTurbo();
+
       }
+
       // This should be "close" to 0 degrees
+
       double heading = gyroHeading2();
+
       Direction rotation = new Direction(-heading / 100, 0);
+
       joystickDrive(new Direction(dir, 0), rotation, heading);
+
       curDistance = rightDistance();
+
       sleep(10);
+
     }
+
     driveTrain.stop();
+
     speedNormal();
+
   }
 
+  // This attempts to drive in a straight(ish) line toward a corner
+  // This will travel toward the rear until it gets to 'dist'
 
 
   // This attempts to drive in a straight(ish) line toward a corner
   public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
-    double rDist, ltDist;
+    double rDist, lDist;
     ElapsedTime tm = new ElapsedTime();
+    fastSyncTurn(0, 2);
     do {
-      rDist = getCappedRange(sensorRangeRear, 1500);
-      ltDist = getCappedRange(sensorRangeLeft, 1500);
+
       // Let's figure out what angle to drive toward to make a straightish line
       // TODO: I have no idea if this is the proper angle or not
       // TODO: Might need to do something like 90 - angle
-      double angle = Math.atan2(rDist, -ltDist);
-      angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
-      sleep(10);
-    } while (rDist > rearDist && ltDist > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      lDist = getCappedRange(sensorRangeLeft, 1500);
+      //double dir = (rearDist < rDist) ? -1 : 1;
+      double magnitude = Math.abs(rearDist - rDist);
+      if (magnitude < 30) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      //double angle = Math.atan2(rDist, rtDist);
+      //angle = AngleUnit.DEGREES.fromRadians(angle);
+      if(rDist < rearDist && lDist > leftDist){
+        //w
+        joystickDrive(new Direction((lDist - leftDist) / (rDist - rearDist), (rDist - rearDist) / (lDist - leftDist)), new Direction(0, 0), gyroHeading());
+      }else if(rDist > rearDist && lDist < leftDist){
+        joystickDrive(new Direction(-(lDist - leftDist) / (rDist - rearDist), -(rDist - rearDist) / (lDist - leftDist)), new Direction(0, 0), gyroHeading());
+      }else if(rDist < rearDist && lDist < leftDist){
+        joystickDrive(new Direction((lDist - leftDist) / (rDist - rearDist), (rDist - rearDist) / (lDist - leftDist)), new Direction(0, 0), gyroHeading());
+      }else{
+        //w
+        joystickDrive(new Direction(-(lDist - leftDist) / (rDist - rearDist), (rDist - rearDist) / (lDist - leftDist)), new Direction(0, 0), gyroHeading());
+      }
+      //fastSyncTurn(0, 0.01);
+      telemetry.addData("rdist ", rDist);
+      telemetry.addData("ldist ", lDist);
+      telemetry.update();
+
+    } while ((rDist > rearDist|| lDist > leftDist) && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -743,17 +905,41 @@ public class TTRobot {
   public void distRearRightDrive(double speed, double rearDist, double rightDist) {
     double rDist, rtDist;
     ElapsedTime tm = new ElapsedTime();
+    fastSyncTurn(0, 2);
     do {
-      rDist = getCappedRange(sensorRangeRear, 1500);
-      rtDist = getCappedRange(sensorRangeLeft, 1500);
       // Let's figure out what angle to drive toward to make a straightish line
       // TODO: I have no idea if this is the proper angle or not
       // TODO: Might need to do something like 90 - angle
-      double angle = Math.atan2(rDist, rtDist);
-      angle = AngleUnit.DEGREES.fromRadians(angle);
-      driveTrain.setDriveVector(speed, angle, gyroHeading());
+      rDist = getCappedRange(sensorRangeRear, 1500);
+      rtDist = getCappedRange(sensorRangeRight, 1500);
+      //double dir = (rearDist < rDist) ? -1 : 1;
+      double magnitude = Math.abs(rearDist - rDist);
+      if (magnitude < 30) {
+        speedSnail();
+      } else if (magnitude < TURBODISTANCE) {
+        speedNormal();
+      } else {
+        speedTurbo();
+      }
+      //double angle = Math.atan2(rDist, rtDist);
+      //angle = AngleUnit.DEGREES.fromRadians(angle);
+      if(rDist > rearDist && rtDist > rightDist){
+        joystickDrive(new Direction((rtDist - rightDist) / (rDist - rearDist), (rDist - rearDist) / (rtDist - rightDist)), new Direction(0, 0), gyroHeading());
+      }else if(rDist > rearDist && rtDist < rightDist){
+        joystickDrive(new Direction((rtDist - rightDist) / (rDist - rearDist), -(rDist - rearDist) / (rtDist - rightDist)), new Direction(0, 0), gyroHeading());
+      }else if(rDist < rearDist && rtDist < rightDist){
+        joystickDrive(new Direction(-(rtDist - rightDist) / -(rDist - rearDist), (rDist - rearDist) / (rtDist - rightDist)), new Direction(0, 0), gyroHeading());
+      }else{
+        joystickDrive(new Direction(-(rtDist - rightDist) / (rDist - rearDist), (rDist - rearDist) / (rtDist - rightDist)), new Direction(0, 0), gyroHeading());
+      }
+
       sleep(10);
-    } while (rDist > rearDist && rtDist > rightDist && tm.time() < 10.0 && opMode.opModeIsActive());
+      telemetry.addData("rdist ", rDist);
+      telemetry.addData("rtdist ", rtDist);
+      telemetry.update();
+
+    } while ((rDist > rearDist || rtDist > rightDist) && tm.time() < 10.0 && opMode.opModeIsActive());
+    fastSyncTurn(0, 2);
     driveTrain.stop();
   }
 
@@ -778,4 +964,9 @@ public class TTRobot {
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
 
+  public void initGyro() {
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    imu.initialize(parameters);
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+  }
 }

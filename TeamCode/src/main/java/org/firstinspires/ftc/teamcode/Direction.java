@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
 public class Direction {
   public double X, Y;
 
   public Direction(double x, double y) {
     X = x;
     Y = y;
+  }
+  //straight up is zero
+  public Direction(double angle){
+
   }
 
   public static Direction None = new Direction(0.0, 0.0);
@@ -42,8 +48,4 @@ public class Direction {
     return (Y < -.5);
   }
 
-  public void turbo(double value) {
-    X = X * value;
-    Y = Y * value;
-  }
 }

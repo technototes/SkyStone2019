@@ -4,7 +4,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 // For use by opModes for driving the robot manually
 public class XDriveManualControl {
-  TTRobot robot;
+  IRobot robot;
   Controller driver;
   Controller control;
   Telemetry telemetry;
@@ -16,7 +16,7 @@ public class XDriveManualControl {
    * @param ctrl  The controller side controller
    * @param tel   The Telemetry thing (not currently used)
    */
-  public XDriveManualControl(TTRobot r, Controller drv, Controller ctrl, Telemetry tel) {
+  public XDriveManualControl(IRobot r, Controller drv, Controller ctrl, Telemetry tel) {
     robot = r;
     driver = drv;
     control = ctrl;
@@ -28,26 +28,21 @@ public class XDriveManualControl {
     // Driver control:
     Direction Dpad = driver.dpad();
     Direction L = driver.lstick();
-    Direction R1 = driver.rstick();
-    Direction R2 = control.rstick();
+    Direction R = driver.rstick();
     Direction D = new Direction(0, 0);
     Direction L2 = new Direction(0, 0);
-    if (Math.abs(R2.X) > robot.STICKDEADZONE) {
-      D.X = R2.X;
-    } else if (Math.abs(R1.X) > robot.STICKDEADZONE) {
-      D.X = R1.X;
+    if (Math.abs(R.X) > robot.STICK_DEAD_ZONE) {
+      D.X = R.X;
     }
-    if (Math.abs(L.X) > robot.STICKDEADZONE) {
+    if (Math.abs(L.X) > robot.STICK_DEAD_ZONE) {
       L2.X = L.X;
     }
-    if (Math.abs(L.Y) > robot.STICKDEADZONE) {
+    if (Math.abs(L.Y) > robot.STICK_DEAD_ZONE) {
       L2.Y = L.Y;
     }
 
     // Turbo Mode (insert Tristan happy face)
-    if ((control.rtrigger() == 1.0 || control.ltrigger() == 1.0)) {
-      robot.speedSnail();
-    } else if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
+    if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
       robot.speedTurbo();
     } else {
       robot.speedNormal();
@@ -55,7 +50,7 @@ public class XDriveManualControl {
     // If the snap-to-angle button has been pressed, override rotation with the snap angle
     if (driver.buttonY() == Button.Pressed) {
       robot.speedNormal();
-      D.X = robot.snap(telemetry);
+      D.X = robot.snap();
     }
 
     if (driver.buttonA() == Button.Pressed && driver.buttonB() == Button.Pressed) {
@@ -63,5 +58,10 @@ public class XDriveManualControl {
     } else {
       robot.joystickDrive(L2, D, robot.gyroHeading());
     }
+
+    if (driver.ltrigger() > 0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed() ) {
+      robot.initGyro();
+    }
+
   }
 }

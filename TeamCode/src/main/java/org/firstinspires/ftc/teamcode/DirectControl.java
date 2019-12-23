@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -28,9 +29,12 @@ public class DirectControl extends LinearOpMode {
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
     waitForStart();
-    robot.rotateClaw(1);
-    while (opModeIsActive()) {
+    ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
+    ElapsedTime timeSinceStart = new ElapsedTime();
+    ElapsedTime loopTime = new ElapsedTime();
 
+    while (opModeIsActive()) {
+      loopTime.reset();
       // Handle Grabber rotation
       /*if (control.buttonA() == Button.Pressed) {
         if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
@@ -43,17 +47,23 @@ public class DirectControl extends LinearOpMode {
       if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
       } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.setClawPosition(ClawPosition.Close); // CLosed
+        robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
-
-      if (control.lbump() == Button.Pressed) {
-        robot.rotateClaw(0);
-        telemetry.addLine("Open 0.4");
-      } else if (control.rbump() == Button.Pressed) {
-        robot.rotateClaw(1);
-        telemetry.addLine("Close 0.6");
+      final double grabRotationDebounceSecs = 0.25;
+      if (sinceLastUsedGrabRotate.seconds() > grabRotationDebounceSecs) {
+        if (control.lbump() == Button.Pressed) {
+          robot.rotateClaw(true);
+          telemetry.addLine("rotateClaw true");
+          sinceLastUsedGrabRotate.reset();
+        } else if (control.rbump() == Button.Pressed) {
+          robot.rotateClaw(false);
+          telemetry.addLine("rotateClaw false");
+          sinceLastUsedGrabRotate.reset();
+        }
       }
+
+
 
       // Override the linear slide limit switches
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
@@ -92,8 +102,16 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.liftStop();
       }
+      if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
+        robot.initGyro();
+      }
+
+      telemetry.addData("Left trigger pos: ", driver.ltrigger());
+      telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering
       manualCtrl.Steer();
+
+      telemetry.addLine(String.format("Timing: %.1f, %.1f", timeSinceStart.seconds(), loopTime.seconds()));
       telemetry.update();
     }
   }
