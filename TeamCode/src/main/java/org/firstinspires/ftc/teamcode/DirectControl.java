@@ -97,7 +97,7 @@ public class DirectControl extends LinearOpMode {
         robot.capstone(0);
       }
 
-      if (ctrlDpad.isUp()) {
+/*      if (ctrlDpad.isUp()) {
         robot.lift.up();
         liftMoving = true;
       } else if (ctrlDpad.isDown()) {
@@ -106,7 +106,7 @@ public class DirectControl extends LinearOpMode {
       } else if (liftMoving) {
         liftMoving = false;
         robot.lift.stop();
-      }
+      }*/
       // More automated control of the lift:
       // Y for 'up a brick'
       // X for 'down a brick'
