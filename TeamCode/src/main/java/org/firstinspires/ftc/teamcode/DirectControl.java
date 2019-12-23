@@ -28,7 +28,6 @@ public class DirectControl extends LinearOpMode {
     robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
-    boolean liftMoving = false;
     int curBrickHeight = -1;
 
     waitForStart();
@@ -97,30 +96,29 @@ public class DirectControl extends LinearOpMode {
         robot.capstone(0);
       }
 
-/*      if (ctrlDpad.isUp()) {
-        robot.lift.up();
-        liftMoving = true;
-      } else if (ctrlDpad.isDown()) {
-        robot.lift.down();
-        liftMoving = true;
-      } else if (liftMoving) {
-        liftMoving = false;
-        robot.lift.stop();
-      }*/
-      // More automated control of the lift:
-      // Y for 'up a brick'
-      // X for 'down a brick'
-      // A for 'position current brick to place'
-      // B for 'grab a brick'
-      if (control.buttonA().isPressed()) {
-        robot.lift.SetBrickWait();
-      } else if (control.buttonY().isPressed()) {
-        robot.lift.LiftBrickWait(++curBrickHeight);
-      } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
-        robot.lift.LiftBrickWait(--curBrickHeight);
-      } else if (control.buttonB().isPressed()) {
-        robot.lift.AcquireBrickWait();
-        curBrickHeight = -1;
+      if ((control.rtrigger() > robot.TRIGGERTHRESHOLD) && (control.ltrigger() > robot.TRIGGERTHRESHOLD)) {
+        if (control.buttonX().isPressed()) {
+          robot.lift.overrideDown();
+        } else {
+          robot.lift.stop();
+          robot.lift.ResetZero();
+        }
+      } else {
+        // More automated control of the lift:
+        // Y for 'up a brick'
+        // X for 'down a brick'
+        // A for 'position current brick to place'
+        // B for 'grab a brick'
+        if (control.buttonA().isPressed()) {
+          robot.lift.SetBrickWait();
+        } else if (control.buttonY().isPressed()) {
+          robot.lift.LiftBrickWait(++curBrickHeight);
+        } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
+          robot.lift.LiftBrickWait(--curBrickHeight);
+        } else if (control.buttonB().isPressed()) {
+          robot.lift.AcquireBrickWait();
+          curBrickHeight = -1;
+        }
       }
 
       if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
