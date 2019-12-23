@@ -14,13 +14,19 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
+import static org.mockito.AdditionalMatchers.gt;
+import static org.mockito.AdditionalMatchers.lt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -52,6 +58,7 @@ class TTRobotTest {
   private CRServo capServo = mock(CRServo.class);
 
   private DistanceSensor sensorRangeRear = mock(DistanceSensor.class);
+  private double rearRangePositionCm = 0;
   private DistanceSensor sensorRangeLeft = mock(DistanceSensor.class);
   private DistanceSensor sensorRangeRight = mock(DistanceSensor.class);
   private ColorSensor sensorColorBottom = mock(ColorSensor.class);
@@ -83,8 +90,26 @@ class TTRobotTest {
   void liftDown() {
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void liftStop() {
+  }
+
+  @Test
+  void distRearDrivePID() {
+    rearRangePositionCm = 20;
+    ttRobot.distRearDrivePID(20);
+    verify(flMotor).setPower(0.0);
+    verify(frMotor).setPower(0.0);
+    verify(rlMotor).setPower(0.0);
+    verify(rrMotor).setPower(0.0);
+    verify(flMotor, never()).setPower(gt(0.0));
+    verify(frMotor, never()).setPower(gt(0.0));
+    verify(rlMotor, never()).setPower(gt(0.0));
+    verify(rrMotor, never()).setPower(gt(0.0));
+    verify(flMotor, never()).setPower(lt(0.0));
+    verify(frMotor, never()).setPower(lt(0.0));
+    verify(rlMotor, never()).setPower(lt(0.0));
+    verify(rrMotor, never()).setPower(lt(0.0));
   }
 
   @BeforeEach
@@ -114,6 +139,12 @@ class TTRobotTest {
     Mockito.lenient().when(hardwareMap.get(CRServo.class, "cap")).thenReturn(capServo);
 
     Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRear")).thenReturn(sensorRangeRear);
+    Mockito.lenient().when(sensorRangeRear.getDistance(DistanceUnit.CM)).then(new Answer<Double>() {
+      public Double answer(InvocationOnMock invocation) {
+        return rearRangePositionCm;
+      }
+    });
+
     Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeLeft")).thenReturn(sensorRangeLeft);
     Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRight")).thenReturn(sensorRangeRight);
 
