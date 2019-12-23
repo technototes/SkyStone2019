@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -25,12 +26,15 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalMatchers.gt;
 import static org.mockito.AdditionalMatchers.lt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TTRobotTest {
@@ -95,7 +99,7 @@ class TTRobotTest {
   }
 
   @Test
-  void distRearDrivePID() {
+  void distRearDrivePIDNone() {
     rearRangePositionCm = 20;
     ttRobot.distRearDrivePID(20);
     verify(flMotor).setPower(0.0);
@@ -110,6 +114,30 @@ class TTRobotTest {
     verify(frMotor, never()).setPower(lt(0.0));
     verify(rlMotor, never()).setPower(lt(0.0));
     verify(rrMotor, never()).setPower(lt(0.0));
+  }
+
+  @Test
+  void distRearDrivePIDForward() {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {}
+          rearRangePositionCm = 22;
+        }
+      }
+    );
+
+    rearRangePositionCm = 0;
+    ElapsedTime runTime = new ElapsedTime();
+    opMode.start();
+    stopTimer.start();
+    ttRobot.distRearDrivePID(20);
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 110, "msDuration less than 110");
+    assertTrue(msDuration >= 100, "msDuration greater or equal to 100");
   }
 
   @BeforeEach
