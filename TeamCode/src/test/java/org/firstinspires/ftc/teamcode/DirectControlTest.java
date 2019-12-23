@@ -1,0 +1,49 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+class DirectControlTest {
+  private TTRobotTest ttRobotTest = new TTRobotTest();
+  private TTRobot ttRobot = ttRobotTest.buildMockRobot();
+  private DirectControl directControl = new DirectControl();
+  private @Mock Gamepad gamepad1;
+  private @Mock Gamepad gamepad2;
+  private @Mock Telemetry telemetry;
+
+  @BeforeEach
+  void setUp() {
+    directControl.SetTestRobot(ttRobot);
+    directControl.gamepad1 = gamepad1;
+    directControl.gamepad2 = gamepad2;
+    directControl.telemetry = telemetry;
+  }
+
+  @Test
+  void runOpMode() {
+
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {}
+          directControl.stop();
+        }
+      }
+    );
+    directControl.start();
+    stopTimer.start();
+    directControl.runOpMode();
+  }
+}
