@@ -46,9 +46,9 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
+      if (control.rtrigger() > TTRobot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
+      } else if (control.ltrigger() > TTRobot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
@@ -96,7 +96,8 @@ public class DirectControl extends LinearOpMode {
         robot.capstone(0);
       }
 
-      if ((control.rtrigger() > robot.TRIGGERTHRESHOLD) && (control.ltrigger() > robot.TRIGGERTHRESHOLD)) {
+      if ((control.ltrigger() > 0.8) && (control.rtrigger() > 0.8) &&
+           control.rbump().isPressed() && control.lbump().isPressed()) {
         if (control.buttonX().isPressed()) {
           robot.lift.overrideDown();
         } else {
