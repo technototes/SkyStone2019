@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DirectControlTest {
-  private TTRobotTest ttRobotTest = new TTRobotTest();
-  private TTRobot ttRobot = ttRobotTest.buildMockRobot();
+  private MockRobot mockRobot;
+  private TTRobot ttRobot;
   private DirectControl directControl = new DirectControl();
   private @Mock Gamepad gamepad1;
   private @Mock Gamepad gamepad2;
@@ -22,6 +22,9 @@ class DirectControlTest {
 
   @BeforeEach
   void setUp() {
+    mockRobot = new MockRobot();
+    ttRobot = mockRobot.buildMockRobot(directControl, telemetry);
+
     directControl.SetTestRobot(ttRobot);
     directControl.gamepad1 = gamepad1;
     directControl.gamepad2 = gamepad2;

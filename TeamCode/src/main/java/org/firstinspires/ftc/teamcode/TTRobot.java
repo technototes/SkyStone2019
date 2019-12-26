@@ -323,37 +323,36 @@ public class TTRobot implements IRobot {
     }
   }
 
-  //sorry
-  private final int CLAW_LEFT_VAL = 0;
-  private final int CLAW_RIGHT_VAL = 0;
-  private final int CLAW_CENTER_VAL = 0;
+  private static final double CLAW_LEFT_VAL = 0;
+  private static final double CLAW_CENTER_VAL = 0.3;
+  private static final double CLAW_RIGHT_VAL = 1.0;
 
   public enum CurrentClawPosition {
     LEFT, CENTER, RIGHT;
   }
 
   public void centerClaw(){
-    turn.setPosition(0.3);
+    turn.setPosition(CLAW_CENTER_VAL);
   }
   private CurrentClawPosition curPos = CurrentClawPosition.CENTER;
 
   public void rotateClaw(boolean increment) {
     if(curPos == CurrentClawPosition.CENTER){
       if(increment){
-        turn.setPosition(1);
+        turn.setPosition(CLAW_RIGHT_VAL);
         curPos = CurrentClawPosition.RIGHT;
       } else{
-        turn.setPosition(0);
+        turn.setPosition(CLAW_LEFT_VAL);
         curPos = CurrentClawPosition.LEFT;
       }
     } else if(curPos == CurrentClawPosition.LEFT){
       if(increment){
-        turn.setPosition(0.3);
+        turn.setPosition(CLAW_CENTER_VAL);
         curPos = CurrentClawPosition.CENTER;
       }
     } else{
       if(!increment){
-        turn.setPosition(0.3);
+        turn.setPosition(CLAW_CENTER_VAL);
         curPos = CurrentClawPosition.CENTER;
       }
     }
