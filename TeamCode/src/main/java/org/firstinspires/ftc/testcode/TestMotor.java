@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -20,12 +21,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * list
  */
 @TeleOp(name = "Basic: Motor Test", group = "Test")
-@Disabled
 public class TestMotor extends LinearOpMode {
 
   // Declare OpMode members.
   private ElapsedTime runtime = new ElapsedTime();
-  private DcMotor motor = null;
+  private DcMotor mother = null;
+  private DcMotor daughter = null;
 
   @Override
   public void runOpMode() {
@@ -36,11 +37,18 @@ public class TestMotor extends LinearOpMode {
     // to 'get' must correspond to the names assigned during the robot configuration
     // step (using the FTC Robot Controller app on the phone).
 
-    motor = hardwareMap.get(DcMotor.class, "Mother");
-    //encoder = "Mother";
-    //motor.setMode(DcMotor.RunMode.RUN_WITH_ENCODEER);
+    mother = hardwareMap.get(DcMotor.class, "motorLiftLeft");
+    daughter = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    mother.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    daughter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    mother.setDirection(DcMotorSimple.Direction.FORWARD);
+    daughter.setDirection(DcMotorSimple.Direction.REVERSE);
 
-    motor.setDirection(DcMotor.Direction.FORWARD);
+    int mPosition = mother.getCurrentPosition();
+    int dPosition = daughter.getCurrentPosition();
+    telemetry.addData("mPos, dPos", "%d, %d", mPosition, dPosition);
+    telemetry.update();
+
     // Wait for the game to start (driver presses PLAY)
     waitForStart();
     runtime.reset();
@@ -50,20 +58,17 @@ public class TestMotor extends LinearOpMode {
     // run until the end of the match (driver presses STOP)
     while (opModeIsActive()) {
       // Every 250 ms, update the power rating
-      if (runtime.milliseconds() - last > 250) {
-        last = runtime.milliseconds();
-        motor.setPower(power);
-        power += inc;
-        if (power < -.799) {
-          inc = .05;
-        } else if (power > .799) {
-          inc = -.05;
-        }
+      double stick = gamepad1.left_stick_y;
+      if (Math.abs(stick) > 0.1) {
+        mother.setPower(stick / 4);
+        daughter.setPower(stick / 4);
+      } else {
+        mother.setPower(0);
+        daughter.setPower(0);
       }
-      int encPosition = motor.getCurrentPosition();
-      telemetry.addData("EncPos:", "%d", encPosition);
-      // Show the elapsed game time and wheel power.
-      telemetry.addData("Power", "%.2f", power);
+      mPosition = mother.getCurrentPosition();
+      dPosition = daughter.getCurrentPosition();
+      telemetry.addData("mPos, dPos", "%d, %d", mPosition, dPosition);
       telemetry.update();
     }
   }

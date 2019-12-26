@@ -76,8 +76,7 @@ public class TTRobot implements IRobot {
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
-  private DcMotor lLiftMotor = null;
-  private DcMotor rLiftMotor = null;
+  public LiftControl lift = null;
   private Servo turn = null;
   private Servo claw = null;
   private Servo blockFlipper = null;
@@ -134,8 +133,9 @@ public class TTRobot implements IRobot {
     sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
     sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
 
-    lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
-    rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    DcMotor lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
+    DcMotor rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
     lGrabber = hardwareMap.get(Servo.class, "lGrabber");
@@ -382,26 +382,6 @@ public class TTRobot implements IRobot {
   public void bpGrabber(double pos) {
     lGrabber.setPosition(pos);
     rGrabber.setPosition(pos);
-  }
-
-  private void setLiftPower(double val) {
-    if (val > 0)
-      val = val / DOWNWARDLIFTSCALE;
-    lLiftMotor.setPower(val);
-    rLiftMotor.setPower(val);
-  }
-
-  public void liftUp() {
-    setLiftPower(-1.0);
-  }
-
-  public void liftDown() {
-    if (!isLiftAtLowerLimit())
-      setLiftPower(1.0);
-  }
-
-  public void liftStop() {
-    setLiftPower(0);
   }
 
   public void blockFlipper(double pos) {

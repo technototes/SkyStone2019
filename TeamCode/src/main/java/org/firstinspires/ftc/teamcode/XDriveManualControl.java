@@ -42,7 +42,13 @@ public class XDriveManualControl {
     }
 
     // Turbo Mode (insert Tristan happy face)
-    if ((driver.rtrigger() == 1.0 || driver.ltrigger() == 1.0)) {
+    /*
+    We apparently don't use Snail Mode
+    if ((control.rtrigger() >= 0.8 || control.ltrigger() >= 0.8)) {
+      robot.speedSnail();
+    } else
+    */
+    if ((driver.rtrigger() >= 0.8 || driver.ltrigger() >= 0.8)) {
       robot.speedTurbo();
     } else {
       robot.speedNormal();
@@ -59,7 +65,7 @@ public class XDriveManualControl {
       robot.joystickDrive(L2, D, robot.gyroHeading());
     }
 
-    if (driver.ltrigger() > 0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed() ) {
+    if (driver.ltrigger() > 0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
       robot.initGyro();
     }
 

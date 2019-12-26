@@ -28,6 +28,8 @@ public class DirectControl extends LinearOpMode {
     robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
+    int curBrickHeight = -1;
+
     waitForStart();
     ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
     ElapsedTime timeSinceStart = new ElapsedTime();
@@ -44,9 +46,9 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
+      if (control.rtrigger() > TTRobot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
+      } else if (control.ltrigger() > TTRobot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
@@ -67,10 +69,10 @@ public class DirectControl extends LinearOpMode {
 
       // Override the linear slide limit switches
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
-      Direction slide = control.dpad();
-      if (slide.isLeft()) {
+      Direction ctrlDpad = control.dpad();
+      if (ctrlDpad.isLeft()) {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.Extend, !slideOverride);
-      } else if (slide.isRight()) {
+      } else if (ctrlDpad.isRight()) {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, !slideOverride);
       } else {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
@@ -93,15 +95,33 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.capstone(0);
       }
-      // Lift control:
-      Direction dir = control.dpad();
-      if (dir.isUp()) {
-        robot.liftUp();
-      } else if (dir.isDown()) {
-        robot.liftDown();
+
+      if ((control.ltrigger() > 0.8) && (control.rtrigger() > 0.8) &&
+           control.rbump().isPressed() && control.lbump().isPressed()) {
+        if (control.buttonX().isPressed()) {
+          robot.lift.overrideDown();
+        } else {
+          robot.lift.stop();
+          robot.lift.ResetZero();
+        }
       } else {
-        robot.liftStop();
+        // More automated control of the lift:
+        // Y for 'up a brick'
+        // X for 'down a brick'
+        // A for 'position current brick to place'
+        // B for 'grab a brick'
+        if (control.buttonA().isPressed()) {
+          robot.lift.SetBrickWait();
+        } else if (control.buttonY().isPressed()) {
+          robot.lift.LiftBrickWait(++curBrickHeight);
+        } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
+          robot.lift.LiftBrickWait(--curBrickHeight);
+        } else if (control.buttonB().isPressed()) {
+          robot.lift.AcquireBrickWait();
+          curBrickHeight = -1;
+        }
       }
+
       if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
         robot.initGyro();
       }
