@@ -76,8 +76,7 @@ public class TTRobot implements IRobot {
   private DigitalChannel lslideSwitch = null;
   private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
-  private DcMotor lLiftMotor = null;
-  private DcMotor rLiftMotor = null;
+  public LiftControl lift = null;
   private Servo turn = null;
   private Servo claw = null;
   private Servo blockFlipper = null;
@@ -103,6 +102,8 @@ public class TTRobot implements IRobot {
 
   // This is an 'opMode aware' sleep: It will stop if you hit 'stop'!
   public final void sleep(long milliseconds) {
+    telemetry.addData("Sleeping!", milliseconds);
+
     try {
       if (UNTESTED) {
         ElapsedTime tm = new ElapsedTime();
@@ -132,12 +133,13 @@ public class TTRobot implements IRobot {
     sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
     sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
 
-    lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
-    rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    DcMotor lLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftLeft");
+    DcMotor rLiftMotor = hardwareMap.get(DcMotor.class, "motorLiftRight");
+    lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
-    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
-    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
+    //lGrabber = hardwareMap.get(Servo.class, "lGrabber");
+    //rGrabber = hardwareMap.get(Servo.class, "rGrabber");
 
     DcMotor flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     DcMotor frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -165,8 +167,8 @@ public class TTRobot implements IRobot {
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-    lGrabber.setDirection(Servo.Direction.FORWARD);
-    rGrabber.setDirection(Servo.Direction.REVERSE);
+    //lGrabber.setDirection(Servo.Direction.FORWARD);
+    //rGrabber.setDirection(Servo.Direction.REVERSE);
 
     // TODO: Add initialization / calibration for the slide and lift?
 
@@ -176,10 +178,15 @@ public class TTRobot implements IRobot {
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
     //set grabber rotation to be centered
-    //turn.setPosition(0.5);
-    centerClaw();
+    turn.setPosition(0.5);
   }
 
+  public int getLLiftEncoder(){
+    return lift.left.getCurrentPosition();
+  }
+  public int getRLiftEncoder(){
+    return lift.right.getCurrentPosition();
+  }
   // Linear slide stuff:
   public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
@@ -320,6 +327,7 @@ public class TTRobot implements IRobot {
     } else{
       claw.setPosition(CLAWCLOSEPOSITION);
     }
+    telemetry.addData("Claw: ", openOrClose);
   }
 
   //sorry
@@ -379,28 +387,8 @@ public class TTRobot implements IRobot {
   }
 
   public void bpGrabber(double pos) {
-    lGrabber.setPosition(pos);
-    rGrabber.setPosition(pos);
-  }
-
-  private void setLiftPower(double val) {
-    if (val > 0)
-      val = val / DOWNWARDLIFTSCALE;
-    lLiftMotor.setPower(val);
-    rLiftMotor.setPower(val);
-  }
-
-  public void liftUp() {
-    setLiftPower(-1.0);
-  }
-
-  public void liftDown() {
-    if (!isLiftAtLowerLimit())
-      setLiftPower(1.0);
-  }
-
-  public void liftStop() {
-    setLiftPower(0);
+    //lGrabber.setPosition(pos);
+    //rGrabber.setPosition(pos);
   }
 
   public void blockFlipper(double pos) {
@@ -870,8 +858,8 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = Math.abs(leftDist - lDist);
-      if (magnitude < 20) {
+      double magnitude = Math.abs(rearDist - rDist);
+      if (magnitude < 30) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
         speedNormal();

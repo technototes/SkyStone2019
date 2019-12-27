@@ -5,8 +5,8 @@
   import com.qualcomm.robotcore.util.ElapsedTime;
 
   //Test
-  @Autonomous(name = "TTAutoStoneMovedWallRedSpeed", group = "TT")
-  public class TTAutoStoneMovedWallRedSpeed extends LinearOpMode {
+  @Autonomous(name = "TTAutoOnlyStoneRedSpeed", group = "TT")
+  public class TTAutoOnlyStoneRedSpeed extends LinearOpMode {
 
     // States
     private enum AutoState {

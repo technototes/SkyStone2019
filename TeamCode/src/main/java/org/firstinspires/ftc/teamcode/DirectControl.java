@@ -10,9 +10,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class DirectControl extends LinearOpMode {
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
+  private TTRobot robotForTest = null;
   private Controller control;
   private Controller driver;
   private XDriveManualControl manualCtrl;
+
+  void SetTestRobot(TTRobot testRobot) {
+    robotForTest = testRobot;
+  }
 
   @Override
   public void runOpMode() {
@@ -20,13 +25,18 @@ public class DirectControl extends LinearOpMode {
     // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, "controller");
-    robot = new TTRobot(this, hardwareMap, telemetry);
+    robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
-    waitForStart();
-    ElapsedTime sinceLastUsed = new ElapsedTime();
-    while (opModeIsActive()) {
+    int curBrickHeight = -1;
 
+    waitForStart();
+    ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
+    ElapsedTime timeSinceStart = new ElapsedTime();
+    ElapsedTime loopTime = new ElapsedTime();
+
+    while (opModeIsActive()) {
+      loopTime.reset();
       // Handle Grabber rotation
       /*if (control.buttonA() == Button.Pressed) {
         if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
@@ -36,29 +46,33 @@ public class DirectControl extends LinearOpMode {
         }
       }*/
       // Handle Grabber clutch
-      if (control.rtrigger() > robot.TRIGGERTHRESHOLD) {
+      if (control.rtrigger() > TTRobot.TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.ltrigger() > robot.TRIGGERTHRESHOLD) {
-        robot.setClawPosition(ClawPosition.Close); // CLosed
+      } else if (control.ltrigger() > TTRobot.TRIGGERTHRESHOLD) {
+        robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
-      if (control.lbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
-        robot.rotateClaw(false);
-        telemetry.addLine("Open 0.4");
-        sinceLastUsed.reset();
-      } else if (control.rbump() == Button.Pressed && sinceLastUsed.seconds() > 0.5) {
-        robot.rotateClaw(true);
-        telemetry.addLine("Close 0.6");
-        sinceLastUsed.reset();
+      final double grabRotationDebounceSecs = 0.25;
+      if (sinceLastUsedGrabRotate.seconds() > grabRotationDebounceSecs) {
+        if (control.lbump() == Button.Pressed) {
+          robot.rotateClaw(true);
+          telemetry.addLine("rotateClaw true");
+          sinceLastUsedGrabRotate.reset();
+        } else if (control.rbump() == Button.Pressed) {
+          robot.rotateClaw(false);
+          telemetry.addLine("rotateClaw false");
+          sinceLastUsedGrabRotate.reset();
+        }
       }
+
 
 
       // Override the linear slide limit switches
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
-      Direction slide = control.dpad();
-      if (slide.isLeft()) {
+      Direction ctrlDpad = control.dpad();
+      if (ctrlDpad.isLeft()) {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.Extend, !slideOverride);
-      } else if (slide.isRight()) {
+      } else if (ctrlDpad.isRight()) {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.Retract, !slideOverride);
       } else {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
@@ -81,15 +95,33 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.capstone(0);
       }
-      // Lift control:
-      Direction dir = control.dpad();
-      if (dir.isUp()) {
-        robot.liftUp();
-      } else if (dir.isDown()) {
-        robot.liftDown();
+
+      if ((control.ltrigger() > 0.8) && (control.rtrigger() > 0.8) &&
+        control.rbump().isPressed() && control.lbump().isPressed()) {
+        if (control.buttonX().isPressed()) {
+          robot.lift.overrideDown();
+        } else {
+          robot.lift.stop();
+          robot.lift.ResetZero();
+        }
       } else {
-        robot.liftStop();
+        // More automated control of the lift:
+        // Y for 'up a brick'
+        // X for 'down a brick'
+        // A for 'position current brick to place'
+        // B for 'grab a brick'
+        if (control.buttonA().isPressed()) {
+          robot.lift.SetBrickWait();
+        } else if (control.buttonY().isPressed()) {
+          robot.lift.LiftBrickWait(++curBrickHeight);
+        } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
+          robot.lift.LiftBrickWait(--curBrickHeight);
+        } else if (control.buttonB().isPressed()) {
+          robot.lift.AcquireBrickWait();
+          curBrickHeight = -1;
+        }
       }
+
       if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
         robot.initGyro();
       }
@@ -98,6 +130,8 @@ public class DirectControl extends LinearOpMode {
       telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering
       manualCtrl.Steer();
+
+      telemetry.addLine(String.format("Timing: %.1f, %.1f", timeSinceStart.seconds(), loopTime.seconds()));
       telemetry.update();
     }
   }
