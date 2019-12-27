@@ -4,18 +4,25 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.gt;
 import static org.mockito.AdditionalMatchers.lt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TTAutoGoToStoneRedPIDTest {
@@ -30,6 +37,18 @@ class TTAutoGoToStoneRedPIDTest {
     autoGoToStoneRedPID = new TTAutoGoToStoneRedPID();
     autoGoToStoneRedPID.telemetry = telemetry;
     ttRobot = mockRobot.buildMockRobot(autoGoToStoneRedPID, telemetry);
+
+
+    Mockito.lenient().when(telemetry.addData(anyString(), any())).then(
+      new Answer<Telemetry.Item>() {
+        @Override
+        public Telemetry.Item answer(InvocationOnMock invocation) {
+          Telemetry.Item item = mock(Telemetry.Item.class);
+          System.out.println((String)invocation.getArgument(0) + ": " + invocation.getArgument(1).toString());
+          return item;
+        }
+      }
+    );
   }
 
   @Test

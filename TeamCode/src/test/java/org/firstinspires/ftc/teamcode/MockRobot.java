@@ -111,12 +111,14 @@ class MockRobot {
     mockHardwareMap.put(new HardwareEntry(CRServo.class, "cap"), capServo);
 
     mockHardwareMap.put(new HardwareEntry(DistanceSensor.class, "sensorRangeRear"), sensorRangeRear);
-    //Mockito.lenient().when(sensorRangeRear.getDistance(DistanceUnit.CM)).thenReturn(rearRangePositionCm);
-    Mockito.lenient().when(sensorRangeRear.getDistance(DistanceUnit.CM)).then(new Answer<Double>() {
-      public Double answer(InvocationOnMock invocation) {
-        return rearRangePositionCm;
+    Mockito.lenient().when(sensorRangeRear.getDistance(DistanceUnit.CM)).then(
+      new Answer<Double>() {
+        @Override
+        public Double answer(InvocationOnMock invocation) {
+          return rearRangePositionCm;
+        }
       }
-    });
+    );
 
     mockHardwareMap.put(new HardwareEntry(DistanceSensor.class, "sensorRangeLeft"), sensorRangeLeft);
     mockHardwareMap.put(new HardwareEntry(DistanceSensor.class, "sensorRangeRight"), sensorRangeRight);
