@@ -178,7 +178,7 @@ public class TTRobot implements IRobot {
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
     //set grabber rotation to be centered
-    turn.setPosition(0.5);
+    centerClaw();
   }
 
   public int getLLiftEncoder(){

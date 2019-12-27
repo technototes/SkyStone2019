@@ -8,7 +8,7 @@ public class LiftControl {
   private static final double DOWNWARD_SCALE = 2.0;
 
   // This is how many 'ticks' a brick is
-  private static int BRICK_HEIGHT = 1100;
+  private static int BRICK_HEIGHT = 1200;
 
   // This is how high the base plate is (to get *over* it while holding a brick)
   private static int BASE_PLATE_HEIGHT = 400;
