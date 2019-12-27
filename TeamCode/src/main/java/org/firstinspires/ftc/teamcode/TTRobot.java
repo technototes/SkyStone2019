@@ -88,7 +88,7 @@ public class TTRobot implements IRobot {
   private Servo lGrabber = null;
   private Servo rGrabber = null;
 
-  private XDrive driveTrain = null;
+  XDrive driveTrain = null;
   private Telemetry telemetry = null;
   private LinearOpMode opMode = null;
   // Stuff for the on-board "inertial measurement unit" (aka gyro)
@@ -577,44 +577,6 @@ public class TTRobot implements IRobot {
       driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
       sleep(10);
     } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0 && opMode.opModeIsActive());
-    driveTrain.stop();
-  }
-
-  // This will move the robot so it's "dist" away based on the rear sensor
-  public void distRearDrivePID(double targetDist) {
-    final double epsilon = 2; // Stop if "dist" is within this many units of the target
-    final double speedIncrementValue = 0.1; // Amount to change speed per speedIncrementTime
-    final double speedIncrementTime = 0.05; // Time (in sec) between changes in speed
-
-    ElapsedTime tm = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-    double curDistance = rearDistance();
-    double distFromGoal = Math.abs(curDistance - targetDist);
-    double speed = 0;
-    double timeOfLastSpeedChange = -1;
-    while (opMode.opModeIsActive() && (distFromGoal > epsilon)) {
-      final double dir = (targetDist < curDistance) ? 1 : -1;
-      final double desiredSpeed = dir * ((distFromGoal > 10) ? 1.0 : (distFromGoal / 10));
-
-      if (Math.abs(desiredSpeed - speed) > speedIncrementValue) {
-        double now = tm.seconds();
-        if (now - timeOfLastSpeedChange > speedIncrementTime) {
-          speed += speedIncrementValue * dir;
-          timeOfLastSpeedChange = now;
-        }
-      } else {
-        speed = desiredSpeed;
-      }
-
-      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed, 0, gyroHeading());
-
-      telemetry.addData("Current Distance", curDistance);
-      telemetry.addData("Current Speed", speed);
-      telemetry.update();
-
-      curDistance = rearDistance();
-      distFromGoal = Math.abs(curDistance - targetDist);
-    }
-
     driveTrain.stop();
   }
 

@@ -24,6 +24,44 @@ public class TTAutoGoToStoneRedPID extends LinearOpMode {
   private ElapsedTime driveTime = new ElapsedTime();
 
 
+  // This will move the robot so it's "dist" away based on the rear sensor
+  void distRearDrivePID(TTRobot robot, double targetDist) {
+    final double epsilon = 2; // Stop if "dist" is within this many units of the target
+    final double speedIncrementValue = 0.1; // Amount to change speed per speedIncrementTime
+    final double speedIncrementTime = 0.05; // Time (in sec) between changes in speed
+
+    ElapsedTime tm = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+    double curDistance = robot.rearDistance();
+    double distFromGoal = Math.abs(curDistance - targetDist);
+    double speed = 0;
+    double timeOfLastSpeedChange = -1;
+    while (opModeIsActive() && (distFromGoal > epsilon)) {
+      final double dir = (targetDist < curDistance) ? 1 : -1;
+      final double desiredSpeed = dir * ((distFromGoal > 10) ? 1.0 : (distFromGoal / 10));
+
+      if (Math.abs(desiredSpeed - speed) > speedIncrementValue) {
+        double now = tm.seconds();
+        if (now - timeOfLastSpeedChange > speedIncrementTime) {
+          speed += speedIncrementValue * dir;
+          timeOfLastSpeedChange = now;
+        }
+      } else {
+        speed = desiredSpeed;
+      }
+
+      robot.driveTrain.setDriveVector(Math.abs(speed), (speed > 0) ? 0 : 180, robot.gyroHeading());
+
+      telemetry.addData("Current Distance", curDistance);
+      telemetry.addData("Current Speed", speed);
+      telemetry.update();
+
+      curDistance = robot.rearDistance();
+      distFromGoal = Math.abs(curDistance - targetDist);
+    }
+
+    robot.stop();
+  }
+
   @Override
   public void runOpMode() {
     double x = 0.0, y = 0.0, z = 0.0;
@@ -39,73 +77,6 @@ public class TTAutoGoToStoneRedPID extends LinearOpMode {
 
     waitForStart();
 
-    robot.distRearDrivePID(20);
-    /*
-    robot.distLeftDrive(this,  -90, 60);
-    runtime.reset();
-    while (opModeIsActive() && runtime.seconds() < 2) {
-      tf.takeALook();
-      telemetry.addData("tfdata ", tf.whichColumn());
-      telemetry.addData("tfconf ", tf.confidence());
-      telemetry.update();
-    }
-    // run until the end of the match (driver presses STOP)
-    int blockPos = tf.whichColumn();
-
-    telemetry.update();
-    while (opModeIsActive()) {
-      telemetry.addData("Status", "Run Time: " + runtime.toString());
-      switch (currentState) {
-        case INITIALIZE:
-          telemetry.addData("state", currentState.toString());
-          runtime.reset();
-          switch (blockPos) {
-            case 0:
-              currentState = AutoState.GOTOBLOCK1;
-              break;
-            case 1:
-              currentState = AutoState.GOTOBLOCK2;
-              break;
-            case 2:
-              currentState = AutoState.GOTOBLOCK3;
-              break;
-          }
-          break;
-
-        case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90, 74);
-          currentState = AutoState.GOFORWARD;
-          break;
-        case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, 90, 60);
-          currentState = AutoState.GOFORWARD;
-          break;
-        case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
-          robot.distLeftDrive(0.5, -90, 47);
-          currentState = AutoState.GOFORWARD;
-          break;
-        case GOFORWARD:
-          telemetry.addData("state", currentState.toString());
-          robot.distRearDrive(0.5, 80);
-          currentState = AutoState.STOP;
-          break;
-        case STOP:
-          telemetry.addData("state", currentState.toString());
-
-          stop();
-          break;
-
-        default:
-          telemetry.addData("state", currentState.toString());
-
-          stop();
-          break;
-      }
-      telemetry.update();
-    }
-    */
+    distRearDrivePID(robot,20);
   }
 }
