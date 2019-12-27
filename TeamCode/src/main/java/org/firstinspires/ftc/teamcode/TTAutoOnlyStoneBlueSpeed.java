@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 //Test
-@Autonomous(name = "TTAutoStoneMovedWallBlueSpeed", group = "TT")
-public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
+@Autonomous(name = "TTAutoOnlyStoneBlueSpeed", group = "TT")
+public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
 
   // States
   private enum AutoState {
@@ -57,6 +53,7 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
     // Put vuforia Here
 
     Truphoria tf = new Truphoria(hardwareMap, telemetry);
+    robot.centerClaw();
     while (!isStarted()) {
       tf.takeALook();
       telemetry.addData("tfdata ", tf.whichColumn());
@@ -107,66 +104,80 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           robot.centerClaw();
           robot.setClawPosition(ClawPosition.Open);
           driveTime.reset();
-          robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+          sleep(1300);
+          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+
+
           break;
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distRearRightDrive(0.5, 80, 90);
+          robot.distRearRightDrive(1, 80, 90);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK2:
           telemetry.addData("state", currentState.toString());
-          robot.distRearRightDrive(0.5, 80, 70);
+          //robot.distRearRightDrive(0.5, 90, 70);
+          robot.fastRearDrive(80);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK3:
           telemetry.addData("state", currentState.toString());
-          robot.fastRearDrive(80);
+          robot.distRearRightDrive(1, 80, 50);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GRABBLOCK:
           telemetry.addData("state", currentState.toString());
-          while(driveTime.seconds() < 1.3){
-            sleep(100);
-          }
-          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-          robot.fastSyncTurn(0, 2);
           //stop();
           robot.setClawPosition(ClawPosition.Close);
           sleep(500);
           driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
-            robot.lift.up();
-          }
+          robot.lift.up();
+          sleep(350);
           robot.lift.stop();
           currentState = AutoState.GOTOBASEPLATE;
           break;
         case GOTOBASEPLATE:
-          robot.fastRearDrive(60);
+          robot.fastRearDrive(50);
           robot.fastSyncTurn(0, 1);
           robot.distRearLeftDrive(1, 90, 40);
           currentState = AutoState.PLACEBLOCK;
           break;
         case PLACEBLOCK:
           robot.setClawPosition(ClawPosition.Open);
-          currentState = AutoState.MOVEBASEPLATE;
+          driveTime.reset();
+          robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
+          sleep(1300);
+          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+          robot.fastRearDrive(60);
+          robot.driveToLine(0.5, 90);
+          //robot.stop();
+          currentState = AutoState.STOP;
           break;
         case MOVEBASEPLATE:
           robot.fastRearDrive(70);
           robot.fastSyncTurn(180, 2);
-          robot.timeDrive(0.5, 0.7, 0);
+          robot.timeDrive(0.5, 1, 0);
           robot.bpGrabber(0);
-          robot.fastSyncTurn(135, 2);
-          robot.timeDrive(0.75, 1, 135);
-          robot.fastSyncTurn(90, 2);
-          robot.timeDrive(0.75, 1, -90);
+
           //TODO make this dist front drive to a distance of 10
-          //robot.timeDrive(0.75, 2, 180);
+          robot.timeDrive(0.75, 2, 180);
           robot.bpGrabber(1);
-          robot.timeDrive(1, 0.5, 90);
+          robot.fastRightDrive(100);
+
+          //TODO also this one but to a distance of 60
+          robot.timeDrive(0.5, 2, 0);
           robot.fastSyncTurn(0, 2);
 
+          driveTime.reset();
+          while (driveTime.seconds() < 1.3) {
+            robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          }
+          robot.setLinearSlideDirection(LinearSlideOperation.None, false);
           //choice for secondary skystone
           switch (blockPos) {
             case 0:
@@ -181,7 +192,7 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           }
           //lower lift
           driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
+          while (driveTime.seconds() < 0.2) {
             robot.lift.down();
           }
           robot.lift.stop();
@@ -206,7 +217,7 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           robot.setClawPosition(ClawPosition.Close);
           sleep(500);
           driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
+          while (driveTime.seconds() < 0.2) {
             robot.lift.up();
           }
           robot.lift.stop();
