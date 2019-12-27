@@ -136,9 +136,9 @@ public class TTAutoStoneMovedNotWallRedSpeed extends LinearOpMode {
           sleep(500);
           driveTime.reset();
           while (driveTime.seconds() < 0.2) {
-            robot.liftUp();
+            robot.lift.up();
           }
-          robot.liftStop();
+          robot.lift.stop();
           currentState = AutoState.GOTOMOVEDBASEPLATE;
           break;
         case GOTOMOVEDBASEPLATE:
@@ -167,9 +167,9 @@ public class TTAutoStoneMovedNotWallRedSpeed extends LinearOpMode {
           //lower lift
           driveTime.reset();
           while (driveTime.seconds() < 0.2) {
-            robot.liftDown();
+            robot.lift.down();
           }
-          robot.liftStop();
+          robot.lift.stop();
           break;
         case GOTOBLOCK4:
           robot.distRearLeftDrive(1, 80, 30);
@@ -192,9 +192,9 @@ public class TTAutoStoneMovedNotWallRedSpeed extends LinearOpMode {
           sleep(500);
           driveTime.reset();
           while (driveTime.seconds() < 0.2) {
-            robot.liftUp();
+            robot.lift.up();
           }
-          robot.liftStop();
+          robot.lift.stop();
           currentState = AutoState.GOTOMOVEDBASEPLATE;
           break;
         case GOTOMOVEDBASEPLATE2:
@@ -223,9 +223,9 @@ public class TTAutoStoneMovedNotWallRedSpeed extends LinearOpMode {
           //lower lift
           driveTime.reset();
           while (driveTime.seconds() < 0.2) {
-            robot.liftDown();
+            robot.lift.down();
           }
-          robot.liftStop();
+          robot.lift.stop();
 
           break;
         case GOTOBLOCK12:
@@ -241,9 +241,9 @@ public class TTAutoStoneMovedNotWallRedSpeed extends LinearOpMode {
           sleep(500);
           driveTime.reset();
           while (driveTime.seconds() < 0.2) {
-            robot.liftUp();
+            robot.lift.up();
           }
-          robot.liftStop();
+          robot.lift.stop();
           currentState = AutoState.GOTOMOVEDBASEPLATE3;
           break;
         case GOTOMOVEDBASEPLATE3:

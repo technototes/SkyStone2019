@@ -124,10 +124,10 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           driveTime.reset();
           while (driveTime.seconds() < 2) {
             if (driveTime.seconds() < 0.75) {
-              robot.liftUp();
+              robot.lift.up();
             }
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
-            robot.liftStop();
+            robot.lift.stop();
           }
 
           robot.setLinearSlideDirection(LinearSlideOperation.None, true);
@@ -151,10 +151,10 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           //}
           driveTime.reset();
           while (driveTime.seconds() < 1 && !robot.liftSwitchSignaled()) {
-            robot.liftDown();
+            robot.lift.down();
 
           }
-          robot.liftStop();
+          robot.lift.stop();
 
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
 
@@ -174,9 +174,9 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           //robot.syncTurn(-90, 3);
           driveTime.reset();
           while (driveTime.seconds() < 0.25) {
-            robot.liftUp();
+            robot.lift.up();
           }
-          robot.liftStop();
+          robot.lift.stop();
 
           break;
 
@@ -197,10 +197,10 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
           runTime.reset();
           while (runTime.seconds() < 0.5) {
-            robot.liftDown();
+            robot.lift.down();
           }
 
-          robot.liftStop();
+          robot.lift.stop();
 
 
           robot.syncTurn(-90, 3);
@@ -210,9 +210,9 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
             robot.timeDrive(0.5, 3, -90);
             runtime.reset();
             while (runtime.seconds() < 1.25) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             robot.rotateClaw(false);
 
             robot.timeDrive(0.3, 1.5, -90);
@@ -220,18 +220,18 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
             robot.timeDrive(0.5, 2.7, -90);
             runtime.reset();
             while (runtime.seconds() < 1.25) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             robot.rotateClaw(false);
             robot.timeDrive(0.4, 1.6, -90);
           } else if (tf.whichColumn() == 2) {
             robot.timeDrive(0.5, 2.5, -90);
             runtime.reset();
             while (runtime.seconds() < 1.25) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             robot.rotateClaw(false);
 
             robot.timeDrive(0.3, 1.5, -90);
@@ -263,18 +263,18 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
           runTime.reset();
           while (runTime.seconds() < 1.25) {
-            robot.liftDown();
+            robot.lift.down();
           }
-          robot.liftStop();
+          robot.lift.stop();
 
           robot.claw(false);
 
           runtime.reset();
           while (runtime.seconds() < 0.5) {
-            robot.liftUp();
+            robot.lift.up();
           }
 
-          robot.liftStop();
+          robot.lift.stop();
 
 
           runtime.reset();
@@ -284,9 +284,9 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           robot.timeDrive(0.4, 0.25, 90);
           runtime.reset();
           while (runtime.seconds() < 1) {
-            robot.liftDown();
+            robot.lift.down();
           }
-          robot.liftStop();
+          robot.lift.stop();
           robot.syncTurn(-90, 2);
           robot.fastLeftDrive(50);
 

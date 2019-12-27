@@ -128,10 +128,10 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             robot.distRearDrive(0.75, 100);
             driveTime.reset();
             while (driveTime.seconds() < 1) {
-              robot.liftUp();
+              robot.lift.up();
               robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
             }
-            robot.liftStop();
+            robot.lift.stop();
             while (driveTime.seconds() < 0.75) {
               robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
             }
@@ -162,10 +162,10 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             robot.setLinearSlideDirection(LinearSlideOperation.None, true);
             driveTime.reset();
             while (driveTime.seconds() < 1.5 && !robot.liftSwitchSignaled()) {
-              robot.liftDown();
+              robot.lift.down();
 
             }
-            robot.liftStop();
+            robot.lift.stop();
 
             robot.setLinearSlideDirection(LinearSlideOperation.None, false);
 
@@ -184,9 +184,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             driveTime.reset();
             while (driveTime.seconds() < 0.25) {
 
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             currentState = AutoState.GO_TO_BASE_PLATE;
             // distToLine(x, y, z);
             robot.distRearDrive(0.75, 40);
@@ -203,9 +203,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
           robot.syncTurn(90, 3);
           driveTime.reset();
           while (driveTime.seconds() < 0.25) {
-            robot.liftUp();
+            robot.lift.up();
           }
-          robot.liftStop();
+          robot.lift.stop();
 
           break;
 
@@ -219,9 +219,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             runTime.reset();
             runTime.reset();
             while (runtime.seconds() < 2) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
 
 
             runTime.reset();
@@ -237,7 +237,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
             runTime.reset();
             while (runTime.seconds() < 0.5) {
-              robot.liftDown();
+              robot.lift.down();
             }
 
             robot.distLeftDrive(0.5, 0, 60);
@@ -245,9 +245,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             robot.timeDrive(0.45, 3, -90);
             runtime.reset();
             while (runtime.seconds() < 1.5) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
 
             robot.timeDrive(0.3, 0.7, -90);
             robot.timeDrive(0.4, 1.6, 90);
@@ -255,9 +255,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             robot.timeDrive(0.5, 2.2, 90);
             runtime.reset();
             while (runtime.seconds() < 1.25) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             robot.rotateClaw(false);
 
             robot.timeDrive(0.3, 1, 90);
@@ -280,9 +280,9 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
             runTime.reset();
             while (runTime.seconds() < 0.25) {
-              robot.liftUp();
+              robot.lift.up();
             }
-            robot.liftStop();
+            robot.lift.stop();
             runTime.reset();
             stop();
             currentState = TTAutoStoneMovedWallRed.AutoState.STOP;
@@ -301,7 +301,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
 
             runTime.reset();
             while (runTime.seconds() < 0.3) {
-              robot.liftDown();
+              robot.lift.down();
             }
             robot.claw(false);
             telemetry.addData("should stop", "");
