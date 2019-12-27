@@ -97,7 +97,7 @@ public class DirectControl extends LinearOpMode {
       }
 
       if ((control.ltrigger() > 0.8) && (control.rtrigger() > 0.8) &&
-        control.rbump().isPressed() && control.lbump().isPressed()) {
+           control.rbump().isPressed() && control.lbump().isPressed()) {
         if (control.buttonX().isPressed()) {
           robot.lift.overrideDown();
         } else {

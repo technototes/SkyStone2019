@@ -71,11 +71,8 @@ public class LiftControl {
   // This is a little more paranoid that 'In the bottom end of the range'
   // to try to prevent more lift axle carnage...
   public boolean atLowerLimit() {
-    //return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
-    return false;
+    return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
   }
-
-
   // Crash recovery here
   public void ResetZero() {
     lZero = left.getCurrentPosition();
@@ -96,7 +93,7 @@ public class LiftControl {
     if (atLowerLimit()) {
       stop();
       return true;
-    }else {
+    } else {
       down();
       return false;
     }
