@@ -8,7 +8,7 @@ public class LiftControl {
   private static final double DOWNWARD_SCALE = 2.0;
 
   // This is how many 'ticks' a brick is
-  private static int BRICK_HEIGHT = 1100;
+  private static int BRICK_HEIGHT = 1200;
 
   // This is how high the base plate is (to get *over* it while holding a brick)
   private static int BASE_PLATE_HEIGHT = 400;
@@ -73,7 +73,6 @@ public class LiftControl {
   public boolean atLowerLimit() {
     return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
   }
-
   // Crash recovery here
   public void ResetZero() {
     lZero = left.getCurrentPosition();
@@ -94,9 +93,10 @@ public class LiftControl {
     if (atLowerLimit()) {
       stop();
       return true;
+    } else {
+      down();
+      return false;
     }
-    down();
-    return false;
   }
 
   // Synchronously moves to the 'grab a brick' height

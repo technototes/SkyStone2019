@@ -138,8 +138,8 @@ public class TTRobot implements IRobot {
     lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
-    lGrabber = hardwareMap.get(Servo.class, "lGrabber");
-    rGrabber = hardwareMap.get(Servo.class, "rGrabber");
+    //lGrabber = hardwareMap.get(Servo.class, "lGrabber");
+    //rGrabber = hardwareMap.get(Servo.class, "rGrabber");
 
     DcMotor flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     DcMotor frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
@@ -167,8 +167,8 @@ public class TTRobot implements IRobot {
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-    lGrabber.setDirection(Servo.Direction.FORWARD);
-    rGrabber.setDirection(Servo.Direction.REVERSE);
+    //lGrabber.setDirection(Servo.Direction.FORWARD);
+    //rGrabber.setDirection(Servo.Direction.REVERSE);
 
     // TODO: Add initialization / calibration for the slide and lift?
 
@@ -178,9 +178,15 @@ public class TTRobot implements IRobot {
     imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
     //set grabber rotation to be centered
-    turn.setPosition(0.5);
+    centerClaw();
   }
 
+  public int getLLiftEncoder(){
+    return lift.left.getCurrentPosition();
+  }
+  public int getRLiftEncoder(){
+    return lift.right.getCurrentPosition();
+  }
   // Linear slide stuff:
   public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
@@ -321,6 +327,7 @@ public class TTRobot implements IRobot {
     } else{
       claw.setPosition(CLAWCLOSEPOSITION);
     }
+    telemetry.addData("Claw: ", openOrClose);
   }
 
   private static final double CLAW_LEFT_VAL = 0;
@@ -379,8 +386,8 @@ public class TTRobot implements IRobot {
   }
 
   public void bpGrabber(double pos) {
-    lGrabber.setPosition(pos);
-    rGrabber.setPosition(pos);
+    //lGrabber.setPosition(pos);
+    //rGrabber.setPosition(pos);
   }
 
   public void blockFlipper(double pos) {
