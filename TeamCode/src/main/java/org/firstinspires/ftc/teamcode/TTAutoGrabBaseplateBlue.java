@@ -80,7 +80,7 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
           if (opModeIsActive()) {
             telemetry.addData("state", currentState.toString());
 
-            robot.bpGrabber(1);
+            robot.blockFlipper(FlipperPosition.Down);
             robot.timeDrive(0, 1, 0);
             currentState = AutoState.BRING_PLATE;
           }
@@ -88,7 +88,7 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
         case BRING_PLATE:
           if (opModeIsActive()) {
             telemetry.addData("state", currentState.toString());
-            robot.bpGrabber(1);
+            robot.blockFlipper(FlipperPosition.Down);
             robot.timeDrive(0.5, 3, 0); // may need to bve tweaked according to testing
             currentState = AutoState.LET_GO;
           }
@@ -96,7 +96,7 @@ public class TTAutoGrabBaseplateBlue extends LinearOpMode {
         case LET_GO:
           if (opModeIsActive()) {
             telemetry.addData("state", currentState.toString());
-            robot.bpGrabber(0);
+            robot.blockFlipper(FlipperPosition.Up);
 
             currentState = AutoState.GO_TO_LINE;
             robot.timeDrive(0.5, 2, 270);
