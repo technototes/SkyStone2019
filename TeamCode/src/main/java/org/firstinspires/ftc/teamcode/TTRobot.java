@@ -49,8 +49,8 @@ public class TTRobot implements IRobot {
   public static final double TRIGGERTHRESHOLD = 0.25;
 
   // Claw grab positions
-  public static final double CLAWOPENPOSITION = 0;
-  public static final double CLAWCLOSEPOSITION = 1;
+  public static final double CLAWOPENPOSITION = 1;
+  public static final double CLAWCLOSEPOSITION = 0;
 
   // Distance speeds in cm for fast auto drive functions
   public static final double TURBODISTANCE = 65;
@@ -321,15 +321,6 @@ public class TTRobot implements IRobot {
 
 
   // Grabber stuff:
-  public void claw(boolean openOrClose) {
-    if(openOrClose){
-      claw.setPosition(CLAWOPENPOSITION);
-    } else{
-      claw.setPosition(CLAWCLOSEPOSITION);
-    }
-    telemetry.addData("Claw: ", openOrClose);
-  }
-
   private static final double CLAW_LEFT_VAL = 0;
   private static final double CLAW_CENTER_VAL = 0.3;
   private static final double CLAW_RIGHT_VAL = 1.0;
@@ -370,12 +361,13 @@ public class TTRobot implements IRobot {
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
-        claw(false); // Open
+        claw.setPosition(CLAWOPENPOSITION);
         break;
       case Close:
-        claw(true); // Closed
+        claw.setPosition(CLAWCLOSEPOSITION);
         break;
     }
+    telemetry.addData("Claw: ", position.toString());
   }
 
   // Lift stuff:
