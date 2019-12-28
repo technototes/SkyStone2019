@@ -79,7 +79,7 @@ class TTAutoGoToStoneRedPIDTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException e) {}
-          mockRobot.setRearRangePositionCm(22);
+          mockRobot.setRearRangePositionCm(73);
         }
       }
     );
@@ -88,9 +88,57 @@ class TTAutoGoToStoneRedPIDTest {
     ElapsedTime runTime = new ElapsedTime();
     autoGoToStoneRedPID.start();
     stopTimer.start();
-    autoGoToStoneRedPID.distRearDrivePID(ttRobot, 20);
+    autoGoToStoneRedPID.distRearDrivePID(ttRobot, 75);
     double msDuration = runTime.milliseconds();
     assertTrue(msDuration < 110, "msDuration less than 110");
     assertTrue(msDuration >= 100, "msDuration greater or equal to 100");
+  }
+
+  @Test
+  void distRearDrivePIDBackward() {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException e) {}
+          mockRobot.setRearRangePositionCm(15);
+        }
+      }
+    );
+
+    Thread stopTimer2 = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(400);
+          } catch (InterruptedException e) {}
+          mockRobot.setRearRangePositionCm(20);
+        }
+      }
+    );
+
+    mockRobot.setRearRangePositionCm(40);
+    ElapsedTime runTime = new ElapsedTime();
+    autoGoToStoneRedPID.start();
+    stopTimer.start();
+    stopTimer2.start();
+    autoGoToStoneRedPID.distRearDrivePID(ttRobot, 20);
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 410, "msDuration " + Double.toString(msDuration) + " less than 410");
+    assertTrue(msDuration >= 400, "msDuration " + Double.toString(msDuration) + " greater or equal to 400");
+  }
+
+  @Test
+  void distRearDrivePID2SecMax() {
+    mockRobot.setRearRangePositionCm(0);
+    ElapsedTime runTime = new ElapsedTime();
+    autoGoToStoneRedPID.start();
+    autoGoToStoneRedPID.distRearDrivePID(ttRobot, 20);
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 2100, "msDuration less than 110");
+    assertTrue(msDuration >= 1900, "msDuration greater or equal to 100");
   }
 }

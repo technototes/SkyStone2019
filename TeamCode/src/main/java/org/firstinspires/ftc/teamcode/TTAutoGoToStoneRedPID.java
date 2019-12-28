@@ -28,19 +28,24 @@ public class TTAutoGoToStoneRedPID extends LinearOpMode {
   void distRearDrivePID(TTRobot robot, double targetDist) {
     final double epsilon = 2; // Stop if "dist" is within this many units of the target
     final double speedIncrementValue = 0.1; // Amount to change speed per speedIncrementTime
-    final double speedIncrementTime = 0.05; // Time (in sec) between changes in speed
+    final double speedIncrementTime = 0.2; // Time (in sec) between changes in speed
 
     ElapsedTime tm = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     double curDistance = robot.rearDistance();
     double distFromGoal = Math.abs(curDistance - targetDist);
     double speed = 0;
     double timeOfLastSpeedChange = -1;
-    while (opModeIsActive() && (distFromGoal > epsilon)) {
+    while (opModeIsActive() && (distFromGoal > epsilon) && tm.seconds() < 6) {
       final double dir = (targetDist < curDistance) ? 1 : -1;
-      final double desiredSpeed = dir * ((distFromGoal > 10) ? 1.0 : (distFromGoal / 10));
+      final double desiredSpeed = dir * ((distFromGoal > 40) ? 1.0 : (distFromGoal / 40));
 
-      if (Math.abs(desiredSpeed - speed) > speedIncrementValue) {
-        double now = tm.seconds();
+      double now = tm.seconds();
+      if (Math.abs(desiredSpeed) < Math.abs(speed)) {
+        // Slow down quickly
+        speed = desiredSpeed;
+        timeOfLastSpeedChange = now;
+      } else if (Math.abs(desiredSpeed - speed) > speedIncrementValue) {
+        // Speed up slowly
         if (now - timeOfLastSpeedChange > speedIncrementTime) {
           speed += speedIncrementValue * dir;
           timeOfLastSpeedChange = now;
@@ -49,7 +54,7 @@ public class TTAutoGoToStoneRedPID extends LinearOpMode {
         speed = desiredSpeed;
       }
 
-      robot.driveTrain.setDriveVector(Math.abs(speed), (speed > 0) ? 0 : 180, robot.gyroHeading());
+      robot.driveTrain.setDriveVector(Math.abs(speed), (speed < 0) ? 0 : 180, robot.gyroHeading());
 
       telemetry.addData("Current Distance", curDistance);
       telemetry.addData("Current Speed", speed);
@@ -77,6 +82,6 @@ public class TTAutoGoToStoneRedPID extends LinearOpMode {
 
     waitForStart();
 
-    distRearDrivePID(robot,20);
+    distRearDrivePID(robot,7);
   }
 }
