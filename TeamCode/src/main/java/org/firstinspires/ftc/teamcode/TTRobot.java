@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -28,8 +25,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
@@ -41,20 +36,17 @@ public class TTRobot implements IRobot {
   // the power of the linear slide
   private static final double LINEARSLIDEPOWER = 0.5;
 
-  // Dead zones
-
-  // This is the middle 'dead zone' of the analog sticks
-  public static final double STICKDEADZONE = 0.05;
-  // Triggers must be pushed at least this far
-  public static final double TRIGGERTHRESHOLD = 0.25;
-
   // Claw grab positions
-  public static final double CLAWOPENPOSITION = 0;
-  public static final double CLAWCLOSEPOSITION = 1;
+  private static final double CLAWOPENPOSITION = 1;
+  private static final double CLAWCLOSEPOSITION = 0;
+
+  // Block flipper / baseplate grabber positions
+  private static final double BLOCK_FLIPPER_UP_POSITION = 0.75;
+  private static final double BLOCK_FLIPPER_DOWN_POSITION = 0.15;
 
   // Distance speeds in cm for fast auto drive functions
-  public static final double TURBODISTANCE = 65;
-  public static final double SNAILDISTANCE = 15;
+  private static final double TURBODISTANCE = 65;
+  private static final double SNAILDISTANCE = 15;
 
   // Unused stuff
   // the grab rotation position for snapping to horizontal or vertical
@@ -70,7 +62,6 @@ public class TTRobot implements IRobot {
     Out
   }
 
-  private boolean isGrabberOpened = true;
   private LinearSlidePosition slidePosition = LinearSlidePosition.In;
 
   private DigitalChannel lslideSwitch = null;
@@ -85,8 +76,6 @@ public class TTRobot implements IRobot {
   private DistanceSensor sensorRangeRear = null;
   private DistanceSensor sensorRangeLeft = null;
   private DistanceSensor sensorRangeRight = null;
-  private Servo lGrabber = null;
-  private Servo rGrabber = null;
 
   XDrive driveTrain = null;
   private Telemetry telemetry = null;
@@ -138,9 +127,6 @@ public class TTRobot implements IRobot {
     lift = new LiftControl(op, lLiftMotor, rLiftMotor);
     sensorColorBottom = hardwareMap.get(ColorSensor.class, "sensorColorBottom");
 
-    //lGrabber = hardwareMap.get(Servo.class, "lGrabber");
-    //rGrabber = hardwareMap.get(Servo.class, "rGrabber");
-
     DcMotor flMotor = hardwareMap.get(DcMotor.class, "motorFrontLeft");
     DcMotor frMotor = hardwareMap.get(DcMotor.class, "motorFrontRight");
     DcMotor rlMotor = hardwareMap.get(DcMotor.class, "motorRearLeft");
@@ -166,9 +152,6 @@ public class TTRobot implements IRobot {
     // Output mode can be used to blink LED's
     lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
     liftSwitch.setMode(DigitalChannel.Mode.INPUT);
-
-    //lGrabber.setDirection(Servo.Direction.FORWARD);
-    //rGrabber.setDirection(Servo.Direction.REVERSE);
 
     // TODO: Add initialization / calibration for the slide and lift?
 
@@ -321,15 +304,6 @@ public class TTRobot implements IRobot {
 
 
   // Grabber stuff:
-  public void claw(boolean openOrClose) {
-    if(openOrClose){
-      claw.setPosition(CLAWOPENPOSITION);
-    } else{
-      claw.setPosition(CLAWCLOSEPOSITION);
-    }
-    telemetry.addData("Claw: ", openOrClose);
-  }
-
   private static final double CLAW_LEFT_VAL = 0;
   private static final double CLAW_CENTER_VAL = 0.3;
   private static final double CLAW_RIGHT_VAL = 1.0;
@@ -370,12 +344,13 @@ public class TTRobot implements IRobot {
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
-        claw(false); // Open
+        claw.setPosition(CLAWOPENPOSITION);
         break;
       case Close:
-        claw(true); // Closed
+        claw.setPosition(CLAWCLOSEPOSITION);
         break;
     }
+    telemetry.addData("Claw: ", position.toString());
   }
 
   // Lift stuff:
@@ -385,13 +360,16 @@ public class TTRobot implements IRobot {
     Below
   }
 
-  public void bpGrabber(double pos) {
-    //lGrabber.setPosition(pos);
-    //rGrabber.setPosition(pos);
-  }
-
-  public void blockFlipper(double pos) {
-    blockFlipper.setPosition(pos);
+  public void blockFlipper(FlipperPosition pos) {
+    switch (pos) {
+      case Down:
+        blockFlipper.setPosition(BLOCK_FLIPPER_DOWN_POSITION);
+        break;
+      case Up:
+      default:
+        blockFlipper.setPosition(BLOCK_FLIPPER_UP_POSITION);
+        break;
+    }
   }
 
   public void capstone(double speed) {
@@ -426,11 +404,6 @@ public class TTRobot implements IRobot {
 
   void setServoPosition(double position) {
     turn.setPosition(position);
-  }
-
-  public int getSkystonePosition() {
-    //add vuforia+tristan vision processing
-    return 1;
   }
 
   // Distance sensing
@@ -552,6 +525,10 @@ public class TTRobot implements IRobot {
     while (runTime.seconds() < time && opMode.opModeIsActive()) {
       driveTrain.timeDrive(speed, time, angle, gyroHeading());
     }
+  }
+
+  public void vectorDrive(double speed, double angle) {
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
   }
 
   public void lineDrive(double speed, double time, double angle) {

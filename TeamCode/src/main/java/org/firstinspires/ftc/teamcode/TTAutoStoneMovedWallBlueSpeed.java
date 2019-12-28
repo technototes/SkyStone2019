@@ -156,14 +156,14 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           robot.fastRearDrive(70);
           robot.fastSyncTurn(180, 2);
           robot.timeDrive(0.5, 0.7, 0);
-          robot.bpGrabber(0);
+          robot.blockFlipper(FlipperPosition.Up);
           robot.fastSyncTurn(135, 2);
           robot.timeDrive(0.75, 1, 135);
           robot.fastSyncTurn(90, 2);
           robot.timeDrive(0.75, 1, -90);
           //TODO make this dist front drive to a distance of 10
           //robot.timeDrive(0.75, 2, 180);
-          robot.bpGrabber(1);
+          robot.blockFlipper(FlipperPosition.Down);
           robot.timeDrive(1, 0.5, 90);
           robot.fastSyncTurn(0, 2);
 

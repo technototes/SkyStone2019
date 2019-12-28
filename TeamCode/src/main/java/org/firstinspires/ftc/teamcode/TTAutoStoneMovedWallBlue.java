@@ -145,7 +145,7 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
           driveTime.reset();
           //robot.rotateClaw(true);
-          robot.claw(false);
+          robot.setClawPosition(ClawPosition.Open);
           //while(driveTime.seconds() < 0.9) {
           //robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
           //}
@@ -166,7 +166,7 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
           telemetry.addData("state", currentState.toString());
 
-          robot.claw(true);
+          robot.setClawPosition(ClawPosition.Close);
           //sleep(1000);
           currentState = AutoState.GO_TO_BASE_PLATE;
           // distToLine(x, y, z);
@@ -267,7 +267,7 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           }
           robot.lift.stop();
 
-          robot.claw(false);
+          robot.setClawPosition(ClawPosition.Open);
 
           runtime.reset();
           while (runtime.seconds() < 0.5) {

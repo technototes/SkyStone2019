@@ -61,7 +61,7 @@ class MockRobot {
 
   private HardwareMap hardwareMap = mock(HardwareMap.class);
   private Orientation gyroOrientation = new Orientation();
-  private Double rearRangePositionCm = 0.0;
+  private double rearRangePositionCm = 0.0;
 
   private class HardwareEntry {
     Class<?> hwClass;
