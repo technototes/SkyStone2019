@@ -527,6 +527,10 @@ public class TTRobot implements IRobot {
     }
   }
 
+  public void vectorDrive(double speed, double angle) {
+    driveTrain.setDriveVector(speed, angle, gyroHeading());
+  }
+
   public void lineDrive(double speed, double time, double angle) {
     driveTrain.setDriveVector(speed, angle, gyroHeading());
     ElapsedTime tm = new ElapsedTime();

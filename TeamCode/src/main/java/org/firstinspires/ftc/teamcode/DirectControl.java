@@ -73,7 +73,7 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
       }
-      
+
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
         robot.blockFlipper(FlipperPosition.Down);
