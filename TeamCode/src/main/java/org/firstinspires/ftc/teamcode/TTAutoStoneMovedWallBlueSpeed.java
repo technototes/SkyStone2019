@@ -107,45 +107,56 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           robot.centerClaw();
           robot.setClawPosition(ClawPosition.Open);
           driveTime.reset();
-          robot.setLinearSlideDirection(LinearSlideOperation.Extend, false);
+          //robot.turnAndDrive(90, 0.4, -90);
+          //sleep(100);
+          //robot.fastSyncTurn(90, 1);
+          //currentState = AutoState.STOP;
+          robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+          //sleep(1300);
+
           break;
 
         case GOTOBLOCK1:
           telemetry.addData("state", currentState.toString());
-          robot.distRearRightDrive(0.5, 80, 90);
+          robot.distRearRightDrive(1, 85, 90);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK2:
           telemetry.addData("state", currentState.toString());
-          robot.distRearRightDrive(0.5, 80, 70);
+          //robot.distRearRightDrive(1, 90, 70);
+          robot.fastRearDrive(90);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK3:
           telemetry.addData("state", currentState.toString());
-          robot.fastRearDrive(80);
+          robot.distRearRightDrive(1, 85, 50);
+          robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GRABBLOCK:
           telemetry.addData("state", currentState.toString());
-          while(driveTime.seconds() < 1.3){
-            sleep(100);
+          //stop();
+          while(driveTime.seconds() < 1.1){
+            sleep(10);
           }
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-          robot.fastSyncTurn(0, 2);
-          //stop();
           robot.setClawPosition(ClawPosition.Close);
           sleep(500);
-          driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
-            robot.lift.up();
-          }
-          robot.lift.stop();
+          robot.lift.LiftBrickWait(0);
           currentState = AutoState.GOTOBASEPLATE;
           break;
         case GOTOBASEPLATE:
-          robot.fastRearDrive(60);
+          robot.fastRearDrive(70);
+          robot.turnAndDrive(90, 0.5, -90);
+          robot.turnAndDrive(0, 0.5, -90);
+          sleep(100);
+          //robot.distRearRightDrive(1, 70, 100);
           robot.fastSyncTurn(0, 1);
-          robot.distRearLeftDrive(1, 90, 40);
+          //robot.distRearLeftDrive(1, 90, 40);
+          //robot.fastLeftDrive(40);
+          robot.fastRearDrive(100);
           currentState = AutoState.PLACEBLOCK;
           break;
         case PLACEBLOCK:
@@ -153,9 +164,10 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           currentState = AutoState.MOVEBASEPLATE;
           break;
         case MOVEBASEPLATE:
+          //TODO test this
           robot.fastRearDrive(70);
           robot.fastSyncTurn(180, 2);
-          robot.timeDrive(0.5, 0.7, 0);
+          //robot.timeDrive(0.5, 0.5, 0);
           robot.blockFlipper(FlipperPosition.Up);
           robot.fastSyncTurn(135, 2);
           robot.timeDrive(0.75, 1, 135);
@@ -180,36 +192,28 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
               break;
           }
           //lower lift
-          driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
-            robot.lift.down();
-          }
-          robot.lift.stop();
+          robot.lift.AcquireBrickWait();
           break;
         case GOTOBLOCK4:
-          robot.distRearRightDrive(1, 80, 30);
+          robot.distRearRightDrive(1, 85, 30);
           robot.fastSyncTurn(0, 1);
           currentState = AutoState.GRABBLOCK2;
           break;
         case GOTOBLOCK5:
-          robot.distRearRightDrive(1, 80, 10);
+          robot.distRearRightDrive(1, 85, 10);
           robot.fastSyncTurn(0, 1);
           currentState = AutoState.GRABBLOCK2;
           break;
         case GOTOBLOCK6:
           //how are we going to grab this one?
-          robot.distRearRightDrive(1, 80, 0);
+          robot.distRearRightDrive(1, 85, 0);
           robot.fastSyncTurn(0, 1);
           currentState = AutoState.GRABBLOCK2;
           break;
         case GRABBLOCK2:
           robot.setClawPosition(ClawPosition.Close);
           sleep(500);
-          driveTime.reset();
-          while (driveTime.seconds() < 0.35) {
-            robot.lift.up();
-          }
-          robot.lift.stop();
+          robot.lift.LiftBrickWait(0);
           currentState = AutoState.GOTOMOVEDBASEPLATE;
           break;
         case GOTOMOVEDBASEPLATE:
@@ -217,7 +221,8 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           robot.fastSyncTurn(-90, 1);
 
           //TODO make this distfront to a dist of 80 maybe
-          robot.timeDrive(0.75, 3, -90);
+          robot.driveToLine(0.75, -90);
+          robot.timeDrive(0.75, 2, -90);
           currentState = AutoState.PLACEBLOCK2;
           break;
         case PLACEBLOCK2:
@@ -225,7 +230,7 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           currentState = AutoState.GOTOLINE;
           break;
         case GOTOLINE:
-          robot.driveToLine(0.5, 90);
+          robot.driveToLine(0.75, 90);
           currentState = AutoState.STOP;
           break;
         case STOP:
