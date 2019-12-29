@@ -83,11 +83,7 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.blockFlipper(0.8);
       }
-      if (dcontrols.isDown()) {
-        robot.bpGrabber(0);
-      } else {
-        robot.bpGrabber(1);
-      }
+
       if (dcontrols.isLeft()) {
         robot.capstone(-1);
       } else if (dcontrols.isRight()) {

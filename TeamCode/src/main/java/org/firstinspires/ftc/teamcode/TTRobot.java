@@ -636,12 +636,10 @@ public class TTRobot implements IRobot {
 
 
   public void setTurningSpeed(double angleDelta) {
-    if (Math.abs(angleDelta) < 25) {
+    if (Math.abs(angleDelta) < 35) {
       speedSnail();
-    } else if (Math.abs(angleDelta) < 75) {
-      speedNormal();
     } else {
-      speedTurbo();
+      speedNormal();
     }
   }
 
@@ -666,6 +664,23 @@ public class TTRobot implements IRobot {
       telemetry.update();
     }
     stop();
+  }
+
+  //turn and drive
+  public void turnAndDrive(int angle, double speed, double driveAngle){
+    driveAngle = Math.toRadians(driveAngle+90);
+    while(Math.abs(gyroHeading2()-angle) > 5) {
+      if (angle < gyroHeading2() - 5) {
+        driveTrain.setSpeed(XDrive.DriveSpeed.Normal);
+        driveTrain.setStickVector(Math.cos(driveAngle), Math.sin(driveAngle), -0.5, gyroHeading2());
+      } else if (angle > gyroHeading2() + 5) {
+        driveTrain.setSpeed(XDrive.DriveSpeed.Normal);
+        driveTrain.setStickVector(Math.cos(driveAngle), Math.sin(driveAngle), 0.5, gyroHeading2());
+      }
+    }
+    driveTrain.stop();
+    fastSyncTurn(angle, 1);
+
   }
 
   // This will travel toward the rear until it gets to 'dist'
@@ -858,8 +873,8 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = Math.abs(rearDist - rDist);
-      if (magnitude < 30) {
+      double magnitude = (Math.abs(rearDist - rDist)+Math.abs(leftDist - lDist))/2;
+      if (magnitude < SNAILDISTANCE) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
         speedNormal();
@@ -900,8 +915,8 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       rtDist = getCappedRange(sensorRangeRight, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = Math.abs(rearDist - rDist);
-      if (magnitude < 30) {
+      double magnitude = (Math.abs(rearDist - rDist)+Math.abs(rightDist - rDist))/2;
+      if (magnitude < SNAILDISTANCE) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
         speedNormal();
