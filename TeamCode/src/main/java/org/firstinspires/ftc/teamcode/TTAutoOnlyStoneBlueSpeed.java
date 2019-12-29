@@ -175,11 +175,11 @@
               robot.fastRearDrive(70);
               robot.fastSyncTurn(180, 2);
               robot.timeDrive(0.5, 1, 0);
-              robot.bpGrabber(0);
+          robot.blockFlipper(FlipperPosition.Up);
 
               //TODO make this dist front drive to a distance of 10
               robot.timeDrive(0.75, 2, 180);
-              robot.bpGrabber(1);
+          robot.blockFlipper(FlipperPosition.Down);
               robot.fastRightDrive(100);
 
               //TODO also this one but to a distance of 60

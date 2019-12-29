@@ -15,6 +15,11 @@ public class DirectControl extends LinearOpMode {
   private Controller driver;
   private XDriveManualControl manualCtrl;
 
+  // This is the middle 'dead zone' of the analog sticks
+  private static final double STICKDEADZONE = 0.05;
+  // Triggers must be pushed at least this far
+  private static final double TRIGGERTHRESHOLD = 0.25;
+
   void SetTestRobot(TTRobot testRobot) {
     robotForTest = testRobot;
   }
@@ -37,18 +42,11 @@ public class DirectControl extends LinearOpMode {
 
     while (opModeIsActive()) {
       loopTime.reset();
-      // Handle Grabber rotation
-      /*if (control.buttonA() == Button.Pressed) {
-        if (robot.getGrabberPosition() == GrabberPosition.Vertical) {
-          robot.snapGrabberPosition(GrabberPosition.Horizontal);
-        } else { // It'sHORIZONTAL!
-          robot.snapGrabberPosition(GrabberPosition.Vertical);
-        }
-      }*/
+
       // Handle Grabber clutch
-      if (control.rtrigger() > TTRobot.TRIGGERTHRESHOLD) {
+      if (control.rtrigger() > TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Open); // Open
-      } else if (control.ltrigger() > TTRobot.TRIGGERTHRESHOLD) {
+      } else if (control.ltrigger() > TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
@@ -65,8 +63,6 @@ public class DirectControl extends LinearOpMode {
         }
       }
 
-
-
       // Override the linear slide limit switches
       boolean slideOverride = (control.rbump() == Button.Pressed) && (control.lbump() == Button.Pressed);
       Direction ctrlDpad = control.dpad();
@@ -77,11 +73,12 @@ public class DirectControl extends LinearOpMode {
       } else {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
       }
+
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
-        robot.blockFlipper(0.15);
+        robot.blockFlipper(FlipperPosition.Down);
       } else {
-        robot.blockFlipper(0.8);
+        robot.blockFlipper(FlipperPosition.Up);
       }
 
       if (dcontrols.isLeft()) {

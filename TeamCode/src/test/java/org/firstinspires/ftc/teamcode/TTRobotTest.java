@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -27,103 +28,126 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TTRobotTest {
+public class TTRobotTest {
+  private MockRobot mockRobot;
   private TTRobot ttRobot;
   private @Mock LinearOpMode opMode;
-  private HardwareMap hardwareMap = mock(HardwareMap.class);
   private Telemetry telemetry = mock(Telemetry.class);
 
-  private BNO055IMU mockImu = mock(BNO055IMU.class);
-  private Orientation gyroOrientation = new Orientation();
-
-  private DcMotor lLiftMotor = mock(DcMotor.class);
-  private DcMotor rLiftMotor = mock(DcMotor.class);
-
-  private DigitalChannel lslideSwitch = mock(DigitalChannel.class);
-  private DigitalChannel liftSwitch = mock(DigitalChannel.class);
-
-  private Servo claw = mock(Servo.class);
-  private Servo lGrabber = mock(Servo.class);
-  private Servo rGrabber = mock(Servo.class);
-  private Servo grabTurn = mock(Servo.class);
-  private Servo blockFlipper = mock(Servo.class);
-
-  private CRServo lslideServo = mock(CRServo.class);
-  private CRServo capServo = mock(CRServo.class);
-
-  private DistanceSensor sensorRangeRear = mock(DistanceSensor.class);
-  private DistanceSensor sensorRangeLeft = mock(DistanceSensor.class);
-  private DistanceSensor sensorRangeRight = mock(DistanceSensor.class);
-  private ColorSensor sensorColorBottom = mock(ColorSensor.class);
-
-  private DcMotor flMotor = mock(DcMotor.class);
-  private DcMotor frMotor = mock(DcMotor.class);
-  private DcMotor rlMotor = mock(DcMotor.class);
-  private DcMotor rrMotor = mock(DcMotor.class);
-
-  @org.junit.jupiter.api.Test
-  void setLinearSlideDirection() {
+  @Test
+  public void setLinearSlideDirection() {
     //when(lslideSwitch.getState()).thenReturn(true).thenReturn(false).thenReturn(true);
     ttRobot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-    verify(lslideServo).setPower(0.0);
+    verify(mockRobot.lslideServo).setPower(0.0);
 
     ttRobot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-    verify(lslideServo, times(2)).setPower(0.0);
+    verify(mockRobot.lslideServo, times(2)).setPower(0.0);
 
     ttRobot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
-    verify(lslideServo).setPower(-0.5);
-    verify(lslideSwitch, never()).getState();
+    verify(mockRobot.lslideServo).setPower(-0.5);
+    verify(mockRobot.lslideSwitch, never()).getState();
   }
 
-  @org.junit.jupiter.api.Test
-  void liftUp() {
+  @Test
+  public void rotateClaw() {
+    final double left = 0;
+    final double center = 0.3;
+    final double right = 1;
+
+    // Verify claw was moved to center as part of creating TTRobot
+    verify(mockRobot.grabTurn, never()).setPosition(right);
+    verify(mockRobot.grabTurn).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(true);
+    verify(mockRobot.grabTurn).setPosition(right);
+    verify(mockRobot.grabTurn).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(true);
+    verify(mockRobot.grabTurn).setPosition(right);
+    verify(mockRobot.grabTurn).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn).setPosition(right);
+    verify(mockRobot.grabTurn, times(2)).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(true);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(2)).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(true);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(2)).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(3)).setPosition(center);
+    verify(mockRobot.grabTurn, never()).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(3)).setPosition(center);
+    verify(mockRobot.grabTurn).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(3)).setPosition(center);
+    verify(mockRobot.grabTurn).setPosition(left);
+
+    ttRobot.rotateClaw(true);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(4)).setPosition(center);
+    verify(mockRobot.grabTurn).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(4)).setPosition(center);
+    verify(mockRobot.grabTurn, times(2)).setPosition(left);
+
+    ttRobot.rotateClaw(false);
+    verify(mockRobot.grabTurn, times(2)).setPosition(right);
+    verify(mockRobot.grabTurn, times(4)).setPosition(center);
+    verify(mockRobot.grabTurn, times(2)).setPosition(left);
   }
 
-  @org.junit.jupiter.api.Test
-  void liftDown() {
-  }
+  @Test
+  public void setClawPosition() {
+    final double open = 1;
+    final double closed = 0;
 
-  @org.junit.jupiter.api.Test
-  void liftStop() {
+    ttRobot.setClawPosition(ClawPosition.Open);
+    verify(mockRobot.claw).setPosition(open);
+    verify(mockRobot.claw, never()).setPosition(closed);
+
+    ttRobot.setClawPosition(ClawPosition.Open);
+    verify(mockRobot.claw, times(2)).setPosition(open);
+    verify(mockRobot.claw, never()).setPosition(closed);
+
+    ttRobot.setClawPosition(ClawPosition.Close);
+    verify(mockRobot.claw, times(2)).setPosition(open);
+    verify(mockRobot.claw).setPosition(closed);
+
+    ttRobot.setClawPosition(ClawPosition.Open);
+    verify(mockRobot.claw, times(3)).setPosition(open);
+    verify(mockRobot.claw).setPosition(closed);
+
+    ttRobot.setClawPosition(ClawPosition.Close);
+    verify(mockRobot.claw, times(3)).setPosition(open);
+    verify(mockRobot.claw, times(2)).setPosition(closed);
+
+    ttRobot.setClawPosition(ClawPosition.Close);
+    verify(mockRobot.claw, times(3)).setPosition(open);
+    verify(mockRobot.claw, times(3)).setPosition(closed);
   }
 
   @BeforeEach
   void setUp() {
-    ttRobot = buildMockRobot();
-  }
-
-  TTRobot buildMockRobot() {
-    Mockito.lenient().when(hardwareMap.get(BNO055IMU.class, "imu1")).thenReturn(mockImu);
-    Mockito.lenient().when(mockImu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES)).thenReturn(gyroOrientation);
-
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorLiftLeft")).thenReturn(lLiftMotor);
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorLiftRight")).thenReturn(rLiftMotor);
-
-    Mockito.lenient().when(hardwareMap.get(DigitalChannel.class, "slideLimit")).thenReturn(lslideSwitch);
-    Mockito.lenient().when(hardwareMap.get(DigitalChannel.class, "liftLimit")).thenReturn(liftSwitch);
-
-    Mockito.lenient().when(hardwareMap.get(CRServo.class, "slide")).thenReturn(lslideServo);
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "claw")).thenReturn(claw);
-
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "lGrabber")).thenReturn(lGrabber);
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "rGrabber")).thenReturn(rGrabber);
-
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "grabTurn")).thenReturn(grabTurn);
-    Mockito.lenient().when(hardwareMap.get(Servo.class, "blockFlipper")).thenReturn(blockFlipper);
-
-    Mockito.lenient().when(hardwareMap.get(CRServo.class, "cap")).thenReturn(capServo);
-
-    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRear")).thenReturn(sensorRangeRear);
-    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeLeft")).thenReturn(sensorRangeLeft);
-    Mockito.lenient().when(hardwareMap.get(DistanceSensor.class, "sensorRangeRight")).thenReturn(sensorRangeRight);
-
-    Mockito.lenient().when(hardwareMap.get(ColorSensor.class, "sensorColorBottom")).thenReturn(sensorColorBottom);
-
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorFrontLeft")).thenReturn(flMotor);
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorFrontRight")).thenReturn(frMotor);
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorRearLeft")).thenReturn(rlMotor);
-    Mockito.lenient().when(hardwareMap.get(DcMotor.class, "motorRearRight")).thenReturn(rrMotor);
-
-    return new TTRobot(opMode, hardwareMap, telemetry);
+    mockRobot = new MockRobot();
+    ttRobot = mockRobot.buildMockRobot(opMode, telemetry);
   }
 }
