@@ -34,7 +34,9 @@ class MockRobot {
   BNO055IMU mockImu = mock(BNO055IMU.class);
 
   DcMotor lLiftMotor = mock(DcMotor.class);
+  private int leftLiftPosition = 0;
   DcMotor rLiftMotor = mock(DcMotor.class);
+  private int rightLiftPosition = 0;
 
   DigitalChannel lslideSwitch = mock(DigitalChannel.class);
   DigitalChannel liftSwitch = mock(DigitalChannel.class);
@@ -92,7 +94,23 @@ class MockRobot {
     mockHardwareMap.put(new HardwareEntry(BNO055IMU.class, "imu1"), mockImu);
 
     mockHardwareMap.put(new HardwareEntry(DcMotor.class, "motorLiftLeft"), lLiftMotor);
+    Mockito.lenient().when(lLiftMotor.getCurrentPosition()).then(
+      new Answer<Integer>() {
+        @Override
+        public Integer answer(InvocationOnMock invocation) {
+          return leftLiftPosition;
+        }
+      }
+    );
     mockHardwareMap.put(new HardwareEntry(DcMotor.class, "motorLiftRight"), rLiftMotor);
+    Mockito.lenient().when(rLiftMotor.getCurrentPosition()).then(
+      new Answer<Integer>() {
+        @Override
+        public Integer answer(InvocationOnMock invocation) {
+          return rightLiftPosition;
+        }
+      }
+    );
 
     mockHardwareMap.put(new HardwareEntry(DigitalChannel.class, "slideLimit"), lslideSwitch);
     mockHardwareMap.put(new HardwareEntry(DigitalChannel.class, "liftLimit"), liftSwitch);
@@ -138,5 +156,10 @@ class MockRobot {
 
   void setGyroOrientation(Orientation orientation) {
     gyroOrientation = orientation;
+  }
+
+  void setLiftPositions(int leftPosition, int rightPosition) {
+    leftLiftPosition = leftPosition;
+    rightLiftPosition = rightPosition;
   }
 }

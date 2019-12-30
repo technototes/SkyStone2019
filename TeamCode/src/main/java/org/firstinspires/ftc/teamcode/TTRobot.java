@@ -164,12 +164,6 @@ public class TTRobot implements IRobot {
     centerClaw();
   }
 
-  public int getLLiftEncoder(){
-    return lift.left.getCurrentPosition();
-  }
-  public int getRLiftEncoder(){
-    return lift.right.getCurrentPosition();
-  }
   // Linear slide stuff:
   public boolean slideSwitchSignaled() {
     return !lslideSwitch.getState();
