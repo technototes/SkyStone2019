@@ -31,8 +31,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class TTRobot implements IRobot {
   // Scaling values
 
-  // The amount we divide speed by when dropping the lift
-  private static final double DOWNWARDLIFTSCALE = 2.0;
   // the power of the linear slide
   private static final double LINEARSLIDEPOWER = 0.5;
 
@@ -64,8 +62,6 @@ public class TTRobot implements IRobot {
 
   private LinearSlidePosition slidePosition = LinearSlidePosition.In;
 
-  private DigitalChannel lslideSwitch = null;
-  private DigitalChannel liftSwitch = null;
   private CRServo slide = null;
   public LiftControl lift = null;
   private Servo turn = null;
@@ -116,8 +112,6 @@ public class TTRobot implements IRobot {
     claw = hardwareMap.get(Servo.class, "claw");
     blockFlipper = hardwareMap.get(Servo.class, "blockFlipper");
     cap = hardwareMap.get(CRServo.class, "cap");
-    lslideSwitch = hardwareMap.get(DigitalChannel.class, "slideLimit");
-    liftSwitch = hardwareMap.get(DigitalChannel.class, "liftLimit");
     sensorRangeRear = hardwareMap.get(DistanceSensor.class, "sensorRangeRear");
     sensorRangeLeft = hardwareMap.get(DistanceSensor.class, "sensorRangeLeft");
     sensorRangeRight = hardwareMap.get(DistanceSensor.class, "sensorRangeRight");
@@ -148,10 +142,6 @@ public class TTRobot implements IRobot {
     // make lift motors work together: they're facing opposite directions
     lLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     rLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    // Set the digital channel mode to
-    // Output mode can be used to blink LED's
-    lslideSwitch.setMode(DigitalChannel.Mode.INPUT);
-    liftSwitch.setMode(DigitalChannel.Mode.INPUT);
 
     // TODO: Add initialization / calibration for the slide and lift?
 
@@ -172,11 +162,7 @@ public class TTRobot implements IRobot {
   }
   // Linear slide stuff:
   public boolean slideSwitchSignaled() {
-    return !lslideSwitch.getState();
-  }
-
-  public boolean liftSwitchSignaled() {
-    return !liftSwitch.getState();
+    return false;
   }
 
   public void setLinearSlideDirectionRyan(LinearSlideOperation operation, boolean override) {
@@ -377,7 +363,7 @@ public class TTRobot implements IRobot {
   }
 
   public boolean isLiftAtLowerLimit() {
-    return !liftSwitch.getState();
+    return lift.atLowerLimit();
   }
 
   // 0 = facing toward the driver (6 O'Clock)
