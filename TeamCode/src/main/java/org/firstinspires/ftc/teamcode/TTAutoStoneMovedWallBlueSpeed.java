@@ -218,10 +218,10 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           break;
         case GOTOMOVEDBASEPLATE:
           robot.fastRearDrive(60);
-          robot.fastSyncTurn(-90, 1);
-
-          //TODO make this distfront to a dist of 80 maybe
-          robot.timeDrive(0.75, 3, -90);
+          //robot.fastSyncTurn(-90, 1);
+          robot.fastRightDrive(70);
+          robot.turnAndDrive(-90, 0.5, -90);
+          robot.timeDrive(0.75, 1, -90);
           currentState = AutoState.PLACEBLOCK2;
           break;
         case PLACEBLOCK2:
