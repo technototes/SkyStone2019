@@ -154,14 +154,9 @@ public class TTRobot implements IRobot {
     centerClaw();
   }
 
-  public int getLLiftEncoder(){
-    return lift.left.getCurrentPosition();
-  }
-  public int getRLiftEncoder(){
-    return lift.right.getCurrentPosition();
-  }
   // Linear slide stuff:
   public boolean slideSwitchSignaled() {
+    // Wound up not using this...
     return false;
   }
 
@@ -262,33 +257,6 @@ public class TTRobot implements IRobot {
     slide.setPower(power);
   }
 
-  public void setLinearSlideDirectionEmily(LinearSlideOperation operation, boolean override) {
-    double power = 0;
-    switch (operation) {
-      case Extend:
-        power = LINEARSLIDEPOWER;
-        break;
-      case Retract:
-        power = -LINEARSLIDEPOWER;
-        break;
-
-    }
-
-    // Hit a limit
-    if (!override && slideSwitchSignaled()) {
-      // Stop the slide
-      while (slideSwitchSignaled() == true && opMode.opModeIsActive()) {
-        slide.setPower(-power);
-        sleep(1);
-      }
-      power = 0;
-    }
-
-
-    slide.setPower(power);
-  }
-
-
   // Grabber stuff:
   private static final double CLAW_LEFT_VAL = 0;
   private static final double CLAW_CENTER_VAL = 0.3;
@@ -360,10 +328,6 @@ public class TTRobot implements IRobot {
 
   public void capstone(double speed) {
     cap.setPower(-speed);
-  }
-
-  public boolean isLiftAtLowerLimit() {
-    return lift.atLowerLimit();
   }
 
   // 0 = facing toward the driver (6 O'Clock)
