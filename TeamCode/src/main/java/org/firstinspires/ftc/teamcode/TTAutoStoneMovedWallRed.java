@@ -161,7 +161,7 @@ public class TTAutoStoneMovedWallRed extends LinearOpMode {
             //}
             robot.setLinearSlideDirection(LinearSlideOperation.None, true);
             driveTime.reset();
-            while (driveTime.seconds() < 1.5 && !robot.liftSwitchSignaled()) {
+            while (driveTime.seconds() < 1.5 && !robot.lift.atLowerLimit()) {
               robot.lift.down();
 
             }

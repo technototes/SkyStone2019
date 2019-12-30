@@ -150,7 +150,7 @@ public class TTAutoStoneMovedWallBlue extends LinearOpMode {
           //robot.setLinearSlideDirection(LinearSlideOperation.Retract, true);
           //}
           driveTime.reset();
-          while (driveTime.seconds() < 1 && !robot.liftSwitchSignaled()) {
+          while (driveTime.seconds() < 1 && !robot.lift.atLowerLimit()) {
             robot.lift.down();
 
           }
