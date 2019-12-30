@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,6 @@ class DirectControlTest {
 
   @Test
   void runOpMode() {
-
     Thread stopTimer = new Thread(
       new Runnable() {
         @Override
@@ -46,7 +46,12 @@ class DirectControlTest {
       }
     );
     directControl.start();
+
+    ElapsedTime runTime = new ElapsedTime();
     stopTimer.start();
     directControl.runOpMode();
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
+    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
   }
 }

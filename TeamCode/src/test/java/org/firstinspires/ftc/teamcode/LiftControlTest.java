@@ -149,7 +149,7 @@ class LiftControlTest {
     liftControl.LiftBrickWait(1);
 
     double msDuration = runTime.milliseconds();
-    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
     verify(mockRobot.lLiftMotor).setPower(0.0);
@@ -210,7 +210,7 @@ class LiftControlTest {
     liftControl.AcquireBrickWait();
 
     double msDuration = runTime.milliseconds();
-    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
     verify(mockRobot.lLiftMotor).setPower(0.0);
@@ -271,7 +271,7 @@ class LiftControlTest {
     liftControl.SetBrickWait();
 
     double msDuration = runTime.milliseconds();
-    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
     verify(mockRobot.lLiftMotor).setPower(0.0);

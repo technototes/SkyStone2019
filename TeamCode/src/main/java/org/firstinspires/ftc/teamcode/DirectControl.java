@@ -33,12 +33,19 @@ public class DirectControl extends LinearOpMode {
     robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
-    int curBrickHeight = -1;
-
     waitForStart();
-    ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
     ElapsedTime timeSinceStart = new ElapsedTime();
     ElapsedTime loopTime = new ElapsedTime();
+
+    final double grabRotateDebounceSecs = 0.25;
+    ElapsedTime grabRotateTime = new ElapsedTime();
+
+    final double brickCommandDebounceSecs = 0.25;
+    ElapsedTime setBrickTime = new ElapsedTime();
+    ElapsedTime brickUpTime = new ElapsedTime();
+    ElapsedTime brickDownTime = new ElapsedTime();
+    ElapsedTime acquireBrickTime = new ElapsedTime();
+    int curBrickHeight = -1;
 
     while (opModeIsActive()) {
       loopTime.reset();
@@ -50,16 +57,15 @@ public class DirectControl extends LinearOpMode {
         robot.setClawPosition(ClawPosition.Close); // Closed
       }
       // Grabber rotation
-      final double grabRotationDebounceSecs = 0.25;
-      if (sinceLastUsedGrabRotate.seconds() > grabRotationDebounceSecs) {
+      if (grabRotateTime.seconds() > grabRotateDebounceSecs) {
         if (control.lbump() == Button.Pressed) {
           robot.rotateClaw(true);
           telemetry.addLine("rotateClaw true");
-          sinceLastUsedGrabRotate.reset();
+          grabRotateTime.reset();
         } else if (control.rbump() == Button.Pressed) {
           robot.rotateClaw(false);
           telemetry.addLine("rotateClaw false");
-          sinceLastUsedGrabRotate.reset();
+          grabRotateTime.reset();
         }
       }
 
@@ -104,14 +110,26 @@ public class DirectControl extends LinearOpMode {
         // A for 'position current brick to place'
         // B for 'grab a brick'
         if (control.buttonA().isPressed()) {
-          robot.lift.SetBrickWait();
-        } else if (control.buttonY().isPressed()) {
-          robot.lift.LiftBrickWait(++curBrickHeight);
-        } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
-          robot.lift.LiftBrickWait(--curBrickHeight);
+          if (setBrickTime.seconds() > brickCommandDebounceSecs) {
+            robot.lift.SetBrickAsync();
+            setBrickTime.reset();
+          }
+        } else if (control.buttonY().isPressed() && (curBrickHeight < LiftControl.MAX_BRICK_HEIGHT)) {
+          if (brickUpTime.seconds() > brickCommandDebounceSecs) {
+            robot.lift.LiftBrickAsync(++curBrickHeight);
+            brickUpTime.reset();
+          }
+        } else if (control.buttonX().isPressed() && (curBrickHeight > 0)) {
+          if (brickDownTime.seconds() > brickCommandDebounceSecs) {
+            robot.lift.LiftBrickAsync(--curBrickHeight);
+            brickDownTime.reset();
+          }
         } else if (control.buttonB().isPressed()) {
-          robot.lift.AcquireBrickWait();
-          curBrickHeight = -1;
+          if (acquireBrickTime.seconds() > brickCommandDebounceSecs) {
+            robot.lift.AcquireBrickAsync();
+            curBrickHeight = -1;
+            acquireBrickTime.reset();
+          }
         }
       }
 

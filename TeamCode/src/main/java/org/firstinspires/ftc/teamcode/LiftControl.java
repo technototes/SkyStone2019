@@ -26,7 +26,7 @@ public class LiftControl {
   private static final int POSITION_TICK_RANGE = 75;
 
   // Maximum height in bricks, to avoid damaging robot
-  private static final int MAX_BRICK_HEIGHT = 5;
+  public static final int MAX_BRICK_HEIGHT = 5;
 
   // Maximum height in 'ticks', to avoid damaging robot
   private static final int MAX_HEIGHT = PLACE_HEIGHT_OFFSET + BASE_PLATE_HEIGHT + (MAX_BRICK_HEIGHT * BRICK_HEIGHT);
@@ -55,7 +55,7 @@ public class LiftControl {
     private LiftControl liftControl;
     private LinearOpMode opMode;
 
-    public AcquireBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+    AcquireBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
       this.liftControl = liftControl;
       this.opMode = opMode;
     }
@@ -74,7 +74,7 @@ public class LiftControl {
     private LinearOpMode opMode;
     private int brickHeight;
 
-    public LiftBrickCommand(LiftControl liftControl, LinearOpMode opMode, int brickHeight) {
+    LiftBrickCommand(LiftControl liftControl, LinearOpMode opMode, int brickHeight) {
       if ((brickHeight < 0) || (brickHeight > MAX_BRICK_HEIGHT)) {
         throw new IllegalArgumentException("Invalid brickHeight");
       }
@@ -98,7 +98,7 @@ public class LiftControl {
     private LiftControl liftControl;
     private LinearOpMode opMode;
 
-    public SetBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+    SetBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
       this.liftControl = liftControl;
       this.opMode = opMode;
     }
@@ -116,7 +116,7 @@ public class LiftControl {
     private LiftControl liftControl;
     private SingleCommandExecutor commandExecutor;
 
-    public StopCommand(LiftControl liftControl, SingleCommandExecutor commandExecutor) {
+    StopCommand(LiftControl liftControl, SingleCommandExecutor commandExecutor) {
       this.liftControl = liftControl;
       this.commandExecutor = commandExecutor;
     }
@@ -171,7 +171,7 @@ public class LiftControl {
 
   // This is a little more paranoid that 'In the bottom end of the range'
   // to try to prevent more lift axle carnage...
-  public boolean atLowerLimit() {
+  private boolean atLowerLimit() {
     return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
   }
   // Crash recovery here
