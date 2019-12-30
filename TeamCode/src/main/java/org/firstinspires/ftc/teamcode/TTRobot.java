@@ -37,7 +37,7 @@ public class TTRobot implements IRobot {
   private static final double LINEARSLIDEPOWER = 0.5;
 
   // Claw grab positions
-  private static final double CLAWOPENPOSITION = 1;
+  private static final double CLAWOPENPOSITION = 0.5;
   private static final double CLAWCLOSEPOSITION = 0;
 
   // Block flipper / baseplate grabber positions

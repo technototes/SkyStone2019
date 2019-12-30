@@ -88,13 +88,13 @@
             }
             */
               switch (blockPos) {
-                case 2:
+                case 0:
                   currentState = AutoState.GOTOBLOCK1;
                   break;
                 case 1:
                   currentState = AutoState.GOTOBLOCK2;
                   break;
-                case 0:
+                case 2:
                   currentState = AutoState.GOTOBLOCK3;
                   break;
               }
@@ -108,43 +108,54 @@
             //robot.fastSyncTurn(90, 1);
             //currentState = AutoState.STOP;
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
+            //robot.fastRearDrive(20);
             //sleep(1300);
 
             break;
 
           case GOTOBLOCK1:
             telemetry.addData("state", currentState.toString());
-            robot.distRearLeftDrive(1, 85, 90);
-            robot.fastSyncTurn(0, 2);
+            robot.fastLeftDrive(90);
+            //robot.fastRearDrive(90);
+            //robot.distRearRightDrive(1, 90, 95);
+            //robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GOTOBLOCK2:
             telemetry.addData("state", currentState.toString());
             //robot.distRearRightDrive(1, 90, 70);
-            robot.fastRearDrive(90);
-            robot.fastSyncTurn(0, 2);
+            //robot.fastRearDrive(90);
+            //robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GOTOBLOCK3:
             telemetry.addData("state", currentState.toString());
-            robot.distRearLeftDrive(1, 85, 50);
-            robot.fastSyncTurn(0, 2);
+            robot.fastLeftDrive(60);
+            //robot.fastLeftDrive(30);
+            //robot.fastRearDrive(90);
+            //robot.distRearRightDrive(1, 90, 50);
+            //robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GRABBLOCK:
             telemetry.addData("state", currentState.toString());
             //stop();
-            while(driveTime.seconds() < 1.1){
+            while(driveTime.seconds() < 1.3){
               sleep(10);
             }
             robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+            robot.fastRearDrive(90);
+
+            robot.fastSyncTurn(0, 1);
             robot.setClawPosition(ClawPosition.Close);
             sleep(500);
             robot.lift.LiftBrickWait(0);
             currentState = AutoState.GOTOBASEPLATE;
             break;
           case GOTOBASEPLATE:
-            robot.fastRearDrive(70);
+            robot.distRearLeftDrive(1, 65, 80);
+            //robot.fastRearDrive(65);
+            //robot.fastRightDrive(80);
             robot.turnAndDrive(-90, 0.5, 90);
             robot.turnAndDrive(0, 0.5, 90);
             sleep(100);
@@ -152,19 +163,22 @@
             robot.fastSyncTurn(0, 1);
             //robot.distRearLeftDrive(1, 90, 40);
             //robot.fastLeftDrive(40);
-            robot.fastRearDrive(100);
+            //robot.fastRearDrive(90);
+            robot.timeDrive(0.5, 0.7, 0);
+            //robot.distRearLeftDrive(1, 100, 40);
             currentState = AutoState.PLACEBLOCK;
             break;
           case PLACEBLOCK:
             robot.setClawPosition(ClawPosition.Open);
             driveTime.reset();
             robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-            robot.fastRearDrive(80);
+            robot.fastRearDrive(70);
             //robot.distRearLeftDrive(1, 70, 100);
             while(driveTime.seconds() < 1.1){
               sleep(10);
-              }
+            }
             robot.setLinearSlideDirection(LinearSlideOperation.None, false);
+            robot.fastSyncTurn(0, 1);
             //robot.driveToLine(0.75, 90);
             //robot.stop();
             currentState = AutoState.GOTOLINE;
