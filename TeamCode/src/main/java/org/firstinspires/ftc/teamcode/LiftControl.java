@@ -50,32 +50,18 @@ public class LiftControl {
   private SingleCommandExecutor commandExecutor;
   private SingleCommandDelayedExecutor watchdogExecutor;
 
-  private static abstract class LiftBaseCommand implements Runnable {
+  private static abstract class LiftBaseCommand extends SingleCommandExecutor.BaseCommand {
     LiftControl liftControl;
-    private LinearOpMode opMode;
-    volatile boolean running = true;
 
     LiftBaseCommand(LiftControl liftControl, LinearOpMode opMode) {
+      super(opMode);
       this.liftControl = liftControl;
-      this.opMode = opMode;
     }
 
     @Override
-    public void run() {
-      boolean interrupted = false;
-      while (!interrupted && !doWork() && opMode.opModeIsActive()) {
-        try {
-          Thread.sleep(1);
-        } catch (InterruptedException e) {
-          interrupted = true;
-        }
-      }
+    public void stopWork() {
       liftControl.stop();
-      running = false;
     }
-
-    // Return true if work is done, false if it's still needed
-    public abstract boolean doWork();
   }
 
   // Move the lift to the height at 'zero' to grab a brick in front of the bot
@@ -183,9 +169,10 @@ public class LiftControl {
 
   // This is a little more paranoid that 'In the bottom end of the range'
   // to try to prevent more lift axle carnage...
-  private boolean atLowerLimit() {
+  public boolean atLowerLimit() {
     return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
   }
+
   // Crash recovery here
   public void ResetZero() {
     lZero = left.getCurrentPosition();

@@ -74,8 +74,7 @@ class LiftControlTest {
   @Test
   void downAndStop() {
     // Pretend the motors are above zero
-    Mockito.lenient().when(mockRobot.lLiftMotor.getCurrentPosition()).thenReturn(500);
-    Mockito.lenient().when(mockRobot.rLiftMotor.getCurrentPosition()).thenReturn(500);
+    mockRobot.setLiftPositions(500, 500);
 
     liftControl.down();
     assertEquals(DOWN_POWER, mockRobot.lLiftPower);
