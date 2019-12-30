@@ -33,12 +33,14 @@ public class DirectControl extends LinearOpMode {
     robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
-    int curBrickHeight = -1;
 
     waitForStart();
     ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
     ElapsedTime timeSinceStart = new ElapsedTime();
     ElapsedTime loopTime = new ElapsedTime();
+
+    int curBrickHeight = -1;
+    boolean liftOverrideDownEnabled = false;
 
     while (opModeIsActive()) {
       loopTime.reset();
@@ -93,11 +95,20 @@ public class DirectControl extends LinearOpMode {
            control.rbump().isPressed() && control.lbump().isPressed()) {
         if (control.buttonX().isPressed()) {
           robot.lift.overrideDown();
+          liftOverrideDownEnabled = true;
         } else {
           robot.lift.stop();
           robot.lift.ResetZero();
+          liftOverrideDownEnabled = false;
         }
       } else {
+        // Released all the buttons simultaneously, so need to stop & reset the lift now
+        if (liftOverrideDownEnabled) {
+          robot.lift.stop();
+          robot.lift.ResetZero();
+          liftOverrideDownEnabled = false;
+        }
+
         // More automated control of the lift:
         // Y for 'up a brick'
         // X for 'down a brick'
