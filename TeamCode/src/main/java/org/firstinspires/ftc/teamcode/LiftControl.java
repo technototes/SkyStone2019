@@ -92,6 +92,25 @@ public class LiftControl {
     }
   }
 
+  // Move *down* to the nearest 'whole brick on top of the baseplate' height
+  // This height should be the right height to release a brick on the stack
+  private static class SetBrickCommand implements Runnable {
+    private LiftControl liftControl;
+    private LinearOpMode opMode;
+
+    public SetBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+      this.liftControl = liftControl;
+      this.opMode = opMode;
+    }
+
+    @Override
+    public void run() {
+      while (!liftControl.SetBrick() && opMode.opModeIsActive()) {
+        opMode.sleep(1);
+      }
+    }
+  }
+
   // Abort any commands in the given SingleCommandExecutor and stop lift
   private static class StopCommand implements Runnable {
     private LiftControl liftControl;
@@ -240,7 +259,7 @@ public class LiftControl {
 
   // Move *down* to the nearest 'whole brick on top of the baseplate' height
   // This height should be the right height to release a brick on the stack
-  public boolean SetBrick() {
+  private boolean SetBrick() {
     int cur = AveragePos();
     int targetLevel = cur / BRICK_HEIGHT;
     int target = targetLevel * BRICK_HEIGHT + PLACE_HEIGHT_OFFSET;
@@ -261,9 +280,17 @@ public class LiftControl {
 
   // Synchronous version of the SetBrick function
   public void SetBrickWait() {
-    while (!SetBrick() && opMode.opModeIsActive()) {
+    SetBrickAsync();
+
+    while (!commandExecutor.isDone() && opMode.opModeIsActive()) {
       opMode.sleep(1);
     }
+  }
+
+  // Asynchronously lift a brick to 'brickHeight' height
+  public void SetBrickAsync() {
+    SetBrickCommand setBrickCommand = new SetBrickCommand(this, opMode);
+    commandExecutor.execute(setBrickCommand);
   }
 
   // Helpers

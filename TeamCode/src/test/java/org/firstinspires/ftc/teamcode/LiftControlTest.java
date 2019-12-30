@@ -108,7 +108,7 @@ class LiftControlTest {
         @Override
         public void run() {
           try {
-            Thread.sleep(200);
+            Thread.sleep(100);
           } catch (InterruptedException ignored) {}
           mockRobot.setLiftPositions(1600, 1600);
         }
@@ -118,7 +118,7 @@ class LiftControlTest {
     liftControl.LiftBrickAsync(1);
     stopTimer.start();
 
-    Thread.sleep(150);
+    Thread.sleep(50);
     verify(mockRobot.lLiftMotor, never()).setPower(0.0);
     verify(mockRobot.rLiftMotor, never()).setPower(0.0);
 
@@ -134,7 +134,7 @@ class LiftControlTest {
         @Override
         public void run() {
           try {
-            Thread.sleep(200);
+            Thread.sleep(100);
           } catch (InterruptedException ignored) {}
           mockRobot.setLiftPositions(1600, 1600);
         }
@@ -149,8 +149,8 @@ class LiftControlTest {
     liftControl.LiftBrickWait(1);
 
     double msDuration = runTime.milliseconds();
-    assertTrue(msDuration < 210, "msDuration less than 210");
-    assertTrue(msDuration >= 200, "msDuration greater or equal to 200");
+    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
     verify(mockRobot.lLiftMotor).setPower(0.0);
     verify(mockRobot.rLiftMotor).setPower(0.0);
@@ -163,7 +163,7 @@ class LiftControlTest {
         @Override
         public void run() {
           try {
-            Thread.sleep(200);
+            Thread.sleep(100);
           } catch (InterruptedException ignored) {}
           mockRobot.setLiftPositions(0, 0);
         }
@@ -176,7 +176,7 @@ class LiftControlTest {
     liftControl.AcquireBrickAsync();
     stopTimer.start();
 
-    Thread.sleep(150);
+    Thread.sleep(50);
     verify(mockRobot.lLiftMotor, never()).setPower(0.0);
     verify(mockRobot.rLiftMotor, never()).setPower(0.0);
 
@@ -192,7 +192,7 @@ class LiftControlTest {
         @Override
         public void run() {
           try {
-            Thread.sleep(200);
+            Thread.sleep(100);
           } catch (InterruptedException ignored) {}
           mockRobot.setLiftPositions(0, 0);
         }
@@ -210,8 +210,69 @@ class LiftControlTest {
     liftControl.AcquireBrickWait();
 
     double msDuration = runTime.milliseconds();
-    assertTrue(msDuration < 210, "msDuration less than 210");
-    assertTrue(msDuration >= 200, "msDuration greater or equal to 200");
+    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
+
+    verify(mockRobot.lLiftMotor).setPower(0.0);
+    verify(mockRobot.rLiftMotor).setPower(0.0);
+  }
+
+  @Test
+  void setBrickAsync() throws InterruptedException {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException ignored) {}
+          mockRobot.setLiftPositions(0, 0);
+        }
+      }
+    );
+
+    // Start above zero
+    mockRobot.setLiftPositions(300, 300);
+
+    liftControl.SetBrickAsync();
+    stopTimer.start();
+
+    Thread.sleep(50);
+    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
+    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+
+    Thread.sleep(100);
+    verify(mockRobot.lLiftMotor).setPower(0.0);
+    verify(mockRobot.rLiftMotor).setPower(0.0);
+  }
+
+  @Test
+  void setBrick() {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException ignored) {}
+          mockRobot.setLiftPositions(1300, 1300);
+        }
+      }
+    );
+
+    // Start above zero
+    mockRobot.setLiftPositions(1500, 1500);
+
+    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
+    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+
+    ElapsedTime runTime = new ElapsedTime();
+    stopTimer.start();
+    liftControl.SetBrickWait();
+
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 110, "msDuration (" + msDuration + ") less than 110");
+    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
     verify(mockRobot.lLiftMotor).setPower(0.0);
     verify(mockRobot.rLiftMotor).setPower(0.0);
