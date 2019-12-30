@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,8 @@ class LiftControlTest {
   private MockRobot mockRobot;
   private @Mock LinearOpMode opMode;
   private LiftControl liftControl;
+  private static final double DOWN_POWER = 0.5;
+  private static final double UP_POWER = -1.0;
 
   @BeforeEach
   void setUp() {
@@ -45,27 +48,27 @@ class LiftControlTest {
   @Test
   void upAndStop() {
     liftControl.up();
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
 
     liftControl.stop();
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
   void upAndAutoStop() throws InterruptedException {
     liftControl.up();
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
 
     Thread.sleep(400);
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
 
-    Thread.sleep(110);
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    Thread.sleep(120);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -75,12 +78,12 @@ class LiftControlTest {
     Mockito.lenient().when(mockRobot.rLiftMotor.getCurrentPosition()).thenReturn(500);
 
     liftControl.down();
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
 
     liftControl.stop();
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -89,16 +92,16 @@ class LiftControlTest {
     mockRobot.setLiftPositions(500, 500);
 
     liftControl.down();
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
 
     Thread.sleep(400);
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
 
-    Thread.sleep(110);
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    Thread.sleep(120);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -115,16 +118,19 @@ class LiftControlTest {
       }
     );
 
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
+
     liftControl.LiftBrickAsync(1);
     stopTimer.start();
 
     Thread.sleep(50);
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
 
     Thread.sleep(100);
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -136,13 +142,15 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
+          assertEquals(UP_POWER, mockRobot.lLiftPower);
+          assertEquals(UP_POWER, mockRobot.rLiftPower);
           mockRobot.setLiftPositions(1600, 1600);
         }
       }
     );
 
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
 
     ElapsedTime runTime = new ElapsedTime();
     stopTimer.start();
@@ -152,8 +160,8 @@ class LiftControlTest {
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -165,6 +173,8 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
+          assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+          assertEquals(DOWN_POWER, mockRobot.rLiftPower);
           mockRobot.setLiftPositions(0, 0);
         }
       }
@@ -172,17 +182,19 @@ class LiftControlTest {
 
     // Start above zero
     mockRobot.setLiftPositions(300, 300);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
 
     liftControl.AcquireBrickAsync();
     stopTimer.start();
 
     Thread.sleep(50);
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
 
     Thread.sleep(100);
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -194,6 +206,8 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
+          assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+          assertEquals(DOWN_POWER, mockRobot.rLiftPower);
           mockRobot.setLiftPositions(0, 0);
         }
       }
@@ -201,9 +215,8 @@ class LiftControlTest {
 
     // Start above zero
     mockRobot.setLiftPositions(300, 300);
-
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
 
     ElapsedTime runTime = new ElapsedTime();
     stopTimer.start();
@@ -213,8 +226,8 @@ class LiftControlTest {
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -226,6 +239,8 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
+          assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+          assertEquals(DOWN_POWER, mockRobot.rLiftPower);
           mockRobot.setLiftPositions(0, 0);
         }
       }
@@ -233,17 +248,19 @@ class LiftControlTest {
 
     // Start above zero
     mockRobot.setLiftPositions(300, 300);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
 
     liftControl.SetBrickAsync();
     stopTimer.start();
 
     Thread.sleep(50);
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
 
     Thread.sleep(100);
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 
   @Test
@@ -255,16 +272,17 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
+          assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+          assertEquals(DOWN_POWER, mockRobot.rLiftPower);
           mockRobot.setLiftPositions(1300, 1300);
         }
       }
     );
 
-    // Start above zero
+    // Start above one brick position
     mockRobot.setLiftPositions(1500, 1500);
-
-    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
-    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
 
     ElapsedTime runTime = new ElapsedTime();
     stopTimer.start();
@@ -274,7 +292,7 @@ class LiftControlTest {
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
     assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
 
-    verify(mockRobot.lLiftMotor).setPower(0.0);
-    verify(mockRobot.rLiftMotor).setPower(0.0);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 }
