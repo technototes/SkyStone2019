@@ -3,11 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import org.firstinspires.ftc.teamcode.infra.SingleCommandDelayedExecutor;
+import org.firstinspires.ftc.teamcode.infra.SingleCommandExecutor;
 
 public class LiftControl {
   // The amount we divide speed by when dropping the lift
@@ -53,52 +50,21 @@ public class LiftControl {
   private SingleCommandExecutor commandExecutor;
   private SingleCommandDelayedExecutor watchdogExecutor;
 
-  // Asynchronous command execution helpers
+  // Move the lift to the height at 'zero' to grab a brick in front of the bot
+  private static class AcquireBrickCommand implements Runnable {
+    private LiftControl liftControl;
+    private LinearOpMode opMode;
 
-  // Execute a single command at a time, interrupting any existing command when a new command is executes
-  private static class SingleCommandExecutor {
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Future<?> currentCommand = null;
-
-    // Schedule a new command to interrupt any existing command
-    public synchronized void execute(Runnable command) {
-      cancel();
-      currentCommand = executor.submit(command);
+    public AcquireBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+      this.liftControl = liftControl;
+      this.opMode = opMode;
     }
 
-    // Cancel and interrupt any command that's not yet done
-    public synchronized void cancel() {
-      if ((currentCommand != null) && !currentCommand.isDone()) {
-        currentCommand.cancel(true);
+    @Override
+    public void run() {
+      while (!liftControl.AcquireBrick() && opMode.opModeIsActive()) {
+        opMode.sleep(1);
       }
-
-      currentCommand = null;
-    }
-
-    // Check if a command is executing or not
-    public synchronized boolean isDone() {
-      return (currentCommand == null) || currentCommand.isDone();
-    }
-  }
-
-  // Execute a single command at a specified time in the future, interrupting any existing command when a new command is scheduled
-  private static class SingleCommandDelayedExecutor {
-    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private Future<?> currentCommand = null;
-
-    // Schedule a new command to interrupt any existing command after delayMS milliseconds
-    public synchronized void schedule(Runnable command, long delayMS) {
-      cancel();
-      currentCommand = executor.schedule(command, delayMS, TimeUnit.MILLISECONDS);
-    }
-
-    // Cancel and interrupt any command that's not yet done
-    public synchronized void cancel() {
-      if ((currentCommand != null) && !currentCommand.isDone()) {
-        currentCommand.cancel(true);
-      }
-
-      currentCommand = null;
     }
   }
 
@@ -210,7 +176,7 @@ public class LiftControl {
 
   // Head toward the height at 'zero' to grab a brick in front of the bot
   // Returns true (which you can ignore) if it's stopped
-  public boolean AcquireBrick() {
+  private boolean AcquireBrick() {
     // This just goes down until we're at the lower limit
     if (atLowerLimit()) {
       stop();
@@ -223,12 +189,20 @@ public class LiftControl {
 
   // Synchronously moves to the 'grab a brick' height
   public void AcquireBrickWait() {
-    while (!AcquireBrick() && opMode.opModeIsActive()) {
+    AcquireBrickAsync();
+
+    while (!commandExecutor.isDone() && opMode.opModeIsActive()) {
       opMode.sleep(1);
     }
   }
 
-  public boolean GoToPosition(int target) {
+  // Asynchronously lift a brick to 'brickHeight' height
+  public void AcquireBrickAsync() {
+    AcquireBrickCommand acquireBrickCommand= new AcquireBrickCommand(this, opMode);
+    commandExecutor.execute(acquireBrickCommand);
+  }
+
+  private boolean GoToPosition(int target) {
     if (AverageInRange(target, POSITION_TICK_RANGE)) {
       stop();
       return true;
@@ -250,9 +224,7 @@ public class LiftControl {
 
   // Wait to lift a brick to 'positioning' height
   public void LiftBrickWait(int brickHeight) {
-    brickHeight = Math.max(0, Math.min(brickHeight, MAX_BRICK_HEIGHT));
-    LiftBrickCommand liftBrickCommand = new LiftBrickCommand(this, opMode, brickHeight);
-    commandExecutor.execute(liftBrickCommand);
+    LiftBrickAsync(brickHeight);
 
     while (!commandExecutor.isDone() && opMode.opModeIsActive()) {
       opMode.sleep(1);

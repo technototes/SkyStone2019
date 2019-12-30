@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -108,13 +109,12 @@ class LiftControlTest {
         public void run() {
           try {
             Thread.sleep(200);
-          } catch (InterruptedException e) {}
+          } catch (InterruptedException ignored) {}
           mockRobot.setLiftPositions(1600, 1600);
         }
       }
     );
 
-    ElapsedTime runTime = new ElapsedTime();
     liftControl.LiftBrickAsync(1);
     stopTimer.start();
 
@@ -125,6 +125,95 @@ class LiftControlTest {
     Thread.sleep(100);
     verify(mockRobot.lLiftMotor).setPower(0.0);
     verify(mockRobot.rLiftMotor).setPower(0.0);
+  }
 
+  @Test
+  void liftBrick() {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException ignored) {}
+          mockRobot.setLiftPositions(1600, 1600);
+        }
+      }
+    );
+
+    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
+    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+
+    ElapsedTime runTime = new ElapsedTime();
+    stopTimer.start();
+    liftControl.LiftBrickWait(1);
+
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 210, "msDuration less than 210");
+    assertTrue(msDuration >= 200, "msDuration greater or equal to 200");
+
+    verify(mockRobot.lLiftMotor).setPower(0.0);
+    verify(mockRobot.rLiftMotor).setPower(0.0);
+  }
+
+  @Test
+  void acquireBrickAsync() throws InterruptedException {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException ignored) {}
+          mockRobot.setLiftPositions(0, 0);
+        }
+      }
+    );
+
+    // Start above zero
+    mockRobot.setLiftPositions(300, 300);
+
+    liftControl.AcquireBrickAsync();
+    stopTimer.start();
+
+    Thread.sleep(150);
+    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
+    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+
+    Thread.sleep(100);
+    verify(mockRobot.lLiftMotor).setPower(0.0);
+    verify(mockRobot.rLiftMotor).setPower(0.0);
+  }
+
+  @Test
+  void acquireBrick() {
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException ignored) {}
+          mockRobot.setLiftPositions(0, 0);
+        }
+      }
+    );
+
+    // Start above zero
+    mockRobot.setLiftPositions(300, 300);
+
+    verify(mockRobot.lLiftMotor, never()).setPower(0.0);
+    verify(mockRobot.rLiftMotor, never()).setPower(0.0);
+
+    ElapsedTime runTime = new ElapsedTime();
+    stopTimer.start();
+    liftControl.AcquireBrickWait();
+
+    double msDuration = runTime.milliseconds();
+    assertTrue(msDuration < 210, "msDuration less than 210");
+    assertTrue(msDuration >= 200, "msDuration greater or equal to 200");
+
+    verify(mockRobot.lLiftMotor).setPower(0.0);
+    verify(mockRobot.rLiftMotor).setPower(0.0);
   }
 }
