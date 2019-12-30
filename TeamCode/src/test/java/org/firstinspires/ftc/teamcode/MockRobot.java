@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 
@@ -35,8 +36,10 @@ class MockRobot {
 
   DcMotor lLiftMotor = mock(DcMotor.class);
   private int leftLiftPosition = 0;
+  double lLiftPower = 0.0;
   DcMotor rLiftMotor = mock(DcMotor.class);
   private int rightLiftPosition = 0;
+  double rLiftPower = 0.0;
 
   DigitalChannel lslideSwitch = mock(DigitalChannel.class);
   DigitalChannel liftSwitch = mock(DigitalChannel.class);
@@ -102,6 +105,14 @@ class MockRobot {
         }
       }
     );
+    Mockito.lenient().doAnswer(new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        lLiftPower = (double)invocation.getArgument(0);
+        return null;
+      }
+    }).when(lLiftMotor).setPower(anyDouble());
+
     mockHardwareMap.put(new HardwareEntry(DcMotor.class, "motorLiftRight"), rLiftMotor);
     Mockito.lenient().when(rLiftMotor.getCurrentPosition()).then(
       new Answer<Integer>() {
@@ -111,6 +122,13 @@ class MockRobot {
         }
       }
     );
+    Mockito.lenient().doAnswer(new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        rLiftPower = (double)invocation.getArgument(0);
+        return null;
+      }
+    }).when(rLiftMotor).setPower(anyDouble());
 
     mockHardwareMap.put(new HardwareEntry(DigitalChannel.class, "slideLimit"), lslideSwitch);
     mockHardwareMap.put(new HardwareEntry(DigitalChannel.class, "liftLimit"), liftSwitch);
