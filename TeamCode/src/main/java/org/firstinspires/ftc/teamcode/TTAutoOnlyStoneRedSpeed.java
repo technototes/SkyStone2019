@@ -89,78 +89,85 @@
             */
               switch (blockPos) {
                 case 2:
-                  currentState = AutoState.GOTOBLOCK3;
+                  currentState = AutoState.GOTOBLOCK1;
                   break;
                 case 1:
                   currentState = AutoState.GOTOBLOCK2;
                   break;
                 case 0:
-                  currentState = AutoState.GOTOBLOCK1;
+                  currentState = AutoState.GOTOBLOCK3;
                   break;
               }
             }
-            robot.fastSyncTurn(0, 2);
+            //robot.syncTurn(0, 2);
             robot.centerClaw();
             robot.setClawPosition(ClawPosition.Open);
             driveTime.reset();
+            //robot.turnAndDrive(90, 0.4, -90);
+            //sleep(100);
+            //robot.fastSyncTurn(90, 1);
+            //currentState = AutoState.STOP;
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
-            sleep(1300);
-            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-
+            //sleep(1300);
 
             break;
 
           case GOTOBLOCK1:
             telemetry.addData("state", currentState.toString());
-            //robot.distRearLeftDrive(0.5, 80, 90);
-            robot.fastRearDrive(80);
+            robot.distRearLeftDrive(1, 85, 90);
             robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GOTOBLOCK2:
             telemetry.addData("state", currentState.toString());
-            //robot.distRearRightDrive(0.5, 90, 70);
-            robot.fastLeftDrive(90);
-            robot.fastLeftDrive(80);
-            robot.fastRearDrive(80);
+            //robot.distRearRightDrive(1, 90, 70);
+            robot.fastRearDrive(90);
             robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GOTOBLOCK3:
             telemetry.addData("state", currentState.toString());
-            //robot.fastRearDrive(80);
-            //robot.fastSyncTurn(0, 2);
+            robot.distRearLeftDrive(1, 85, 50);
+            robot.fastSyncTurn(0, 2);
             currentState = AutoState.GRABBLOCK;
             break;
           case GRABBLOCK:
             telemetry.addData("state", currentState.toString());
             //stop();
+            while(driveTime.seconds() < 1.1){
+              sleep(10);
+            }
+            robot.setLinearSlideDirection(LinearSlideOperation.None, false);
             robot.setClawPosition(ClawPosition.Close);
             sleep(500);
-            driveTime.reset();
-            while (driveTime.seconds() < 0.35) {
-              robot.lift.up();
-            }
-            robot.lift.stop();
+            robot.lift.LiftBrickWait(0);
             currentState = AutoState.GOTOBASEPLATE;
             break;
           case GOTOBASEPLATE:
-            robot.fastRearDrive(40);
+            robot.fastRearDrive(70);
+            robot.turnAndDrive(-90, 0.5, 90);
+            robot.turnAndDrive(0, 0.5, 90);
+            sleep(100);
+            //robot.distRearRightDrive(1, 70, 100);
             robot.fastSyncTurn(0, 1);
-            robot.distRearRightDrive(1, 90, 40);
+            //robot.distRearLeftDrive(1, 90, 40);
+            //robot.fastLeftDrive(40);
+            robot.fastRearDrive(100);
             currentState = AutoState.PLACEBLOCK;
             break;
           case PLACEBLOCK:
             robot.setClawPosition(ClawPosition.Open);
             driveTime.reset();
             robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-            sleep(1300);
+            robot.fastRearDrive(80);
+            //robot.distRearLeftDrive(1, 70, 100);
+            while(driveTime.seconds() < 1.1){
+              sleep(10);
+              }
             robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-            robot.fastRearDrive(60);
-            robot.driveToLine(0.5, -90);
-            robot.timeDrive(0.5, 0.5, 90);
+            //robot.driveToLine(0.75, 90);
             //robot.stop();
-            currentState = AutoState.STOP;
+            currentState = AutoState.GOTOLINE;
             break;
           case MOVEBASEPLATE:
             robot.fastRearDrive(70);
