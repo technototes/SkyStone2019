@@ -7,9 +7,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DirectControlTest {
@@ -48,5 +50,53 @@ class DirectControlTest {
     directControl.start();
     stopTimer.start();
     directControl.runOpMode();
+  }
+
+  @Test
+  void liftOverride() {
+    Thread releaseButtonTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+
+          assertEquals(0.5, mockRobot.lLiftPower);
+          assertEquals(0.5, mockRobot.rLiftPower);
+          gamepad2.left_trigger = 0.0f;
+          gamepad2.right_trigger = 0.0f;
+          gamepad2.right_bumper = false;
+          gamepad2.left_bumper = false;
+          gamepad2.x = false;
+        }
+      }
+    );
+
+    Thread stopTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException ignored) {}
+          directControl.stop();
+        }
+      }
+    );
+
+    gamepad2.left_trigger = 1.0f;
+    gamepad2.right_trigger = 1.0f;
+    gamepad2.right_bumper = true;
+    gamepad2.left_bumper = true;
+    gamepad2.x = true;
+
+    directControl.start();
+    releaseButtonTimer.start();
+    stopTimer.start();
+    directControl.runOpMode();
+
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
   }
 }
