@@ -50,64 +50,76 @@ public class LiftControl {
   private SingleCommandExecutor commandExecutor;
   private SingleCommandDelayedExecutor watchdogExecutor;
 
-  // Move the lift to the height at 'zero' to grab a brick in front of the bot
-  private static class AcquireBrickCommand implements Runnable {
-    private LiftControl liftControl;
+  private static abstract class LiftBaseCommand implements Runnable {
+    LiftControl liftControl;
     private LinearOpMode opMode;
+    volatile boolean running = true;
 
-    AcquireBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+    LiftBaseCommand(LiftControl liftControl, LinearOpMode opMode) {
       this.liftControl = liftControl;
       this.opMode = opMode;
     }
 
     @Override
     public void run() {
-      while (!liftControl.AcquireBrick() && opMode.opModeIsActive()) {
-        opMode.sleep(1);
+      boolean interrupted = false;
+      while (!interrupted && !doWork() && opMode.opModeIsActive()) {
+        try {
+          Thread.sleep(1);
+        } catch (InterruptedException e) {
+          interrupted = true;
+        }
       }
+      liftControl.stop();
+      running = false;
+    }
+
+    // Return true if work is done, false if it's still needed
+    public abstract boolean doWork();
+  }
+
+  // Move the lift to the height at 'zero' to grab a brick in front of the bot
+  private static class AcquireBrickCommand extends LiftBaseCommand {
+    AcquireBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
+      super(liftControl, opMode);
+    }
+
+    @Override
+    public boolean doWork() {
+      return liftControl.AcquireBrick();
     }
   }
 
   // Move the lift to the specified number of 'brick' increments above the baseplate
-  private static class LiftBrickCommand implements Runnable {
-    private LiftControl liftControl;
-    private LinearOpMode opMode;
+  private static class LiftBrickCommand extends LiftBaseCommand {
     private int brickHeight;
 
     LiftBrickCommand(LiftControl liftControl, LinearOpMode opMode, int brickHeight) {
+      super(liftControl, opMode);
+
       if ((brickHeight < 0) || (brickHeight > MAX_BRICK_HEIGHT)) {
         throw new IllegalArgumentException("Invalid brickHeight");
       }
 
-      this.liftControl = liftControl;
-      this.opMode = opMode;
       this.brickHeight = brickHeight;
     }
 
     @Override
-    public void run() {
-      while (!liftControl.LiftBrick(brickHeight) && opMode.opModeIsActive()) {
-        opMode.sleep(1);
-      }
+    public boolean doWork() {
+      return liftControl.LiftBrick(brickHeight);
     }
   }
 
   // Move *down* to the nearest 'whole brick on top of the baseplate' height
   // This height should be the right height to release a brick on the stack
-  private static class SetBrickCommand implements Runnable {
-    private LiftControl liftControl;
-    private LinearOpMode opMode;
-
+  private static class SetBrickCommand extends LiftBaseCommand {
     SetBrickCommand(LiftControl liftControl, LinearOpMode opMode) {
-      this.liftControl = liftControl;
-      this.opMode = opMode;
+      super(liftControl, opMode);
     }
 
     @Override
-    public void run() {
-      while (!liftControl.SetBrick() && opMode.opModeIsActive()) {
-        opMode.sleep(1);
-      }
+    public boolean doWork() {
+      return liftControl.SetBrick();
     }
   }
 

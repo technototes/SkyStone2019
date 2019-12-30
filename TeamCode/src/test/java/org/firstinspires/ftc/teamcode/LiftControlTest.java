@@ -158,7 +158,7 @@ class LiftControlTest {
 
     double msDuration = runTime.milliseconds();
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
-    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
+    assertTrue(msDuration >= 95, "msDuration (" + msDuration + ") greater or equal to 95");
 
     assertEquals(0.0, mockRobot.lLiftPower);
     assertEquals(0.0, mockRobot.rLiftPower);
@@ -224,7 +224,7 @@ class LiftControlTest {
 
     double msDuration = runTime.milliseconds();
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
-    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
+    assertTrue(msDuration >= 95, "msDuration (" + msDuration + ") greater or equal to 95");
 
     assertEquals(0.0, mockRobot.lLiftPower);
     assertEquals(0.0, mockRobot.rLiftPower);
@@ -290,7 +290,7 @@ class LiftControlTest {
 
     double msDuration = runTime.milliseconds();
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
-    assertTrue(msDuration >= 100, "msDuration (" + msDuration + ") greater or equal to 100");
+    assertTrue(msDuration >= 95, "msDuration (" + msDuration + ") greater or equal to 95");
 
     assertEquals(0.0, mockRobot.lLiftPower);
     assertEquals(0.0, mockRobot.rLiftPower);
