@@ -11,7 +11,7 @@ public class LiftControl {
   private static int BRICK_HEIGHT = 1200;
 
   // This is how high the base plate is (to get *over* it while holding a brick)
-  private static int BASE_PLATE_HEIGHT = 400;
+  private static int BASE_PLATE_HEIGHT = 800;
 
   // This is the height offset for placing a brick
   private static int PLACE_HEIGHT_OFFSET = 100;
