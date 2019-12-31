@@ -79,10 +79,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
     while (opModeIsActive()) {
 
       telemetry.addData("Status", "Run Time: " + runtime.toString());
+      telemetry.addData("state", currentState.toString());
       switch (currentState) {
         case INITIALIZE:
           if (opModeIsActive()) {
-            telemetry.addData("state", currentState.toString());
             runtime.reset();
                 /*
                 if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
@@ -116,7 +116,6 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
 
         case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(85);
           //robot.fastRearDrive(90);
           //robot.distRearRightDrive(1, 90, 95);
@@ -124,14 +123,12 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
           //robot.distRearRightDrive(1, 90, 70);
           //robot.fastRearDrive(90);
           //robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(40);
           robot.fastRightDrive(40);
           //robot.fastRearDrive(90);
@@ -140,7 +137,6 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.GRABBLOCK;
           break;
         case GRABBLOCK:
-          telemetry.addData("state", currentState.toString());
           //stop();
           while(driveTime.seconds() < 1.3){
             sleep(10);
@@ -269,6 +265,9 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
         case STOP:
           stop();
       }
+
+      telemetry.addLine("Dist (R, F, L, R): " + robot.rearDistance() + ", " + robot.frontDistance() + ", " + robot.leftDistance() + ", " + robot.rightDistance());
+      telemetry.update();
     }
   }
 }
