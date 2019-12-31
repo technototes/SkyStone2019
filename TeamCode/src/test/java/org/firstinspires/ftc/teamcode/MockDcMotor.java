@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class DcMotor implements java.lang.Runnable {
+public class MockDcMotor implements java.lang.Runnable {
 
   // Neverest 60's have a 'no load' RPM of 105
   // This is way to fast :/
@@ -91,7 +91,7 @@ public class DcMotor implements java.lang.Runnable {
 
   Thread runner;
 
-  public DcMotor(int id) {
+  public MockDcMotor(int id) {
     System.out.printf("Pulses/min: %3.3f Pulses/ms: %3.3f\n", PULSES_PER_MIN, PULSE_PER_MS);
     this.id = id;
     runner = new Thread(this);

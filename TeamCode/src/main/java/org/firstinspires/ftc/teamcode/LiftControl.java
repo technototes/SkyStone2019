@@ -22,6 +22,9 @@ public class LiftControl {
   // How many ticks should we be within for 'zero'
   private static final int ZERO_TICK_RANGE = 150;
 
+  // How many ticks should we be within for the upper limit
+  private static final int UPPER_TICK_RANGE = 150;
+
   // How many ticks should we be within for a given height
   private static final int POSITION_TICK_RANGE = 75;
 
@@ -151,12 +154,19 @@ public class LiftControl {
   }
 
   public void up() {
-    setLiftPower(LIFT_UP_POWER);
+    if (atUpperLimit()) {
+      setLiftPower(0);
+    } else {
+      setLiftPower(LIFT_UP_POWER);
+    }
   }
 
   public void down() {
-    if (!atLowerLimit())
+    if (atLowerLimit()) {
+      setLiftPower(0);
+    } else {
       setLiftPower(LIFT_DOWN_POWER);
+    }
   }
 
   public void overrideDown() {
@@ -171,6 +181,12 @@ public class LiftControl {
   // to try to prevent more lift axle carnage...
   public boolean atLowerLimit() {
     return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
+  }
+
+  // This is a little more paranoid that 'In the top end of the range'
+  // to try to prevent more lift axle carnage...
+  public boolean atUpperLimit() {
+    return BothInRange(MAX_HEIGHT, UPPER_TICK_RANGE) || (LeftPos() > MAX_HEIGHT) || (RightPos() > MAX_HEIGHT);
   }
 
   // Crash recovery here
