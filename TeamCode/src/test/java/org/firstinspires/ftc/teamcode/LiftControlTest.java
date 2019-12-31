@@ -1,28 +1,26 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class LiftControlTest {
   private MockRobot mockRobot;
-  private @Mock LinearOpMode opMode;
+  private MockOpMode opMode = new MockOpMode();
   private LiftControl liftControl;
   private static final double DOWN_POWER = 0.5;
   private static final double UP_POWER = -1.0;
+  private static final int BRICK_HEIGHT = 1200;
+  private static final int BASE_PLATE_HEIGHT = 400;
 
   @BeforeEach
   void setUp() {
@@ -112,7 +110,7 @@ class LiftControlTest {
           try {
             Thread.sleep(100);
           } catch (InterruptedException ignored) {}
-          mockRobot.setLiftPositions(1600, 1600);
+          mockRobot.setLiftPositions(BRICK_HEIGHT + BASE_PLATE_HEIGHT, BRICK_HEIGHT + BASE_PLATE_HEIGHT);
         }
       }
     );
@@ -143,7 +141,7 @@ class LiftControlTest {
           } catch (InterruptedException ignored) {}
           assertEquals(UP_POWER, mockRobot.lLiftPower);
           assertEquals(UP_POWER, mockRobot.rLiftPower);
-          mockRobot.setLiftPositions(1600, 1600);
+          mockRobot.setLiftPositions(BRICK_HEIGHT + BASE_PLATE_HEIGHT, BRICK_HEIGHT + BASE_PLATE_HEIGHT);
         }
       }
     );
@@ -293,5 +291,72 @@ class LiftControlTest {
 
     assertEquals(0.0, mockRobot.lLiftPower);
     assertEquals(0.0, mockRobot.rLiftPower);
+  }
+
+  @Test
+  void liftBrickOverride() throws InterruptedException {
+    Thread levelChangeTimer = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+          liftControl.LiftBrickAsync(1);
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+          liftControl.LiftBrickAsync(2);
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+          liftControl.LiftBrickAsync(3);
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+          liftControl.LiftBrickAsync(2);
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException ignored) {}
+          liftControl.LiftBrickAsync(1);
+        }
+      }
+    );
+
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
+
+    levelChangeTimer.start();
+
+    Thread.sleep(25);
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
+
+    Thread.sleep(50);
+    // Moving to position 1
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
+
+    Thread.sleep(40);
+    //Moving to position 2
+    mockRobot.setLiftPositions(BRICK_HEIGHT + BASE_PLATE_HEIGHT, BRICK_HEIGHT + BASE_PLATE_HEIGHT);
+    Thread.sleep(10);
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
+
+    Thread.sleep(50);
+    // Moving to position 3
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
+
+    Thread.sleep(50);
+    // Moving to position 2
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
+
+    Thread.sleep(50);
+    // Moving to position 1
+    assertEquals(0, mockRobot.lLiftPower);
+    assertEquals(0, mockRobot.rLiftPower);
   }
 }
