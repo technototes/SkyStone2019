@@ -617,172 +617,105 @@ public class TTRobot implements IRobot {
 
   // This will travel toward the rear until it gets to 'dist'
   public void fastRearDrive(double dist) {
-
     // Update: No attention should be paid to 'speed'
-
     // Just drive and slow down when we get slow to the target
-
     ElapsedTime tm = new ElapsedTime();
-
     double curDistance = rearDistance();
 
     fastSyncTurn(0, 2);
 
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
-
       telemetry.addData("Current Distance", curDistance);
-
       telemetry.update();
-
       double dir = (dist < curDistance) ? 1 : -1;
-
       double magnitude = Math.abs(dist - curDistance);
-
       if (magnitude < 30) {
-
         speedSnail();
-
       } else if (magnitude < TURBODISTANCE) {
-
         speedNormal();
-
       } else {
-
         speedTurbo();
-
       }
 
       double heading = gyroHeading();
 
       //double turn = (heading < 0) ? .5 : -.5;
-
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-
       joystickDrive(new Direction(0, dir), Direction.None, heading);
-
       curDistance = rearDistance();
-
       sleep(10);
-
     }
 
     driveTrain.stop();
-
     speedNormal();
-
   }
 
 // This will travel toward the front until it gets to 'dist'
   public void fastFrontDrive(double dist) {
-
     // Update: No attention should be paid to 'speed'
-
     // Just drive and slow down when we get slow to the target
-
     ElapsedTime tm = new ElapsedTime();
-
     double curDistance = frontDistance();
 
     fastSyncTurn(0, 2);
 
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
-
       telemetry.addData("Current Distance", curDistance);
-
       telemetry.update();
-
       double dir = (dist < curDistance) ? 1 : -1;
-
       double magnitude = Math.abs(dist - curDistance);
-
       if (magnitude < 30) {
-
         speedSnail();
-
       } else if (magnitude < TURBODISTANCE) {
-
         speedNormal();
-
       } else {
-
         speedTurbo();
-
       }
 
       double heading = gyroHeading();
 
       //double turn = (heading < 0) ? .5 : -.5;
-
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-
       joystickDrive(new Direction(0, dir), Direction.None, heading);
-
       curDistance = frontDistance();
-
       sleep(10);
-
     }
 
     driveTrain.stop();
-
     speedNormal();
-
   }
 
   public void fastLeftDrive(double dist) {
-
     // Update: No attention should be paid to 'speed'
-
     // Just drive and slow down when we get slow to the target
-
     ElapsedTime tm = new ElapsedTime();
-
     double curDistance = leftDistance();
 
     fastSyncTurn(0, 2);
 
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
-
       telemetry.addData("Current Distance", curDistance);
-
       telemetry.update();
-
       double dir = (dist < curDistance) ? -1 : 1;
-
       double magnitude = Math.abs(dist - curDistance);
-
       if (magnitude < SNAILDISTANCE) {
-
         speedSnail();
-
       } else if (magnitude < TURBODISTANCE) {
-
         speedNormal();
-
       } else {
-
         speedTurbo();
-
       }
 
       double heading = gyroHeading();
-
       //double turn = (heading < 0) ? .5 : -.5;
-
       //Direction rotation = new Direction((Math.abs(heading) > 175) ? turn : 0, 0);
-
       joystickDrive(new Direction(dir, 0), Direction.None, heading);
-
       curDistance = leftDistance();
-
       sleep(10);
-
     }
 
     driveTrain.stop();
-
     speedNormal();
-
   }
 
   public void fastRightDrive(double dist) {
@@ -790,7 +723,9 @@ public class TTRobot implements IRobot {
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rightDistance();
+
     fastSyncTurn(0, 2);
+
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
