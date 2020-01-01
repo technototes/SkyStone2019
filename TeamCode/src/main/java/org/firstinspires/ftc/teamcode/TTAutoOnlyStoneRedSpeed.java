@@ -110,9 +110,7 @@
             robot.setLinearSlideDirection(LinearSlideOperation.Extend, true);
             //robot.fastRearDrive(20);
             //sleep(1300);
-
             break;
-
           case GOTOBLOCK1:
             telemetry.addData("state", currentState.toString());
             robot.fastLeftDrive(90);

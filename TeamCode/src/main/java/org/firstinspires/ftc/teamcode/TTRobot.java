@@ -362,7 +362,7 @@ public class TTRobot implements IRobot {
   public double frontDistance() {
     return sensorRangeFront.getDistance(DistanceUnit.CM);
   }
-  
+
   public double rearDistance() {
     return sensorRangeRear.getDistance(DistanceUnit.CM);
   }
@@ -685,6 +685,8 @@ public class TTRobot implements IRobot {
     speedNormal();
   }
 
+
+
   public void fastLeftDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
@@ -723,9 +725,7 @@ public class TTRobot implements IRobot {
     // Just drive and slow down when we get slow to the target
     ElapsedTime tm = new ElapsedTime();
     double curDistance = rightDistance();
-
     fastSyncTurn(0, 2);
-
     while (opMode.opModeIsActive() && Math.abs(curDistance - dist) > 4 && tm.time() < 3.0) {
       telemetry.addData("Current Distance", curDistance);
       telemetry.update();
