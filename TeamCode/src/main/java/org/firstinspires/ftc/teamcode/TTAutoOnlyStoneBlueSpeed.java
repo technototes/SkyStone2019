@@ -173,6 +173,7 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
         case PLACEBLOCK:
           robot.setClawPosition(ClawPosition.Open);
+          sleep(200);
           driveTime.reset();
           robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
           robot.fastRearDrive(85);
