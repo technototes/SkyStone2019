@@ -153,7 +153,7 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
         case GOTOBASEPLATE:
           robot.fastRearDrive(55);
-          robot.fastRightDrive(70);
+          robot.fastRightDrive(75);
           robot.fastSyncTurn(0, 1);
           robot.turnAndDrive(90, 0.5, -90);
           robot.turnAndDrive(0, 0.5, -90);
@@ -169,6 +169,7 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
         case PLACEBLOCK:
           robot.setClawPosition(ClawPosition.Open);
+          sleep(200);
           driveTime.reset();
           robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
           robot.fastRearDrive(85);
@@ -177,14 +178,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
             sleep(10);
           }
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-          robot.fastSyncTurn(180, 2);
-          robot.fastFrontDrive(90);
-          // robot.blockFlipper(FlipperPosition.Down);
-          // robot.fastFrontDrive(10);
-          // // robot.fastSyncTurn(0, 1);
-          // //robot.driveToLine(0.75, 90);
-          // //robot.stop();
-          currentState = AutoState.STOP;
+          robot.fastSyncTurn(0, 1);
+          //robot.driveToLine(0.75, 90);
+          //robot.stop();
+          currentState = AutoState.GOTOLINE;
           break;
         case MOVEBASEPLATE:
           robot.fastRearDrive(70);

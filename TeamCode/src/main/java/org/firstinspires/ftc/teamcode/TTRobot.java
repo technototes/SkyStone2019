@@ -35,7 +35,7 @@ public class TTRobot implements IRobot {
   private static final double LINEARSLIDEPOWER = 0.5;
 
   // Claw grab positions
-  private static final double CLAWOPENPOSITION = 0.5;
+  private static final double CLAWOPENPOSITION = 0.7;
   private static final double CLAWCLOSEPOSITION = 0;
 
   // Block flipper / baseplate grabber positions
@@ -570,7 +570,9 @@ public class TTRobot implements IRobot {
   public void setTurningSpeed(double angleDelta) {
     if (Math.abs(angleDelta) < 35) {
       speedSnail();
-    } else {
+    } else if (Math.abs(angleDelta) > 130) {
+      speedTurbo();
+    }else{
       speedNormal();
     }
   }
