@@ -613,9 +613,9 @@ public class TTRobot implements IRobot {
       }
     }
     driveTrain.stop();
-    fastSyncTurn(angle, 1);
-
+    //fastSyncTurn(angle, 1);
   }
+
 
   // This will travel toward the rear until it gets to 'dist'
   public void fastRearDrive(double dist) {
@@ -762,6 +762,7 @@ public class TTRobot implements IRobot {
     double rDist, lDist;
     ElapsedTime tm = new ElapsedTime();
     fastSyncTurn(0, 2);
+    double magnitude;
     do {
 
       // Let's figure out what angle to drive toward to make a straightish line
@@ -770,7 +771,7 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = (Math.abs(rearDist - rDist)+Math.abs(leftDist - lDist))/2;
+      magnitude = (Math.abs(rearDist - rDist)+Math.abs(leftDist - lDist))/2;
       if (magnitude < SNAILDISTANCE) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
@@ -796,7 +797,7 @@ public class TTRobot implements IRobot {
       telemetry.addData("ldist ", lDist);
       telemetry.update();
 
-    } while ((rDist > rearDist|| lDist > leftDist) && tm.time() < 10.0 && opMode.opModeIsActive());
+    } while (magnitude > 3 && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -805,6 +806,7 @@ public class TTRobot implements IRobot {
     double rDist, rtDist;
     ElapsedTime tm = new ElapsedTime();
     fastSyncTurn(0, 2);
+    double magnitude;
     do {
       // Let's figure out what angle to drive toward to make a straightish line
       // TODO: I have no idea if this is the proper angle or not
@@ -812,7 +814,7 @@ public class TTRobot implements IRobot {
       rDist = getCappedRange(sensorRangeRear, 1500);
       rtDist = getCappedRange(sensorRangeRight, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
-      double magnitude = (Math.abs(rearDist - rDist)+Math.abs(rightDist - rDist))/2;
+      magnitude = (Math.abs(rearDist - rDist)+Math.abs(rightDist - rDist))/2;
       if (magnitude < SNAILDISTANCE) {
         speedSnail();
       } else if (magnitude < TURBODISTANCE) {
@@ -837,8 +839,8 @@ public class TTRobot implements IRobot {
       telemetry.addData("rtdist ", rtDist);
       telemetry.update();
 
-    } while ((rDist > rearDist || rtDist > rightDist) && tm.time() < 10.0 && opMode.opModeIsActive());
-    fastSyncTurn(0, 2);
+    } while(magnitude > 3 && tm.time() < 10.0 && opMode.opModeIsActive());
+    //fastSyncTurn(0, 2);
     driveTrain.stop();
   }
 

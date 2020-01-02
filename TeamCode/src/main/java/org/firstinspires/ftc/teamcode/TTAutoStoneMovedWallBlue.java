@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 //Test
+@Disabled
 @Autonomous(name = "TTAutoStoneMovedWallBlue", group = "TT")
 public class TTAutoStoneMovedWallBlue extends LinearOpMode {
 
