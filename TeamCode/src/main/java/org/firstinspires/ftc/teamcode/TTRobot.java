@@ -797,7 +797,7 @@ public class TTRobot implements IRobot {
       telemetry.addData("ldist ", lDist);
       telemetry.update();
 
-    } while (magnitude > 3 && tm.time() < 10.0 && opMode.opModeIsActive());
+    } while (magnitude > 5 && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -839,7 +839,7 @@ public class TTRobot implements IRobot {
       telemetry.addData("rtdist ", rtDist);
       telemetry.update();
 
-    } while(magnitude > 3 && tm.time() < 10.0 && opMode.opModeIsActive());
+    } while(magnitude > 5 && tm.time() < 10.0 && opMode.opModeIsActive());
     //fastSyncTurn(0, 2);
     driveTrain.stop();
   }

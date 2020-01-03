@@ -19,17 +19,30 @@ public class LiftControl {
   // How many ticks should we be within for 'zero'
   private static int ZERO_TICK_RANGE = 150;
 
+  // How many ticks should we be within for the upper limit
+  private static final int UPPER_TICK_RANGE = 150;
+
   // How many ticks should we be within for a given height
   private static int POSITION_TICK_RANGE = 75;
 
-  DcMotor left;
-  DcMotor right;
+  // Maximum height in bricks, to avoid damaging robot
+  public static final int MAX_BRICK_HEIGHT = 5;
 
-  int lZero;
-  int rZero;
+  // Maximum height in 'ticks', to avoid damaging robot
+  private static final int MAX_HEIGHT = PLACE_HEIGHT_OFFSET + BASE_PLATE_HEIGHT + (MAX_BRICK_HEIGHT * BRICK_HEIGHT);
+
+  // Power value to move the lifts up and down
+  private static final double LIFT_UP_POWER = -1.0;
+  private static final double LIFT_DOWN_POWER = 1.0;
+
+  private final DcMotor left;
+  private final DcMotor right;
+
+  private int lZero;
+  private int rZero;
 
   // to check opModeIsActive()...
-  private LinearOpMode opMode;
+  private final LinearOpMode opMode;
 
   public LiftControl(LinearOpMode op, DcMotor leftMotor, DcMotor rightMotor) {
     opMode = op;
@@ -52,16 +65,23 @@ public class LiftControl {
   }
 
   public void up() {
-    setLiftPower(-1.0);
+    if (atUpperLimit()) {
+      setLiftPower(0);
+    } else {
+      setLiftPower(LIFT_UP_POWER);
+    }
   }
 
   public void down() {
-    if (!atLowerLimit())
-      setLiftPower(1.0);
+    if (atLowerLimit()) {
+      setLiftPower(0);
+    } else {
+      setLiftPower(LIFT_DOWN_POWER);
+    }
   }
 
   public void overrideDown() {
-    setLiftPower(1.0);
+    setLiftPower(LIFT_DOWN_POWER);
   }
 
   public void stop() {
@@ -73,6 +93,13 @@ public class LiftControl {
   public boolean atLowerLimit() {
     return BothInRange(0, ZERO_TICK_RANGE) || LeftPos() < 0 || RightPos() < 0;
   }
+
+  // This is a little more paranoid that 'In the top end of the range'
+  // to try to prevent more lift axle carnage...
+  public boolean atUpperLimit() {
+    return BothInRange(MAX_HEIGHT, UPPER_TICK_RANGE) || (LeftPos() > MAX_HEIGHT) || (RightPos() > MAX_HEIGHT);
+  }
+
   // Crash recovery here
   public void ResetZero() {
     lZero = left.getCurrentPosition();
@@ -123,6 +150,7 @@ public class LiftControl {
 
   // Lift a brick to 'positioning' height (0: baseplate placing height, 1: bp+1, etc...)
   public boolean LiftBrick(int brickHeight) {
+    brickHeight = Math.max(0, Math.min(brickHeight, MAX_BRICK_HEIGHT));
     return GoToPosition(brickHeight * BRICK_HEIGHT + BASE_PLATE_HEIGHT);
   }
 

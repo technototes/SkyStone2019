@@ -99,6 +99,7 @@ public class DirectControl extends LinearOpMode {
         } else {
           robot.lift.stop();
           robot.lift.ResetZero();
+          curBrickHeight = -1;
           liftOverrideDownEnabled = false;
         }
       } else {
@@ -106,6 +107,7 @@ public class DirectControl extends LinearOpMode {
         if (liftOverrideDownEnabled) {
           robot.lift.stop();
           robot.lift.ResetZero();
+          curBrickHeight = -1;
           liftOverrideDownEnabled = false;
         }
 
@@ -116,7 +118,7 @@ public class DirectControl extends LinearOpMode {
         // B for 'grab a brick'
         if (control.buttonA().isPressed()) {
           robot.lift.SetBrickWait();
-        } else if (control.buttonY().isPressed()) {
+        } else if (control.buttonY().isPressed() && curBrickHeight < LiftControl.MAX_BRICK_HEIGHT) {
           robot.lift.LiftBrickWait(++curBrickHeight);
         } else if (control.buttonX().isPressed() && curBrickHeight > 0) {
           robot.lift.LiftBrickWait(--curBrickHeight);

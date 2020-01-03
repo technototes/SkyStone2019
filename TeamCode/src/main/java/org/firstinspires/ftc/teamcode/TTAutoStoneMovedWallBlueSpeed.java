@@ -144,7 +144,7 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
         case GRABBLOCK:
           telemetry.addData("state", currentState.toString());
           //stop();
-          while (driveTime.seconds() < 1) {
+          while (driveTime.seconds() < 1.3) {
             sleep(100);
           }
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
@@ -156,19 +156,20 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           currentState = AutoState.GOTOBASEPLATE;
           break;
         case GOTOBASEPLATE:
-          //robot.fastRearDrive(55);
-          //robot.fastRightDrive(75);
-          robot.fastRearDrive(70);
-          robot.distRearRightDrive(1, 55, 75);
-          robot.fastSyncTurn(0, 1);
-          robot.turnAndDrive(80, 0.5, -90);
+          robot.fastRearDrive(60);
+          robot.fastRightDrive(80);
+          robot.fastSyncTurn(90, 2);
+          //robot.fastRearDrive(70);
+          //robot.distRearRightDrive(1, 55, 75);
+          //robot.turnAndDrive(80, 0.5, -90);
+          robot.driveToLine(0.75, -90);
           robot.turnAndDrive(0, 0.5, -90);
           sleep(100);
           //robot.distRearRightDrive(1, 70, 100);
           robot.fastSyncTurn(0, 1);
-          robot.distRearLeftDrive(1, 90, 65);
-          //robot.fastLeftDrive(65);
-          //robot.timeDrive(0.5, 0.5, 0);
+          //robot.distRearLeftDrive(1, 90, 65);
+          robot.fastLeftDrive(65);
+          robot.timeDrive(0.7, 0.4, 0);
           currentState = AutoState.PLACEBLOCK;
           break;
         case PLACEBLOCK:
@@ -181,16 +182,17 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           currentState = AutoState.MOVEBASEPLATE;
           break;
         case MOVEBASEPLATE:
-          robot.distRearLeftDrive(1, 80, 45);
-          robot.fastSyncTurn(173, 4);
-          robot.timeDrive(0.5, 0.4, 0);
+          robot.distRearLeftDrive(1, 80, 40);
+          robot.fastSyncTurn(170, 4);
+          robot.timeDrive(0.5, 0.7, 0);
           robot.blockFlipper(FlipperPosition.Down);
-          robot.timeDrive(0.3, 0.25, 180);
+          robot.timeDrive(0.3, 0.1, 180);
+          robot.timeDrive(0.6, 0.1, 180);
           sleep(200);
           //robot.fastSyncTurn(135, 2);
           //robot.timeDrive(0.75, 0.5, 135);
           //robot.fastSyncTurn(90, 2);
-          robot.timeDrive(0.4, 0.5, 180);
+          robot.timeDrive(0.5, 0.7, 180);
           robot.turnAndDrive(90, 0.4, 120);
           robot.blockFlipper(FlipperPosition.Up);
           //robot.fastLeftDrive(70);
@@ -208,13 +210,14 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
               break;
           }
 
-          robot.timeDrive(0.5, 0.2, 0);
+          robot.timeDrive(0.5, 0.4, 0);
           //robot.timeDrive(1, 2, -90);
           robot.lift.AcquireBrickWait();
           //robot.timeDrive(0.5, 0.2, 180);
           robot.driveToLine(0.75, 90);
           robot.turnAndDrive(0, 0.5, 90);
-          robot.distRearRightDrive(1, 60, 30);
+          robot.fastRightDrive(15);
+          //robot.distRearRightDrive(1, 60, 30);
           break;
         case GOTOBLOCK4:
           robot.distRearRightDrive(1, 85, 25);
@@ -244,13 +247,13 @@ public class TTAutoStoneMovedWallBlueSpeed extends LinearOpMode {
           currentState = AutoState.GOTOMOVEDBASEPLATE;
           break;
         case GOTOMOVEDBASEPLATE:
-          robot.fastRearDrive(70);
-          //robot.fastRearDrive(55);
-          //robot.fastRightDrive(20);
-          robot.distRearRightDrive(1, 55, 20);
+          //robot.fastRearDrive(70);
+          robot.fastRearDrive(65);
+          robot.fastRightDrive(20);
+          //robot.distRearRightDrive(1, 55, 20);
           robot.fastSyncTurn(0, 1);
           robot.turnAndDrive(-90, 0.5, -90);
-          robot.timeDrive(0.75, 2, -90);
+          robot.timeDrive(0.75, 2, -80);
           currentState = AutoState.PLACEBLOCK2;
           break;
         case PLACEBLOCK2:

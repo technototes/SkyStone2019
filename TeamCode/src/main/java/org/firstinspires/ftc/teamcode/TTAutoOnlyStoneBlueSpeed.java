@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //DOCUMENTED FOR ENG NOTEBOOK
 
 //AUTONOMOUS TO GRAB ONE SKYSTONE ON BLUE SIDE, PLACE IT ON THE BASEPLATE, AND PARK ON THE CENTER LINE.
-//WORTH ?? POINTS zx
+//WORTH ?? POINTS
 
 //Name as appears in Driver Station Autonomous menu
 @Autonomous(name = "TTAutoOnlyStoneBlueSpeed", group = "TT")
@@ -63,10 +63,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
     //main loop
     while (opModeIsActive()) {
       telemetry.addData("Status", "Run Time: " + runtime.toString());
+      telemetry.addData("state", currentState.toString());
       switch (currentState) {
         case INITIALIZE:
           if (opModeIsActive()) {
-            telemetry.addData("state", currentState.toString());
             runtime.reset();
 
             //choose how to grab skystone
@@ -90,17 +90,15 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
 
         //funtions to drive to different stones depending on configuration
         case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(85);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
+          //robot.distRearRightDrive(1, 90, 70);
           robot.fastRightDrive(58);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(40);
           robot.fastRightDrive(40);
           currentState = AutoState.GRABBLOCK;
@@ -160,6 +158,9 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           //stop robot
           stop();
       }
+
+      telemetry.addLine("Dist (R, F, L, R): " + robot.rearDistance() + ", " + robot.frontDistance() + ", " + robot.leftDistance() + ", " + robot.rightDistance());
+      telemetry.update();
     }
   }
 }

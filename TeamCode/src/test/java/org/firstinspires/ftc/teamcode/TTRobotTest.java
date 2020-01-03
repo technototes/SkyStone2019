@@ -104,7 +104,7 @@ public class TTRobotTest {
 
   @Test
   public void setClawPosition() {
-    final double open = 1;
+    final double open = 0.7;
     final double closed = 0;
 
     ttRobot.setClawPosition(ClawPosition.Open);
