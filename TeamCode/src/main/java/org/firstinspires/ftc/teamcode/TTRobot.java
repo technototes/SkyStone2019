@@ -586,10 +586,10 @@ public class TTRobot implements IRobot {
     while (opMode.opModeIsActive() &&
       runTime.seconds() < time &&
       Math.abs(gyroHeading2() - angle) > 4) {
-      if (gyroHeading2() > angle + 4) {
+      if (gyroHeading2() > angle + 2) {
         setTurningSpeed(gyroHeading2() - angle);
         joystickDrive(Direction.None, new Direction(-0.7, 0), gyroHeading2());
-      } else if (gyroHeading2() < angle - 4) {
+      } else if (gyroHeading2() < angle - 2) {
         setTurningSpeed(angle - gyroHeading2());
         joystickDrive(Direction.None, new Direction(0.7, 0), gyroHeading2());
       }
@@ -797,7 +797,7 @@ public class TTRobot implements IRobot {
       telemetry.addData("ldist ", lDist);
       telemetry.update();
 
-    } while (magnitude > 5 && tm.time() < 10.0 && opMode.opModeIsActive());
+    } while (magnitude > 7 && tm.time() < 10.0 && opMode.opModeIsActive());
     driveTrain.stop();
   }
 
@@ -839,7 +839,7 @@ public class TTRobot implements IRobot {
       telemetry.addData("rtdist ", rtDist);
       telemetry.update();
 
-    } while(magnitude > 5 && tm.time() < 10.0 && opMode.opModeIsActive());
+    } while(magnitude > 7 && tm.time() < 10.0 && opMode.opModeIsActive());
     //fastSyncTurn(0, 2);
     driveTrain.stop();
   }
