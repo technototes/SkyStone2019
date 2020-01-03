@@ -865,6 +865,20 @@ public class TTRobot implements IRobot {
     driveTrain.timeDrive(speed, time, angle, gyroHeading());
   }
 
+  // Given a target angle & a current angle,
+  // returns the direction & magnitude to turn to get to the target angle
+  // This normalizes "I'm currently at 175, I need to go to -175"
+  public static double goToAngle(double target, double current) {
+    double delta = (target % 360) - (current % 360.0);
+    if (delta > 180) {
+      return delta - 360;
+    } else if (delta < -180) {
+      return 360 + delta;
+    } else {
+      return delta;
+    }
+  }
+
   public void initGyro() {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     imu.initialize(parameters);
