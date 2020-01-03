@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +21,7 @@ class LiftControlTest {
   private static final double DOWN_POWER = 0.5;
   private static final double UP_POWER = -1.0;
   private static final int BRICK_HEIGHT = 1200;
-  private static final int BASE_PLATE_HEIGHT = 400;
+  private static final int BASE_PLATE_HEIGHT = 800;
 
   @BeforeEach
   void setUp() {
@@ -55,6 +56,21 @@ class LiftControlTest {
   }
 
   @Test
+  void upAndStopsAtMax() {
+    mockRobot.setLiftPositions(2000, 2000);
+    liftControl.up();
+    assertEquals(UP_POWER, mockRobot.lLiftPower);
+    assertEquals(UP_POWER, mockRobot.rLiftPower);
+
+    // move motors to near maximum position and up is requested again
+    mockRobot.setLiftPositions(6850, 6860);
+    liftControl.up();
+
+    // Motors should be stopped
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
+  }
+
   void upAndAutoStop() throws InterruptedException {
     liftControl.up();
     assertEquals(UP_POWER, mockRobot.lLiftPower);
@@ -84,6 +100,23 @@ class LiftControlTest {
   }
 
   @Test
+  void downStopsAtZero() {
+    // Pretend the motors are above zero
+    mockRobot.setLiftPositions(500, 500);
+
+    liftControl.down();
+    assertEquals(DOWN_POWER, mockRobot.lLiftPower);
+    assertEquals(DOWN_POWER, mockRobot.rLiftPower);
+
+    // Pretend the motors are near zero and down is requested again
+    mockRobot.setLiftPositions(10, 15);
+    liftControl.down();
+
+    // Motors should be stopped
+    assertEquals(0.0, mockRobot.lLiftPower);
+    assertEquals(0.0, mockRobot.rLiftPower);
+  }
+
   void downAndAutoStop() throws InterruptedException {
     // Pretend the motors are above zero
     mockRobot.setLiftPositions(500, 500);
@@ -221,7 +254,7 @@ class LiftControlTest {
 
     double msDuration = runTime.milliseconds();
     assertTrue(msDuration < 120, "msDuration (" + msDuration + ") less than 120");
-    assertTrue(msDuration >= 95, "msDuration (" + msDuration + ") greater or equal to 95");
+    assertTrue(msDuration >= 90, "msDuration (" + msDuration + ") greater or equal to 90");
 
     assertEquals(0.0, mockRobot.lLiftPower);
     assertEquals(0.0, mockRobot.rLiftPower);

@@ -79,10 +79,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
     while (opModeIsActive()) {
 
       telemetry.addData("Status", "Run Time: " + runtime.toString());
+      telemetry.addData("state", currentState.toString());
       switch (currentState) {
         case INITIALIZE:
           if (opModeIsActive()) {
-            telemetry.addData("state", currentState.toString());
             runtime.reset();
                 /*
                 if (skystonepos.equals(SkyStonePos.UNKNOWN) && tfod != null) {
@@ -116,7 +116,6 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
 
         case GOTOBLOCK1:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(85);
           //robot.fastRearDrive(90);
           //robot.distRearRightDrive(1, 90, 95);
@@ -124,14 +123,13 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK2:
-          telemetry.addData("state", currentState.toString());
           //robot.distRearRightDrive(1, 90, 70);
+          robot.fastRightDrive(58);
           //robot.fastRearDrive(90);
           //robot.fastSyncTurn(0, 2);
           currentState = AutoState.GRABBLOCK;
           break;
         case GOTOBLOCK3:
-          telemetry.addData("state", currentState.toString());
           robot.fastRightDrive(40);
           robot.fastRightDrive(40);
           //robot.fastRearDrive(90);
@@ -140,13 +138,12 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.GRABBLOCK;
           break;
         case GRABBLOCK:
-          telemetry.addData("state", currentState.toString());
           //stop();
           while(driveTime.seconds() < 1.3){
             sleep(10);
           }
           robot.setLinearSlideDirection(LinearSlideOperation.None, false);
-          robot.fastRearDrive(90);
+          robot.fastRearDrive(82);
 
           robot.fastSyncTurn(0, 1);
           robot.setClawPosition(ClawPosition.Close);
@@ -155,16 +152,16 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.GOTOBASEPLATE;
           break;
         case GOTOBASEPLATE:
-          robot.distRearRightDrive(1, 65, 80);
-          //robot.fastRearDrive(65);
-          //robot.fastRightDrive(80);
+          robot.fastRearDrive(55);
+          robot.fastRightDrive(75);
+          robot.fastSyncTurn(0, 1);
           robot.turnAndDrive(90, 0.5, -90);
           robot.turnAndDrive(0, 0.5, -90);
           sleep(100);
           //robot.distRearRightDrive(1, 70, 100);
           robot.fastSyncTurn(0, 1);
           //robot.distRearLeftDrive(1, 90, 40);
-          //robot.fastLeftDrive(40);
+          robot.fastLeftDrive(40);
           //robot.fastRearDrive(90);
           robot.timeDrive(0.5, 0.7, 0);
           //robot.distRearLeftDrive(1, 100, 40);
@@ -172,9 +169,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
         case PLACEBLOCK:
           robot.setClawPosition(ClawPosition.Open);
+          sleep(200);
           driveTime.reset();
           robot.setLinearSlideDirection(LinearSlideOperation.Retract, false);
-          robot.fastRearDrive(90);
+          robot.fastRearDrive(85);
           //robot.distRearLeftDrive(1, 70, 100);
           while(driveTime.seconds() < 1.1){
             sleep(10);
@@ -265,6 +263,9 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
         case STOP:
           stop();
       }
+
+      telemetry.addLine("Dist (R, F, L, R): " + robot.rearDistance() + ", " + robot.frontDistance() + ", " + robot.leftDistance() + ", " + robot.rightDistance());
+      telemetry.update();
     }
   }
 }

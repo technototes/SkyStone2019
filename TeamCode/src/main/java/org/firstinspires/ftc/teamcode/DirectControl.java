@@ -104,6 +104,7 @@ public class DirectControl extends LinearOpMode {
         } else {
           robot.lift.stop();
           robot.lift.ResetZero();
+          curBrickHeight = -1;
           liftOverrideDownEnabled = false;
         }
       } else {
@@ -111,6 +112,7 @@ public class DirectControl extends LinearOpMode {
         if (liftOverrideDownEnabled) {
           robot.lift.stop();
           robot.lift.ResetZero();
+          curBrickHeight = -1;
           liftOverrideDownEnabled = false;
         }
 

@@ -14,7 +14,7 @@ public class LiftControl {
   private static final int BRICK_HEIGHT = 1200;
 
   // This is how high the base plate is (to get *over* it while holding a brick)
-  private static final int BASE_PLATE_HEIGHT = 400;
+  private static int BASE_PLATE_HEIGHT = 800;
 
   // This is the height offset for placing a brick
   private static final int PLACE_HEIGHT_OFFSET = 100;
@@ -48,7 +48,7 @@ public class LiftControl {
   private int rZero;
 
   // to check opModeIsActive()...
-  private LinearOpMode opMode;
+  private final LinearOpMode opMode;
 
   private SingleCommandExecutor commandExecutor;
   private SingleCommandDelayedExecutor watchdogExecutor;
@@ -252,7 +252,8 @@ public class LiftControl {
   }
 
   // Lift a brick to 'positioning' height (0: baseplate placing height, 1: bp+1, etc...)
-  private boolean LiftBrick(int brickHeight) {
+  public boolean LiftBrick(int brickHeight) {
+    brickHeight = Math.max(0, Math.min(brickHeight, MAX_BRICK_HEIGHT));
     return GoToPosition(brickHeight * BRICK_HEIGHT + BASE_PLATE_HEIGHT);
   }
 
