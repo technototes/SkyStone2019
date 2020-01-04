@@ -182,6 +182,7 @@ public class TTRobot implements IRobot {
     }
   }
 
+  //Linear slide stuff:
   private LinearSlidePosition currentPos = LinearSlidePosition.In;
 
   public void setLinearSlideDirection(LinearSlideOperation operation, boolean override) {
@@ -273,6 +274,7 @@ public class TTRobot implements IRobot {
   }
   private CurrentClawPosition curPos = CurrentClawPosition.CENTER;
 
+  //rotate claw
   public void rotateClaw(boolean increment) {
     if(curPos == CurrentClawPosition.CENTER){
       if(increment){
@@ -297,6 +299,7 @@ public class TTRobot implements IRobot {
     //telemetry.update();
   }
 
+  //open or close claw
   public void setClawPosition(ClawPosition position) {
     switch (position) {
       case Open:
@@ -316,6 +319,7 @@ public class TTRobot implements IRobot {
     Below
   }
 
+  //block flipper+baseplate grabber
   public void blockFlipper(FlipperPosition pos) {
     switch (pos) {
       case Down:
@@ -328,6 +332,7 @@ public class TTRobot implements IRobot {
     }
   }
 
+  //move capstone
   public void capstone(double speed) {
     cap.setPower(-speed);
   }
@@ -350,13 +355,6 @@ public class TTRobot implements IRobot {
     return -AngleUnit.DEGREES.fromUnit(angles1.angleUnit, angles1.firstAngle);
   }
 
-  void setServoDirection(Servo.Direction direction) {
-    turn.setDirection(direction);
-  }
-
-  void setServoPosition(double position) {
-    turn.setPosition(position);
-  }
 
   // Distance sensing
   public double frontDistance() {
@@ -445,6 +443,7 @@ public class TTRobot implements IRobot {
     return 0;
   }
 
+  //snap to angle
   private double scaledSnap(double targetAngle) {
     double angleMag = Math.abs(targetAngle);
     double motorMag = 0.0;
@@ -465,6 +464,7 @@ public class TTRobot implements IRobot {
     return motorMag;
   }
 
+  //STOP
   public void stop() {
     driveTrain.stop();
   }
@@ -475,6 +475,7 @@ public class TTRobot implements IRobot {
     telemetry.addData("control rstick X: ", j2.X);
   }
 
+  //drive for a time
   public void timeDrive(double speed, double time, double angle) {
 
     ElapsedTime runTime = new ElapsedTime();
@@ -483,90 +484,20 @@ public class TTRobot implements IRobot {
     }
   }
 
-  public void vectorDrive(double speed, double angle) {
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
-  }
-
+  //because it is in interface
+  @Override
   public void lineDrive(double speed, double time, double angle) {
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
-    ElapsedTime tm = new ElapsedTime();
-    int red, blue;
-    do {
-      sleep(10);
-      red = sensorColorBottom.red();
-      blue = sensorColorBottom.blue();
-    } while (tm.seconds() < time && !(Math.abs(red - blue) > 50) && opMode.opModeIsActive());
-    driveTrain.stop();
+
   }
 
+  //drive to line
   public void driveToLine(double speed, double direction) {
     lineDrive(speed, 5, direction);
   }
 
-  // This will travel toward the rear until it gets to 'dist'
-  public void distRearDrive(double speed, double dist) {
-    ElapsedTime tm = new ElapsedTime();
-    double curDistance = 0;
-    do {
-      curDistance = rearDistance();
-      telemetry.addData("Current Distance", curDistance);
-      telemetry.update();
-      double dir = (dist < curDistance) ? 1 : -1;
-      double speedMult = (Math.abs(dist - curDistance) > 10) ? 1.0 : 0.5;
-      driveTrain.setStickVector(XDrive.DriveSpeed.Normal, 0, dir * speed * speedMult, 0, gyroHeading());
-      sleep(10);
-    } while (Math.abs(curDistance - dist) > 2 && tm.time() < 3.0 && opMode.opModeIsActive());
-    driveTrain.stop();
-  }
-
-  public void syncTurn(double angle, double time) {
-
-    ElapsedTime runTime = new ElapsedTime();
-    runTime.reset();
-    while (runTime.seconds() < time && opMode.opModeIsActive()) {
-      if (gyroHeading2() > angle + 5) {
-        joystickDrive(Direction.None, new Direction(-0.5, 0), gyroHeading2());
-      } else if (gyroHeading2() < angle - 5) {
-        joystickDrive(Direction.None, new Direction(0.5, 0), gyroHeading2());
-      } else {
-        joystickDrive(Direction.None, new Direction(0, 0), gyroHeading2());
-        time = 0;
-      }
-      telemetry.addData("gyro:", gyroHeading());
-      telemetry.addData("gyro2:", gyroHeading2());
-      telemetry.update();
-    }
-    //new code
-    //._. ._.
-    // \_(0.0)_/
-
-  }
-
-  public void distLeftDrive(double speed, double angle, double leftDist) {
-    // TODO: Check this angle
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
-    ElapsedTime tm = new ElapsedTime();
-    do {
-      sleep(10);
-    } while (getCappedRange(sensorRangeLeft, 1500) > leftDist && tm.time() < 10.0 && opMode.opModeIsActive());
-    driveTrain.stop();
-  }
-
-  public void distRightDrive(double speed, double angle, double rightDist) {
-    // TODO: Check this angle
-    driveTrain.setDriveVector(speed, angle, gyroHeading());
-
-    ElapsedTime tm = new ElapsedTime();
-    tm.reset();
-    do {
-      sleep(10);
-    } while (Math.abs(getCappedRange(sensorRangeRight, 1500) - rightDist) > 2 && tm.seconds() < 5.0 && opMode.opModeIsActive());
-    driveTrain.stop();
-  }
-
   // Adaptive autonomous driving stuff:
 
-
+  //set turning speed
   public void setTurningSpeed(double angleDelta) {
     if (Math.abs(angleDelta) < 35) {
       speedSnail();
@@ -652,7 +583,7 @@ public class TTRobot implements IRobot {
     speedNormal();
   }
 
-// This will travel toward the front until it gets to 'dist'
+  // This will travel toward the front until it gets to 'dist'
   public void fastFrontDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
@@ -686,9 +617,7 @@ public class TTRobot implements IRobot {
     driveTrain.stop();
     speedNormal();
   }
-
-
-
+  // This will travel toward the left until it gets to 'dist'
   public void fastLeftDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
@@ -721,7 +650,7 @@ public class TTRobot implements IRobot {
     driveTrain.stop();
     speedNormal();
   }
-
+  // This will travel toward the right until it gets to 'dist'
   public void fastRightDrive(double dist) {
     // Update: No attention should be paid to 'speed'
     // Just drive and slow down when we get slow to the target
@@ -753,11 +682,7 @@ public class TTRobot implements IRobot {
     speedNormal();
   }
 
-  // This attempts to drive in a straight(ish) line toward a corner
-  // This will travel toward the rear until it gets to 'dist'
-
-
-  // This attempts to drive in a straight(ish) line toward a corner
+  // This attempts to drive in a straight(ish) line toward a corner to the left and rear
   public void distRearLeftDrive(double speed, double rearDist, double leftDist) {
     double rDist, lDist;
     ElapsedTime tm = new ElapsedTime();
@@ -765,9 +690,6 @@ public class TTRobot implements IRobot {
     double magnitude;
     do {
 
-      // Let's figure out what angle to drive toward to make a straightish line
-      // TODO: I have no idea if this is the proper angle or not
-      // TODO: Might need to do something like 90 - angle
       rDist = getCappedRange(sensorRangeRear, 1500);
       lDist = getCappedRange(sensorRangeLeft, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
@@ -801,16 +723,13 @@ public class TTRobot implements IRobot {
     driveTrain.stop();
   }
 
-  // This attempts to drive in a straight(ish) line toward a corner
+  // This attempts to drive in a straight(ish) line toward a corner to the right and rear
   public void distRearRightDrive(double speed, double rearDist, double rightDist) {
     double rDist, rtDist;
     ElapsedTime tm = new ElapsedTime();
     fastSyncTurn(0, 2);
     double magnitude;
     do {
-      // Let's figure out what angle to drive toward to make a straightish line
-      // TODO: I have no idea if this is the proper angle or not
-      // TODO: Might need to do something like 90 - angle
       rDist = getCappedRange(sensorRangeRear, 1500);
       rtDist = getCappedRange(sensorRangeRight, 1500);
       //double dir = (rearDist < rDist) ? -1 : 1;
@@ -844,26 +763,12 @@ public class TTRobot implements IRobot {
     driveTrain.stop();
   }
 
+  //get range with a cap
   private double getCappedRange(DistanceSensor sens, double cap) {
     double res = sens.getDistance(DistanceUnit.CM);
     return Range.clip(res, 0.01, cap);
   }
 
-  public void driveWallRear(double speed, double time, double angle, double distance) {
-    double gyroAngle = gyroHeading();
-
-    if (rearDistance() < distance && (angle < 180 && angle > 0)) {
-
-      gyroAngle = gyroHeading() + 3;
-    } else if (rearDistance() > distance && (angle > 180 && angle < 260)) {
-      gyroAngle = gyroHeading() - 3;
-    } else {
-      gyroAngle = gyroHeading();
-    }
-
-
-    driveTrain.timeDrive(speed, time, angle, gyroHeading());
-  }
 
   // Given a target angle & a current angle,
   // returns the direction & magnitude to turn to get to the target angle
