@@ -6,8 +6,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+//MAIN CONTROL FUNCTION
 @TeleOp(name = "Direct Control")
 public class DirectControl extends LinearOpMode {
+
+  //declare
   private static double FINEDRIVESPEED = 0.2;
   private TTRobot robot;
   private TTRobot robotForTest = null;
@@ -26,22 +29,24 @@ public class DirectControl extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    // If you want telemetry, include a name as a string
-    // If you don't want telemetry, pass a null:
     driver = new Controller(gamepad1, telemetry, "driver");
     control = new Controller(gamepad2, telemetry, "controller");
     robot = (robotForTest != null) ? robotForTest : new TTRobot(this, hardwareMap, telemetry);
     manualCtrl = new XDriveManualControl(robot, driver, control, telemetry);
 
-
+    //wait for play button pressed
     waitForStart();
+
+    //timers
     ElapsedTime sinceLastUsedGrabRotate = new ElapsedTime();
     ElapsedTime timeSinceStart = new ElapsedTime();
     ElapsedTime loopTime = new ElapsedTime();
 
+    //lift settings
     int curBrickHeight = -1;
     boolean liftOverrideDownEnabled = false;
 
+    //Main Loop
     while (opModeIsActive()) {
       loopTime.reset();
 
@@ -51,6 +56,7 @@ public class DirectControl extends LinearOpMode {
       } else if (control.ltrigger() > TRIGGERTHRESHOLD) {
         robot.setClawPosition(ClawPosition.Close); // Closed
       }
+
       // Grabber rotation
       final double grabRotationDebounceSecs = 0.25;
       if (sinceLastUsedGrabRotate.seconds() > grabRotationDebounceSecs) {
@@ -76,6 +82,7 @@ public class DirectControl extends LinearOpMode {
         robot.setLinearSlideDirectionRyan(LinearSlideOperation.None, !slideOverride);
       }
 
+      //block flipper/baseplate grabber
       Direction dcontrols = driver.dpad();
       if (dcontrols.isUp()) {
         robot.blockFlipper(FlipperPosition.Down);
@@ -83,6 +90,7 @@ public class DirectControl extends LinearOpMode {
         robot.blockFlipper(FlipperPosition.Up);
       }
 
+      //capstone holder
       if (dcontrols.isLeft()) {
         robot.capstone(-1);
       } else if (dcontrols.isRight()) {
@@ -91,6 +99,7 @@ public class DirectControl extends LinearOpMode {
         robot.capstone(0);
       }
 
+      //LIFT
       if ((control.ltrigger() > 0.8) && (control.rtrigger() > 0.8) &&
            control.rbump().isPressed() && control.lbump().isPressed()) {
         if (control.buttonX().isPressed()) {
@@ -128,10 +137,12 @@ public class DirectControl extends LinearOpMode {
         }
       }
 
+      //reset gyro
       if (driver.ltrigger() >  0.8 && driver.rtrigger() > 0.8 && driver.rbump().isPressed() && driver.lbump().isPressed()) {
         robot.initGyro();
       }
 
+      //telemetry
       telemetry.addData("Left trigger pos: ", driver.ltrigger());
       telemetry.addData("Right trigger pos: ", driver.rtrigger());
       // This is just steering

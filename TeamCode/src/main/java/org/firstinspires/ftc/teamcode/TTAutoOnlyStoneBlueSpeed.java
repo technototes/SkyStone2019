@@ -121,24 +121,13 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           break;
 
         case GOTOBASEPLATE:
-          //robot.fastRearDrive(65);
           robot.fastRearDrive(65);
-          //robot.fastRightDrive(80);
           robot.fastSyncTurn(90, 2);
-          //robot.fastRearDrive(70);
-          //robot.distRearRightDrive(1, 55, 75);
-          //robot.turnAndDrive(80, 0.5, -90);
           robot.driveToLine(0.75, -90);
           robot.turnAndDrive(0, 0.5, -90);
           sleep(100);
-          //robot.distRearRightDrive(1, 70, 100);
           robot.fastSyncTurn(0, 1);
-          //robot.distRearLeftDrive(1, 90, 65);
           robot.fastLeftDrive(15);
-          //robot.lift.up();
-          //robot.timeDrive(0.7, 0.2, 0);
-          //robot.lift.stop();
-          //robot.timeDrive(0.7, 0.3, 0);
           robot.lift.up();
           sleep(200);
           robot.lift.stop();
@@ -146,15 +135,15 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           currentState = AutoState.PLACEBLOCK;
           break;
         case PLACEBLOCK:
+          //place block
           robot.setClawPosition(ClawPosition.Open);
           sleep(500);
           driveTime.reset();
           robot.fastSyncTurn(0, 1);
-          //robot.driveToLine(0.75, 90);
-          //robot.stop();
           currentState = AutoState.MOVEBASEPLATE;
           break;
         case MOVEBASEPLATE:
+          //move baseplate
           robot.distRearLeftDrive(1, 80, 33);
           robot.fastSyncTurn(170, 4);
           robot.timeDrive(0.5, 0.5, 0);
@@ -162,17 +151,10 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           robot.timeDrive(0.3, 0.1, 180);
           robot.timeDrive(0.6, 0.1, 180);
           sleep(200);
-          //robot.fastSyncTurn(135, 2);
-          //robot.timeDrive(0.75, 0.5, 135);
-          //robot.fastSyncTurn(90, 2);
           robot.timeDrive(0.5, 0.7, 180);
           robot.turnAndDrive(90, 0.4, 120);
           robot.blockFlipper(FlipperPosition.Up);
-          //robot.fastLeftDrive(70);
-
-          //robot.timeDrive(0.5, 0.4, 0);
           robot.distRightDrive(0.5, 0, 60);
-          //robot.timeDrive(1, 2, -90);
           robot.lift.AcquireBrickWait();
           robot.timeDrive(0.75, 1, -90);
           robot.timeDrive(0.5, 0.5, 90);
@@ -193,7 +175,7 @@ public class TTAutoOnlyStoneBlueSpeed extends LinearOpMode {
           //stop robot
           stop();
       }
-
+      //telemetry
       telemetry.addLine("Dist (R, F, L, R): " + robot.rearDistance() + ", " + robot.frontDistance() + ", " + robot.leftDistance() + ", " + robot.rightDistance());
       telemetry.update();
     }

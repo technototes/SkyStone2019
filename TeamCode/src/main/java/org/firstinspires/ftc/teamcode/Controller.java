@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Controller {
+
+  //Controller components
   private Gamepad pad = null;
   private Telemetry telemetry = null;
   private String name = null;
@@ -14,6 +16,7 @@ public class Controller {
     name = nm;
   }
 
+  //Dpad
   Direction dpad() {
     float X = 0, Y = 0;
     if (pad.dpad_down) {
@@ -31,6 +34,7 @@ public class Controller {
     return getStick("d", X, Y);
   }
 
+  //Sticks
   public Direction lstick() {
     return getStick("l", pad.left_stick_x, pad.left_stick_y);
   }
@@ -46,6 +50,7 @@ public class Controller {
     return new Direction(X, Y);
   }
 
+  //triggers
   double ltrigger() {
     return (double) pad.left_trigger;
   }
@@ -54,6 +59,7 @@ public class Controller {
     return (double) pad.right_trigger;
   }
 
+  //bumpers
   Button lbump() {
     return toButton(pad.left_bumper);
   }
@@ -62,6 +68,7 @@ public class Controller {
     return toButton(pad.right_bumper);
   }
 
+  //Buttons
   Button back() {
     return toButton(pad.back);
   }

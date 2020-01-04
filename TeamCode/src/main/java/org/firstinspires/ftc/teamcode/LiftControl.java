@@ -64,6 +64,7 @@ public class LiftControl {
     rZero = right.getCurrentPosition();
   }
 
+  //functions
   public void up() {
     if (atUpperLimit()) {
       setLiftPower(0);

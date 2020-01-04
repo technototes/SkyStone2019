@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+//INTERFACE FOR ROBOT
 public interface IRobot {
   // This is the 'center' space on the controllers, used by the XDrive code, to not move the bot
   // Feel free to change it: The bigger it is, the more you have to push the sticks before the

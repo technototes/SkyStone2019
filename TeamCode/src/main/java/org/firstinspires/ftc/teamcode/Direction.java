@@ -9,13 +9,10 @@ public class Direction {
     X = x;
     Y = y;
   }
-  //straight up is zero
-  public Direction(double angle){
-
-  }
-
+  //empty direction
   public static Direction None = new Direction(0.0, 0.0);
 
+  //functions
   public boolean isOnlyRight() {
     return (Math.abs(Y) < .3) && (X < -.7);
   }
